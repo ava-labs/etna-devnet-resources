@@ -61,6 +61,6 @@ To run an AvalancheGo node connected to the Etna DevNet:
 
 ## Getting DevNet AVAX
 
-You can get 5 AVAX on the DevNet C-Chain from the public faucet here: [https://core.app/tools/testnet-faucet/?subnet=cdevnet&token=cdevnet].
+You can get 5 AVAX on the DevNet C-Chain from the public faucet [here](https://core.app/tools/testnet-faucet/?subnet=cdevnet&token=cdevnet).
 
 If you require more, please reach out to our team in the relevant Telegram/Slack channel.
