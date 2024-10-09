@@ -28,4 +28,4 @@ avalanche key list --devnet --endpoint https://etna.avax-dev.network --keys <KEY
 avalanche key list --devnet --endpoint https://etna.avax-dev.network --keys <KEYNAME>
 ```
 
-If you are just looking for a supply of P-Chain AVAX, ping Meaghan or Michael on Slack.
+If you require more AVAX than the faucet provides, reach out to our team on the relevant Telegram or Slack channel.
