@@ -6,13 +6,15 @@ This README and repository is a collection of various resources to help in inter
 
 ## Common Credentials
 
-RPC: [https://etna.avax-dev.network/ext/bc/C/rpc]
+```text
+RPC: https://etna.avax-dev.network/ext/bc/C/rpc
 Name: Etna C-Chain
 Chain ID: 43117
 Token: AVAX
-Explorer URL: [https://feat-etna-devnet.subnets.pages.dev/]
-Faucet: [https://core.app/tools/testnet-faucet/?subnet=cdevnet&token=cdevnet]
-Glacier Dev APIs: [https://glacier-api-dev.avax.network/api]
+Explorer URL: https://feat-etna-devnet.subnets.pages.dev/
+Faucet: https://core.app/tools/testnet-faucet/?subnet=cdevnet&token=cdevnet
+Glacier Dev APIs: https://glacier-api-dev.avax.network/api
+```
 
 ## Public RPCs
 
