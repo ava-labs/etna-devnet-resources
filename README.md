@@ -50,8 +50,17 @@ You can find the Postman Collection and an Example Environment in the [resources
 
 To run an AvalancheGo node connected to the Etna DevNet:
 
-- Ensure that you are using an AvalancheGo build from the `v1.12.0-initial-poc.5` tag or later.
-- Specify the `network-id`, `bootstrap-ids`, `bootstrap-ips`, `genesis-file-content`, and `upgrade-file-content` below. These can also be provided via configuration files if desired.
+1. Ensure that you are using an AvalancheGo build from the `v1.12.0-initial-poc.5` tag or later.
+
+```zsh
+➜  avalanchego git:(master) git pull
+➜  avalanchego git:(master) git checkout v1.12.0-initial-poc.5
+➜  avalanchego git:(v1.12.0-initial-poc.5) ./scripts/build.sh
+```
+
+For more info on the setup required to run a Node, see this [tutorial](https://docs.avax.network/nodes/run-a-node/manually).
+
+2. Specify the `network-id`, `bootstrap-ids`, `bootstrap-ips`, `genesis-file-content`, and `upgrade-file-content` below. These can also be provided via configuration files if desired.
 
 ```zsh
 ./build/avalanchego \
