@@ -55,6 +55,7 @@ To run an AvalancheGo node connected to the Etna DevNet:
 ```zsh
 ➜  avalanchego git:(master) git pull
 ➜  avalanchego git:(master) git checkout v1.12.0-initial-poc.5
+➜  avalanchego git:(v1.12.0-initial-poc.5) ./scripts/build.sh
 ```
 
 For more info on the setup required to run a Node, see this [tutorial](https://docs.avax.network/nodes/run-a-node/manually).
