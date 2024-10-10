@@ -15,7 +15,7 @@ Faucet: https://core.app/tools/testnet-faucet/?subnet=cdevnet&token=cdevnet
 Glacier Dev APIs: https://glacier-api-dev.avax.network/api
 ```
 
-[Devnet Explorer](https://2ffd1590.etna-83w.pages.dev/p-chain/tx/2RPj2k6iVvQMtzfjkvRTJDwq51wbhWcb8saTpHAtaj7N85Yhox)
+[Devnet Explorer](https://2ffd1590.etna-83w.pages.dev/)
 
 ## Public RPCs
 
