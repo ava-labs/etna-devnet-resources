@@ -11,10 +11,11 @@ RPC: https://etna.avax-dev.network/ext/bc/C/rpc
 Name: Etna C-Chain
 Chain ID: 43117
 Token: AVAX
-Explorer URL: https://feat-etna-devnet.subnets.pages.dev/
 Faucet: https://core.app/tools/testnet-faucet/?subnet=cdevnet&token=cdevnet
 Glacier Dev APIs: https://glacier-api-dev.avax.network/api
 ```
+
+[Devnet Explorer](https://2ffd1590.etna-83w.pages.dev/p-chain/tx/2RPj2k6iVvQMtzfjkvRTJDwq51wbhWcb8saTpHAtaj7N85Yhox)
 
 ## Public RPCs
 
