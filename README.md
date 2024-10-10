@@ -87,7 +87,7 @@ Inside `wallet/subnet/primary/examples` [folder](https://github.com/ava-labs/ava
 
 `go run wallet/subnet/primary/examples/create-subnet/main.go`
 
-`go run go run wallet/subnet/primary/examples/create-chain/main.go`
+`go run wallet/subnet/primary/examples/create-chain/main.go`
 
 `go run wallet/subnet/primary/examples/convert-subnet/main.go`
 
