@@ -8,7 +8,7 @@ It uses the [Avalanche CLI](https://github.com/ava-labs/avalanche-cli) to provis
 1. Authenticate with the AWS account that you will use to create the infrastructure, and note the profile name to be used in `~/.aws/config`.
 2. Clone the [`avalanche-cli`](https://github.com/ava-labs/avalanche-cli) repo, and checkout the ACP-77 branch. 
 3. Build the CLI by running `./scripts/build.sh`. For ease of use, you can move the `bin/avalanche` binary into a directory in your `PATH`, such as `/usr/local/bin`. 
-4. Run `avalanche node create <NODE_NAME> --use-ssh-agent --aws --aws-profile <AWS_PROFILE_NAME>` to create your own personal DevNet running AvalancheGo.
+4. Run `avalanche node create <NODE_NAME> --use-ssh-agent --aws --aws-profile <AWS_PROFILE_NAME> --use-static-ip=false` to create your own personal DevNet running AvalancheGo.
     * This by default expects you to use a Yubikey to access the provisioned nodes.
     * Select `Devnet`
     * Use the custom AvalancheGo version of `v1.12.0-initial-poc.5`
