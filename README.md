@@ -13,6 +13,7 @@ Chain ID: 43117
 Token: AVAX
 Faucet: https://core.app/tools/testnet-faucet/?subnet=cdevnet&token=cdevnet
 Glacier Dev APIs: https://glacier-api-dev.avax.network/api
+NetworkID: 76
 ```
 
 [Devnet Explorer](https://2ffd1590.etna-83w.pages.dev/)
