@@ -18,9 +18,9 @@ avalanche key list --devnet --endpoint https://etna.avax-dev.network --keys <KEY
 
 5. Rename `example.env` file to `.env`, and populate with your keys. All non-EVM addresses should be prepended with `P-custom`. Save the file.
 
-6.Run `yarn install` in your terminal.
+6. Run `yarn install` in your terminal.
 
-7.Run `yarn run export-c` in your terminal.
+7. Run `yarn run export-c` in your terminal.
 
 9. Run `yarn run import-p` in your terminal.
 
