@@ -11,7 +11,7 @@ mkdir -p $GOPATH/src/github.com/ava-labs
 cd $GOPATH/src/github.com/ava-labs
 git clone https://github.com/ava-labs/avalanchego.git
 cd $GOPATH/src/github.com/ava-labs/avalanchego
-git checkout v.12.0-initial-poc.5
+git checkout v1.12.0-initial-poc.5
 ./scripts/build.sh
 ```
 
