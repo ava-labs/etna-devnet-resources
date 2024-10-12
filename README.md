@@ -82,7 +82,7 @@ If you require more, please reach out to our team in the relevant Telegram/Slack
 
 Ensure you are locally running an AvalancheGo node. 
 
-The AvalancheGo [wallet](https://github.com/ava-labs/avalanchego/tree/v1.12.0-initial-poc.5/wallet) folder contains example scripts written in Goland for testing common workflows. 
+The AvalancheGo [wallet](https://github.com/ava-labs/avalanchego/tree/v1.12.0-initial-poc.5/wallet) folder contains example scripts written in Golang for testing common workflows. 
 
 Inside `wallet/subnet/primary/examples` [folder](https://github.com/ava-labs/avalanchego/tree/v1.12.0-initial-poc.5/wallet/subnet/primary/examples), you will find scripts you can run locally. To test creating a new L1 on Etna Devnet, you can run:
 
