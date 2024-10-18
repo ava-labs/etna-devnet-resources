@@ -34,7 +34,7 @@ Choose your configs, and for ease of use, just use the `ewoq` key for everything
 Chain ID: <chainId>
 Token Symbol: <symbol>
 prefunding address 0x187b4F2412825D8d359308195f0026D4932a3Cf0 with balance 1000000000000000000000000
-File /home/vscode/.avalanche-cli/subnets/stt2/chain.json successfully written
+File /home/vscode/.avalanche-cli/subnets/<chainName>/chain.json successfully written
 ✓ Successfully created blockchain configuration
 Run 'avalanche blockchain describe' to view all created addresses and what their roles are
 ```
