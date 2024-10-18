@@ -1,32 +1,19 @@
-# How to Deploy a Sovereign L1 on the Etna Devnet
+# How to Deploy a Sovereign L1 on the Etna Devnet using the Avalanche Starter Kit
 
-Use the CLI to create, deploy, and convert your L1 tracked by a locally run Node.
+The Avalanche Starter Kit contains everything you need to get started quickly with Avalanche. Among other tools it contains Avalanche CLI. With that you can set up a local network, create a Avalanche L1, customize the Avalanche L1/VM configuration, and so on.
 
-Warning: this flow is in active development. None of the following should be used in or with production-related infrastructure.
+## Open the Avalanche Starter Kit Github Repository:
 
-In this guide, we will be creating a sovereign L1 with locally run Avalanche Nodes as its bootstrap validators.
-At the end of this guide, we will also go through adding and removing validators in our sovereign L1
+Open [Avalanche Starter Kit](https://github.com/ava-labs/avalanche-starter-kit/tree/acp-77), and ensure you are on the correct branch, `acp-77`.
 
-## Build Etna-enabled AvalancheGo
+## Create a Codespace
 
-```zsh
-mkdir -p $GOPATH/src/github.com/ava-labs
-cd $GOPATH/src/github.com/ava-labs
-git clone https://github.com/ava-labs/avalanchego.git
-cd $GOPATH/src/github.com/ava-labs/avalanchego
-git checkout v1.12.0-initial-poc.5
-./scripts/build.sh
-```
+- Click the green Code button
+- Switch to the Codespaces tab
+- Click Create Codespace on main or if you already have a Codespace click the plus (+) button
+- The Codespace will open in a new tab. Wait a few minutes until it's fully built.
 
-Take note of path of AvalancheGo build as we will use it later on.
-
-## Download Avalanche CLI
-
-In a separate terminal window:
-
-```zsh
-curl -sSfL https://raw.githubusercontent.com/ava-labs/avalanche-cli/main/scripts/install.sh | sh -s v1.8.0-rc0
-```
+All required packages, such as `avalanchego` and `avalanche-cli`, will come pre-installed with their correct versions.
 
 ## Create Blockchain
 
@@ -57,7 +44,7 @@ Run 'avalanche blockchain describe' to view all created addresses and what their
 You can deploy the blockchain and boot validator nodes using the following command, referencing the `avalanchego` location:
 
 ```zsh
-avalanche blockchain deploy <chainName> --etna-devnet --use-local-machine --avalanchego-path=<avalancheGoBuildPath>
+avalanche blockchain deploy <chainName> --etna-devnet --use-local-machine --avalanchego-path=/usr/local/bin/avalanchego
 ```
 
 If it's a public network and you're using an ewoq key, you will receive the following error. This is for security reasons, to avoid attacks.
@@ -86,6 +73,14 @@ When the blockchain deploy command is called, it will:
 
 By the end of your command, you would have a running sovereign L1 with Proof of Authority Validator Manager
 Contract deployed into it!
+
+## Make RPC-Endpoint publicly accessible
+
+Since the Avalanche Network is running in a Github Codespace the localhost (127.0.0.1) will only be accessible from inside the Codespace.
+
+Therefore, we need to make the RPC-Endpoint publicly accessible. Click on the little antenna icon in the bottom bar of the Codespace:
+
+![](https://avalanche-academy-git-starter-kit-pause-and-resume-ava-labs.vercel.app/_next/image?url=%2F_next%2Fstatic%2Fmedia%2Fports-open.ea371fea.png&w=828&q=75)
 
 ## Destroy Nodes
 
