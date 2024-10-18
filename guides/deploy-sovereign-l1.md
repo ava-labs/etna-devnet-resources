@@ -5,6 +5,7 @@ Use the CLI to create, deploy, and convert your L1 tracked by a locally run Node
 Warning: this flow is in active development. None of the following should be used in or with production-related infrastructure.
 
 In this guide, we will be creating a sovereign L1 with locally run Avalanche Nodes as its bootstrap validators.
+At the end of this guide, we will also go through adding and removing validators in our sovereign L1
 
 ## Build Etna-enabled AvalancheGo
 
@@ -107,4 +108,53 @@ To restart your local Avalanche nodes after a shutdown, run:
 
 ```zsh
 ./bin/avalanche node local start <nodeClusterName> --etna-devnet --avalanchego-path=<avalancheGoBuildPath>
+```
+
+## Adding a new validator
+
+We will first create a new Avalanche Node to be added as a new validator. Since we already have
+a local AvalancheGo process running, we will create a new node in AWS / GCP.
+
+```zsh
+`./bin/avalanche node create <newClusterName> --custom-avalanchego-version=v1.12.0-initial-poc.5 --etna-devnet`
+```
+
+More info regarding `avalanchenode create` command can be found at [our docs](https://docs.avax.network/tooling/create-avalanche-nodes/run-validators-aws).
+
+Next we will ssh into the created node to get the Node ID and BLS info.
+
+To SSH into our node, run:
+
+```zsh
+`avalanche node ssh <newClusterName>`
+```
+
+run the printed out command to ssh into the remote node
+
+Next, to get the Node ID and BLS info, run:
+
+```zsh
+`curl -X POST --data '{
+"jsonrpc":"2.0",
+"id"     :1,
+"method" :"info.getNodeID"
+}' -H 'content-type:application/json;' 127.0.0.1:9650/ext/info`
+```
+
+Now we will be adding this node as a validator in our sovereign L1. Note that `nodeClusterName` is the
+in the form of <chainName>-local-node if it was created automatically through `avalanche subnet deploy`
+command.
+
+```zsh
+`./bin/avalanche blockchain addValidator <chainName> --cluster <nodeClusterName>`
+```
+
+Enter the Node ID and BLS info we obtained
+
+## Removing validator
+
+To remove a validator, run: 
+
+```zsh
+`./bin/avalanche blockchain removeValidator <chainName> --cluster <nodeClusterName>`
 ```
