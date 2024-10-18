@@ -5,7 +5,6 @@ Use the CLI to create, deploy, and convert your L1 tracked by a locally run Node
 Warning: this flow is in active development. None of the following should be used in or with production-related infrastructure.
 
 In this guide, we will be creating a sovereign L1 with locally run Avalanche Nodes as its bootstrap validators.
-At the end of this guide, we will also go through adding and removing validators in our sovereign L1
 
 ## Build Etna-enabled AvalancheGo
 
