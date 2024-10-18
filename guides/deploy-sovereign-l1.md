@@ -20,12 +20,15 @@ git checkout v1.12.0-initial-poc.5
 
 Take note of path of AvalancheGo build as we will use it later on.
 
-## Download Avalanche CLI
+## Build Etna-enabled Avalanche CLI
 
 In a separate terminal window:
 
 ```zsh
-curl -sSfL https://raw.githubusercontent.com/ava-labs/avalanche-cli/main/scripts/install.sh | sh -s v1.8.0-rc0
+git clone https://github.com/ava-labs/avalanche-cli.git
+cd avalanche-cli
+git checkout acp-77
+./scripts/build.sh
 ```
 
 ## Create Blockchain
