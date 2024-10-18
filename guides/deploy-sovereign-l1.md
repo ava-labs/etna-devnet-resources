@@ -35,7 +35,7 @@ git checkout acp-77
 You can use the following command to create the blockchain:
 
 ```zsh
-avalanche blockchain create <chainName> --evm --proof-of-authority
+./bin/avalanche blockchain create <chainName> --evm --proof-of-authority
 ```
 
 Select `I want to use defaults for a production environment`
@@ -59,7 +59,7 @@ Run 'avalanche blockchain describe' to view all created addresses and what their
 You can deploy the blockchain and boot validator nodes using the following command, referencing the `avalanchego` location:
 
 ```zsh
-avalanche blockchain deploy <chainName> --etna-devnet --use-local-machine --avalanchego-path=<avalancheGoBuildPath>
+./bin/avalanche blockchain deploy <chainName> --etna-devnet --use-local-machine --avalanchego-path=<avalancheGoBuildPath>
 ```
 
 If it's a public network and you're using an ewoq key, you will receive the following error. This is for security reasons, to avoid attacks.
@@ -94,7 +94,7 @@ Contract deployed into it!
 To tear down your local Avalanche Nodes, run:
 
 ```zsh
-avalanche node local destroy <nodeClusterName>
+./bin/avalanche node local destroy <nodeClusterName>
 ```
 
 `nodeClusterName` is in the form of <chainName>-local-node
@@ -104,5 +104,5 @@ avalanche node local destroy <nodeClusterName>
 To restart your local Avalanche nodes after a shutdown, run:
 
 ```zsh
-avalanche node local start <nodeClusterName> --etna-devnet --avalanchego-path=<avalancheGoBuildPath>
+./bin/avalanche node local start <nodeClusterName> --etna-devnet --avalanchego-path=<avalancheGoBuildPath>
 ```
