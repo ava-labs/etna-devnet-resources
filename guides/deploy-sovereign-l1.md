@@ -62,6 +62,8 @@ You can deploy the blockchain and boot validator nodes using the following comma
 ./bin/avalanche blockchain deploy <chainName> --etna-devnet --use-local-machine --avalanchego-path=<avalancheGoBuildPath>
 ```
 
+If you installed avalanchego with the workflow defined in the [Build Etna-enabled AvalancheGo](#build-etna-enabled-avalanchego) section, or according to [this tutorial](https://docs.avax.network/nodes/run-a-node/manually), the `avalancheGoBuildPath` should be `$GOPATH/src/github.com/ava-labs/avalanchego`. 
+
 If it's a public network and you're using an ewoq key, you will receive the following error. This is for security reasons, to avoid attacks.
 
 ```zsh
