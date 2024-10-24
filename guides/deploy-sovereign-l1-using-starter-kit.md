@@ -1,6 +1,6 @@
 # How to Deploy a Sovereign L1 on the Etna Devnet using the Avalanche Starter Kit
 
-The Avalanche Starter Kit contains everything you need to get started quickly with Avalanche. Among other tools it contains Avalanche CLI. With that you can set up a local network, create a Avalanche L1, customize the Avalanche L1/VM configuration, and so on.
+The Avalanche Starter Kit contains everything you need to get started quickly with Avalanche utilizing Github Codespaces. Among other tools it contains Avalanche CLI. With that you can set up a local network, create a Avalanche L1, customize the Avalanche L1/VM configuration, and so on.
 
 ## Open the Avalanche Starter Kit Github Repository:
 
@@ -57,8 +57,8 @@ When you try to generate the blockchain again with --force flag, new keys named 
 
 ```zsh
 ✔ Get address from an existing stored key (created from avalanche key create or avalanche key import)
-Use the arrow keys to navigate: ↓ ↑ → ← 
-? Which stored key should be used enable as controller of ValidatorManager contract?: 
+Use the arrow keys to navigate: ↓ ↑ → ←
+? Which stored key should be used enable as controller of ValidatorManager contract?:
     ewoq
   ▸ subnet_<chainName>_airdrop
     cli-awm-relayer
@@ -66,7 +66,8 @@ Use the arrow keys to navigate: ↓ ↑ → ←
 ```
 
 When the blockchain deploy command is called, it will:
-- Create 5 Avalanche Nodes on your local machine. 
+
+- Create 5 Avalanche Nodes on your local machine.
 - Add these 5 nodes as bootstrap validators in your sovereign L1
 - Have these nodes track your L1
 - Initialize Validator Manager Contract on your L1

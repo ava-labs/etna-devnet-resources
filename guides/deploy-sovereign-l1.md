@@ -5,7 +5,6 @@ Use the CLI to create, deploy, and convert your L1 tracked by a locally run Node
 Warning: this flow is in active development. None of the following should be used in or with production-related infrastructure.
 
 In this guide, we will be creating a sovereign L1 with locally run Avalanche Nodes as its bootstrap validators.
-At the end of this guide, we will also go through adding and removing validators in our sovereign L1
 
 ## Build Etna-enabled AvalancheGo
 
@@ -63,7 +62,7 @@ You can deploy the blockchain and boot validator nodes using the following comma
 ./bin/avalanche blockchain deploy <chainName> --etna-devnet --use-local-machine --avalanchego-path=<avalancheGoBuildPath>
 ```
 
-If you installed avalanchego with the workflow defined in the [Build Etna-enabled AvalancheGo](#build-etna-enabled-avalanchego) section, or according to [this tutorial](https://docs.avax.network/nodes/run-a-node/manually), the `avalancheGoBuildPath` should be `$GOPATH/src/github.com/ava-labs/avalanchego/build/avalanchego`. 
+If you installed avalanchego with the workflow defined in the [Build Etna-enabled AvalancheGo](#build-etna-enabled-avalanchego) section, or according to [this tutorial](https://docs.avax.network/nodes/run-a-node/manually), the `avalancheGoBuildPath` should be `$GOPATH/src/github.com/ava-labs/avalanchego/build/avalanchego`.
 
 If it's a public network and you're using an ewoq key, you will receive the following error. This is for security reasons, to avoid attacks.
 
@@ -75,8 +74,8 @@ When you try to generate the blockchain again with --force flag, new keys named 
 
 ```zsh
 ✔ Get address from an existing stored key (created from avalanche key create or avalanche key import)
-Use the arrow keys to navigate: ↓ ↑ → ← 
-? Which stored key should be used enable as controller of ValidatorManager contract?: 
+Use the arrow keys to navigate: ↓ ↑ → ←
+? Which stored key should be used enable as controller of ValidatorManager contract?:
     ewoq
   ▸ subnet_<chainName>_airdrop
     cli-awm-relayer
@@ -84,7 +83,8 @@ Use the arrow keys to navigate: ↓ ↑ → ←
 ```
 
 When the blockchain deploy command is called, it will:
-- Create 5 Avalanche Nodes on your local machine. 
+
+- Create 5 Avalanche Nodes on your local machine.
 - Add these 5 nodes as bootstrap validators in your sovereign L1
 - Have these nodes track your L1
 - Initialize Validator Manager Contract on your L1
@@ -108,53 +108,4 @@ To restart your local Avalanche nodes after a shutdown, run:
 
 ```zsh
 ./bin/avalanche node local start <nodeClusterName> --etna-devnet --avalanchego-path=<avalancheGoBuildPath>
-```
-
-## Adding a new validator
-
-We will first create a new Avalanche Node to be added as a new validator. Since we already have
-a local AvalancheGo process running, we will create a new node in AWS / GCP.
-
-```zsh
-`./bin/avalanche node create <newClusterName> --custom-avalanchego-version=v1.12.0-initial-poc.5 --etna-devnet`
-```
-
-More info regarding `avalanchenode create` command can be found at [our docs](https://docs.avax.network/tooling/create-avalanche-nodes/run-validators-aws).
-
-Next we will ssh into the created node to get the Node ID and BLS info.
-
-To SSH into our node, run:
-
-```zsh
-`avalanche node ssh <newClusterName>`
-```
-
-run the printed out command to ssh into the remote node
-
-Next, to get the Node ID and BLS info, run:
-
-```zsh
-`curl -X POST --data '{
-"jsonrpc":"2.0",
-"id"     :1,
-"method" :"info.getNodeID"
-}' -H 'content-type:application/json;' 127.0.0.1:9650/ext/info`
-```
-
-Now we will be adding this node as a validator in our sovereign L1. Note that `nodeClusterName` is the
-in the form of <chainName>-local-node if it was created automatically through `avalanche subnet deploy`
-command.
-
-```zsh
-`./bin/avalanche blockchain addValidator <chainName> --cluster <nodeClusterName>`
-```
-
-Enter the Node ID and BLS info we obtained
-
-## Removing validator
-
-To remove a validator, run: 
-
-```zsh
-`./bin/avalanche blockchain removeValidator <chainName> --cluster <nodeClusterName>`
 ```
