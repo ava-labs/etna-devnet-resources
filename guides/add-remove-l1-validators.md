@@ -1,6 +1,6 @@
 # How to Add and Remove Validators from a PoA L1
 
-In this guide, we will walk through how to add and remove validators from a Proof-of-Authority L1.
+In this guide, we will walk through how to add and remove validators from a Proof-of-Authority L1. If you have not yet created an L1, you must first complete the steps outlined in [this guide](/guides/deploy-sovereign-l1.md) before proceeding.
 
 ## Adding a New L1 Validator
 
