@@ -8,7 +8,7 @@ We will first create a new Avalanche Node to be added as a new validator. Since 
 a local AvalancheGo process running, we will create a new node in AWS / GCP.
 
 ```zsh
-`./bin/avalanche node create <newClusterName> --custom-avalanchego-version=v1.12.0-initial-poc.5 --etna-devnet`
+`./bin/avalanche node create <newClusterName> --custom-avalanchego-version=v1.12.0-initial-poc.6 --etna-devnet`
 ```
 
 More info regarding `avalanche node create` command can be found in [our docs](https://docs.avax.network/tooling/create-avalanche-nodes/run-validators-aws).
