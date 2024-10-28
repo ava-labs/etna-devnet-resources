@@ -97,5 +97,5 @@ avalanche node local destroy <nodeClusterName>
 To restart your local Avalanche nodes after a shutdown, run:
 
 ```zsh
-avalanche node local start <nodeClusterName> --etna-devnet --avalanchego-path=<avalancheGoBuildPath>
+avalanche node local start <nodeClusterName> --etna-devnet --avalanchego-path=/usr/local/bin/avalanchego
 ```
