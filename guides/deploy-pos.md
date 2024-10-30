@@ -68,8 +68,45 @@ When the blockchain deploy command is called, it will:
 - Have these nodes track your L1
 - Initialize Native Token PoS Validator Manager Contract on your L1
 
+For the prompting of Native Token Staking Manger choose these default values to avoid error:
+
+```
+Enter the minimum stake amount (1 = 1 NATIVE TOKEN): 1
+Enter the maximum stake amount (1 = 1 NATIVE TOKEN): 100
+Enter the minimum stake duration (in seconds): 10
+Enter the minimum delegation fee (in bips): 100
+Enter the maximum stake multiplier: 2
+Enter the weight to value factor: 1
+```
+
 By the end of your command, you would have a running sovereign L1 with a Proof of Stake Native Token Validator Manager
 Contract deployed into it!
+
+
+
+## Add Validator
+```bash
+./avalanche blockchain addValidator pos
+```
+
+Follow the prompting, select **Yes** when asked if network is PoS
+
+```bash
+✔ Enter the amount of tokens to stake (in OWEN): 3
+✔ Enter the delegation fee (in bips): 100
+✔ Enter the stake duration (in seconds): 100
+
+Validator weight: 3
+ValidationID: nJTTNdofYhZttdjH234BiGKHeSpi9L5wtLmyxhkoL4iyaJWJY
+RegisterSubnetValidatorTX fee: 0.000001546 AVAX
+RegisterSubnetValidatorTx ID: XVsUBdXSE3ixqkwjoDP6dYDqNMrnMLjKGmhKFveTjgmxZVb8T
+Waiting for P-Chain to update validator information ... 100% [===============]           
+  NodeID: NodeID-C3Cbvw4wDtGuWRCJh2v3LttdiLdNWYwox
+  Network: Cluster pos-local-node
+  Weight: 3
+  Balance: 10
+✓ Validator successfully added to the Subnet
+```
 
 ## Destroy Nodes
 
