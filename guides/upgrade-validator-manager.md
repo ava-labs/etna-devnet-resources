@@ -112,7 +112,7 @@ cast storage 0xC0FFEE1234567890aBcDEF1234567890AbCdEf34 0xb53127684a568b3173ae13
 
 Check Proxy's implementation through ProxyAdmin
 ```bash
-cast call 0xFEEDBEEF0000000000000000000000000000000A "getProxyAdmin(address)" 0xC0FFEE1234567890aBcDEF1234567890AbCdEf34 --rpc-url=$LOCAL_RPC
+cast call 0xFEEDBEEF0000000000000000000000000000000A "getProxyImplementation(address)" 0xC0FFEE1234567890aBcDEF1234567890AbCdEf34 --rpc-url=$LOCAL_RPC
 ```
 
 Check Proxy's admin through ProxyAdmin
