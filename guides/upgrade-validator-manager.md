@@ -7,14 +7,14 @@ Both the PoA and PoS options offered in the CLI `acp-77-pos` branch are deployed
 0x0Feedc0de0000000000000000000000000000000
 ```
 
-The implementation for either PoA or PoS `ValidatorManager` (depending on what you choose in CLI) is included in genesis at the address:
-```bash
-0x0C0DEbA5E0000000000000000000000000000000
-```
-
 The admin of this `TransparentProxy` is a `ProxyAdmin` contract included in genesis at the address:
 ```bash
 0xC0fFEE1234567890aBCdeF1234567890abcDef34
+```
+
+The implementation for either PoA or PoS `ValidatorManager` (depending on what you choose in CLI) is included in genesis at the address:
+```bash
+0x0C0DEbA5E0000000000000000000000000000000
 ```
 
 The owner of the `ProxyAdmin` contract is decided when you select an owner during
