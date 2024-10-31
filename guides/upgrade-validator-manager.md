@@ -4,17 +4,17 @@
 ## Context
 Both the PoA and PoS options offered in the CLI `acp-77-pos` branch are deployed behind a `TransparentProxy` contract included in genesis at the address:
 ```bash
-0xC0FFEE1234567890aBcDEF1234567890AbCdEf34
+0x0Feedc0de0000000000000000000000000000000
 ```
 
 The implementation for either PoA or PoS `ValidatorManager` (depending on what you choose in CLI) is included in genesis at the address:
 ```bash
-0x5F584C2D56B4c356e7d82EC6129349393dc5df17
+0x0C0DEbA5E0000000000000000000000000000000
 ```
 
 The admin of this `TransparentProxy` is a `ProxyAdmin` contract included in genesis at the address:
 ```bash
-0xFEEDBEEF0000000000000000000000000000000A
+0xC0fFEE1234567890aBCdeF1234567890abcDef34
 ```
 
 The owner of the `ProxyAdmin` contract is decided when you select an owner during
@@ -135,31 +135,31 @@ https://github.com/ava-labs/teleporter/blob/main/contracts/validator-manager/Exa
 
 ### Check the current Proxy implementation through sslot
 ```bash
-cast storage 0xC0FFEE1234567890aBcDEF1234567890AbCdEf34 0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc --rpc-url=$LOCAL_RPC
+cast storage 0x0Feedc0de0000000000000000000000000000000 0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc --rpc-url=$LOCAL_RPC
 ```
 
 ### Check the current Proxy admin through sslot
 ```bash
-cast storage 0xC0FFEE1234567890aBcDEF1234567890AbCdEf34 0xb53127684a568b3173ae13b9f8a6016e243e63b6e8ee1178d6a717850b5d6103 --rpc-url=$LOCAL_RPC
+cast storage 0x0Feedc0de0000000000000000000000000000000 0xb53127684a568b3173ae13b9f8a6016e243e63b6e8ee1178d6a717850b5d6103 --rpc-url=$LOCAL_RPC
 ```
 
 ### Check Proxy's implementation through ProxyAdmin
 ```bash
-cast call 0xFEEDBEEF0000000000000000000000000000000A "getProxyImplementation(address)" 0xC0FFEE1234567890aBcDEF1234567890AbCdEf34 --rpc-url=$LOCAL_RPC
+cast call 0xC0fFEE1234567890aBCdeF1234567890abcDef34 "getProxyImplementation(address)" 0x0Feedc0de0000000000000000000000000000000 --rpc-url=$LOCAL_RPC
 ```
 
 ### Check Proxy's admin through ProxyAdmin
 
 ```bash
-cast call 0xFEEDBEEF0000000000000000000000000000000A "getProxyAdmin(address)" 0xC0FFEE1234567890aBcDEF1234567890AbCdEf34 --rpc-url=$LOCAL_RPC
+cast call 0xC0fFEE1234567890aBCdeF1234567890abcDef34 "getProxyAdmin(address)" 0x0Feedc0de0000000000000000000000000000000 --rpc-url=$LOCAL_RPC
 ```
 
 ### Check owner of ProxyAdmin
 ```bash
-cast call 0xFEEDBEEF0000000000000000000000000000000A "owner()" --rpc-url=$LOCAL_RPC
+cast call 0xC0fFEE1234567890aBCdeF1234567890abcDef34 "owner()" --rpc-url=$LOCAL_RPC
 ```
 
 ### Check Reward Calculator Basis Points
 ```bash
-cast call <Reward Contract Address> "rewardBasisPoints()" --rpc-url=$LOCAL_RPC
+cast call <Deployed Reward Contract Address> "rewardBasisPoints()" --rpc-url=$LOCAL_RPC
 ```
