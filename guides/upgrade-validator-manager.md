@@ -16,16 +16,16 @@ The owner of the `ProxyAdmin` contract is decided when you select an owner durin
 ```
 avalanche blockchain create
 ```
+You can also use the flag `--proxy-contract-owner=<address>`
+
+This address has control over upgrading the implementation `ValidatorManager` referenced by the `TransparentProxy` through use of a `ProxyAdmin`.
+
 
 The implementation for either PoA or PoS `ValidatorManager` (depending on what you choose in CLI) is included in genesis at the address:
 ```bash
 0x0C0DEbA5E0000000000000000000000000000000
 ```
 
-
-You can also use the flag `--proxy-contract-owner=<address>`
-
-This address has control over upgrading the implementation `ValidatorManager` referenced by the `TransparentProxy` through use of a `ProxyAdmin`.
 
 ### More Info
 The `TransparentProxy` and `ProxyAdmin` are from [OpenZeppelin v4.9](https://github.com/OpenZeppelin/openzeppelin-contracts/blob/release-v4.9/contracts/proxy/transparent/TransparentUpgradeableProxy.sol)
