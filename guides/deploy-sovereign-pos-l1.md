@@ -38,6 +38,13 @@ You can use the following command to create the blockchain:
 ./bin/avalanche blockchain create <chainName> --evm --proof-of-stake
 ```
 
+```
+Enter reward basis points for PoS Reward Calculator: 100
+```
+We include an [ExampleRewardCalculator](https://github.com/ava-labs/teleporter/blob/main/contracts/validator-manager/ExampleRewardCalculator.sol) in the genesis with storage for rewardBasisPoints set to this parameter
+
+You can include the `--reward-basis-points` flag instead to skip this prompt.
+
 Select `I want to use defaults for a production environment`
 Choose your configs, and for ease of use, just use the `ewoq` key for everything.
 
@@ -72,17 +79,18 @@ For the prompting of Native Token Staking Manger choose these default values to 
 
 ```
 Enter the minimum stake amount (1 = 1 NATIVE TOKEN): 1
-Enter the maximum stake amount (1 = 1 NATIVE TOKEN): 100
+Enter the maximum stake amount (1 = 1 NATIVE TOKEN): 1000
 Enter the minimum stake duration (in seconds): 10
-Enter the minimum delegation fee (in bips): 100
-Enter the maximum stake multiplier: 2
+Enter the minimum delegation fee (in bips): 1
+Enter the maximum stake multiplier: 1
 Enter the weight to value factor: 1
 ```
 
-By the end of your command, you would have a running sovereign L1 with a Proof of Stake Native Token Validator Manager
+By the end of your command, you should have a running sovereign L1 with a Proof of Stake Native Token Validator Manager
 Contract deployed into it!
 
-
+## Notice
+The initial validator set is still treated as a Proof of Authority network, in order for validators to receive rewards they must first be cycled (removed from validator set and added again). 
 
 ## Add Validator
 ```bash
