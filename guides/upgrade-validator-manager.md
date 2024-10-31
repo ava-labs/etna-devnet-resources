@@ -114,7 +114,14 @@ which is expected, as the validator set was already initialized on PoA manager p
 
 ### 6. [Test Adding Validator](https://github.com/ava-labs/etna-devnet-resources/blob/main/guides/deploy-sovereign-pos-l1.md#add-validator)
 
+## Notice
+This upgrade is incomplete unless the `NativeMinter` precompile is enabled with the `TransparentProxy` address set as `Enabled`.
 
+For more information on `NativeTokenMinter` precompile, please reference: 
+https://docs.avax.network/avalanche-l1s/upgrade/customize-avalanche-l1#minting-native-coins
+
+To perform a network upgrade, please reference:
+https://docs.avax.network/avalanche-l1s/upgrade/customize-avalanche-l1#network-upgrades-enabledisable-precompiles
 
 ## More Info
 
