@@ -4,7 +4,7 @@
 ## Context
 Both the PoA and PoS options offered in the CLI `acp-77-pos` branch are deployed behind a `TransparentProxy` contract included in genesis at the address:
 ```bash
-0x0Feedc0de0000000000000000000000000000000
+0xFEEDC0DE0000000000000000000000000000000
 ```
 
 The admin of this `TransparentProxy` is a `ProxyAdmin` contract included in genesis at the address:
@@ -23,7 +23,7 @@ This address has control over upgrading the implementation `ValidatorManager` re
 
 The implementation for either PoA or PoS `ValidatorManager` (depending on what you choose in CLI) is included in genesis at the address:
 ```bash
-0x0C0DEbA5E0000000000000000000000000000000
+0xC0DEBA5E0000000000000000000000000000000
 ```
 
 
@@ -72,7 +72,7 @@ Transaction hash: 0xcb7956d6a1c41c91433096f3ebeda2092f92a36af3320c4ca6ab81c91a87
 ### 4. Point the `TransparentProxy`'s implementation to the new address through a call to `ProxyAdmin`
 
 ```bash
-cast send 0xFEEDBEEF0000000000000000000000000000000A "upgrade(address,address)" 0xC0FFEE1234567890aBcDEF1234567890AbCdEf34 0x4Ac1d98D9cEF99EC6546dEd4Bd550b0b287aaD6D --private-key $PKEY --rpc-url=$LOCAL_RPC
+cast send 0xC0fFEE1234567890aBCdeF1234567890abcDef34 "upgrade(address,address)" 0xFEEDC0DE0000000000000000000000000000000 0x4Ac1d98D9cEF99EC6546dEd4Bd550b0b287aaD6D --private-key $PKEY --rpc-url=$LOCAL_RPC
 ```
 
 ### 5. Initialize the new `NativeTokenStakingManager`
@@ -136,23 +136,23 @@ https://github.com/ava-labs/teleporter/blob/main/contracts/validator-manager/Exa
 
 ### Check the current Proxy implementation through sslot
 ```bash
-cast storage 0x0Feedc0de0000000000000000000000000000000 0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc --rpc-url=$LOCAL_RPC
+cast storage 0xFEEDC0DE0000000000000000000000000000000 0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc --rpc-url=$LOCAL_RPC
 ```
 
 ### Check the current Proxy admin through sslot
 ```bash
-cast storage 0x0Feedc0de0000000000000000000000000000000 0xb53127684a568b3173ae13b9f8a6016e243e63b6e8ee1178d6a717850b5d6103 --rpc-url=$LOCAL_RPC
+cast storage 0xFEEDC0DE0000000000000000000000000000000 0xb53127684a568b3173ae13b9f8a6016e243e63b6e8ee1178d6a717850b5d6103 --rpc-url=$LOCAL_RPC
 ```
 
 ### Check Proxy's implementation through ProxyAdmin
 ```bash
-cast call 0xC0fFEE1234567890aBCdeF1234567890abcDef34 "getProxyImplementation(address)" 0x0Feedc0de0000000000000000000000000000000 --rpc-url=$LOCAL_RPC
+cast call 0xC0fFEE1234567890aBCdeF1234567890abcDef34 "getProxyImplementation(address)" 0xFEEDC0DE0000000000000000000000000000000 --rpc-url=$LOCAL_RPC
 ```
 
 ### Check Proxy's admin through ProxyAdmin
 
 ```bash
-cast call 0xC0fFEE1234567890aBCdeF1234567890abcDef34 "getProxyAdmin(address)" 0x0Feedc0de0000000000000000000000000000000 --rpc-url=$LOCAL_RPC
+cast call 0xC0fFEE1234567890aBCdeF1234567890abcDef34 "getProxyAdmin(address)" 0xFEEDC0DE0000000000000000000000000000000 --rpc-url=$LOCAL_RPC
 ```
 
 ### Check owner of ProxyAdmin
