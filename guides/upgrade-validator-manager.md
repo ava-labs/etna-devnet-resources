@@ -55,13 +55,26 @@ Deployed to: 0x4Ac1d98D9cEF99EC6546dEd4Bd550b0b287aaD6D
 Transaction hash: 0x130aa259436614d193cabacbe2adb115c8b0f83e6e744293ab57f5c3aa3fa292
 ```
 
-### 3. Point the `TransparentProxy`'s implementation to the new address through a call to `ProxyAdmin`
+### 3. Deploy `ExampleRewardCalculator`
+
+The constructor argument here determines the `rewardBasisPoints`
+```bash
+forge create contracts/validator-manager/ExampleRewardCalculator.sol:ExampleRewardCalculator --constructor-args 100 --private-key $PKEY --rpc-url=$LOCAL_RPC
+```
+```bash
+Deployer: 0x8db97C7cEcE249c2b98bDC0226Cc4C2A57BF52FC
+Deployed to: 0x52C84043CD9c865236f11d9Fc9F56aa003c1f922
+Transaction hash: 0xcb7956d6a1c41c91433096f3ebeda2092f92a36af3320c4ca6ab81c91a877b5c
+```
+
+
+### 4. Point the `TransparentProxy`'s implementation to the new address through a call to `ProxyAdmin`
 
 ```bash
 cast send 0xFEEDBEEF0000000000000000000000000000000A "upgrade(address,address)" 0xC0FFEE1234567890aBcDEF1234567890AbCdEf34 0x4Ac1d98D9cEF99EC6546dEd4Bd550b0b287aaD6D --private-key $PKEY --rpc-url=$LOCAL_RPC
 ```
 
-### 4. Initialize the new `NativeTokenStakingManager`
+### 5. Initialize the new `NativeTokenStakingManager`
 
 ```bash
 avalanche contract initPosManager poa
@@ -72,6 +85,7 @@ avalanche contract initPosManager poa
 ✔ Get Devnet RPC endpoint from an existing node cluster (created from avalanche node create or avalanche devnet wiz)
 ✔ poa-local-node
 RPC Endpoint: http://127.0.0.1:9650/ext/bc/6MiZgo2yGyetKKn8pPKaDo6hBjvLpS4N7FyJDRwHHNPSuVkbG/rpc
+
 ✔ Enter the minimum stake amount: 1█
 Enter the minimum stake amount: 1
 Enter the maximum stake amount: 100
@@ -107,37 +121,38 @@ which is expected, as the validator set was already initialized on PoA manager p
 For more info on how to perform upgrades please reference `ValidatorManager` contracts:
 https://github.com/ava-labs/teleporter/tree/main/contracts/validator-manager#convert-poa-to-pos
 
-It is important to note this PoS upgrade won't be completely functional in distributing rewards as there is no `RewardCalculator` precompile on default settings for PoA network.
+For more info on reward calculation please reference `ExampleRewardCalculator` contract:
+https://github.com/ava-labs/teleporter/blob/main/contracts/validator-manager/ExampleRewardCalculator.sol
 
-To include the `RewardCalculator` either make sure it is enabled in genesis, or perform a network upgrade:
+## Helpers
 
-reference: https://docs.avax.network/virtual-machines/evm-customization/precompile-overview
-
-### Helpers
-
-Check the current Proxy implementation through sslot
+### Check the current Proxy implementation through sslot
 ```bash
 cast storage 0xC0FFEE1234567890aBcDEF1234567890AbCdEf34 0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc --rpc-url=$LOCAL_RPC
 ```
 
-Check the current Proxy admin through sslot
+### Check the current Proxy admin through sslot
 ```bash
 cast storage 0xC0FFEE1234567890aBcDEF1234567890AbCdEf34 0xb53127684a568b3173ae13b9f8a6016e243e63b6e8ee1178d6a717850b5d6103 --rpc-url=$LOCAL_RPC
 ```
 
-Check Proxy's implementation through ProxyAdmin
+### Check Proxy's implementation through ProxyAdmin
 ```bash
 cast call 0xFEEDBEEF0000000000000000000000000000000A "getProxyImplementation(address)" 0xC0FFEE1234567890aBcDEF1234567890AbCdEf34 --rpc-url=$LOCAL_RPC
 ```
 
-Check Proxy's admin through ProxyAdmin
+### Check Proxy's admin through ProxyAdmin
 
 ```bash
 cast call 0xFEEDBEEF0000000000000000000000000000000A "getProxyAdmin(address)" 0xC0FFEE1234567890aBcDEF1234567890AbCdEf34 --rpc-url=$LOCAL_RPC
 ```
 
-Check owner of ProxyAdmin
+### Check owner of ProxyAdmin
 ```bash
 cast call 0xFEEDBEEF0000000000000000000000000000000A "owner()" --rpc-url=$LOCAL_RPC
 ```
 
+### Check Reward Calculator Basis Points
+```bash
+cast call <Reward Contract Address> "rewardBasisPoints()" --rpc-url=$LOCAL_RPC
+```
