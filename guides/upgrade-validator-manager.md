@@ -98,7 +98,7 @@ The part that failed is
 ```
 which is expected, as the validator set was already initialized on PoA manager prior to the Proxy upgrade.
 
-### 5. [Test Adding Validator](https://github.com/ava-labs/etna-devnet-resources/blob/main/guides/deploy-pos.md#add-validator)
+### 5. [Test Adding Validator](https://github.com/ava-labs/etna-devnet-resources/blob/main/guides/deploy-sovereign-pos-l1.md#add-validator)
 
 
 
