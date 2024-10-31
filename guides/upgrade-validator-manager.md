@@ -87,6 +87,8 @@ avalanche contract initPosManager poa
 ✔ poa-local-node
 RPC Endpoint: http://127.0.0.1:9650/ext/bc/6MiZgo2yGyetKKn8pPKaDo6hBjvLpS4N7FyJDRwHHNPSuVkbG/rpc
 
+✗ Enter the address for the Reward Calculator contract: 0x52C84043CD9c865236f11d9Fc9F56aa003c1f922
+
 ✔ Enter the minimum stake amount: 1█
 Enter the minimum stake amount: 1
 Enter the maximum stake amount: 100
