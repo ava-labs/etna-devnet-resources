@@ -1,4 +1,4 @@
-# How to Deploy a Sovereign L1 on the Etna Devnet
+# How to Deploy a PoS L1 on the Etna Devnet
 
 Use the CLI to create, deploy, and convert your L1 tracked by a locally run Node.
 
@@ -56,7 +56,7 @@ Run 'avalanche blockchain describe' to view all created addresses and what their
 You can deploy the blockchain and boot validator nodes using the following command, referencing the `avalanchego` location:
 
 ```zsh
-./bin/avalanche blockchain deploy <chainName> --etna-devnet --use-local-machine --avalanchego-path=<avalancheGoBuildPath> --pos
+./bin/avalanche blockchain deploy <chainName> --etna-devnet --use-local-machine --avalanchego-path=<avalancheGoBuildPath>
 ```
 
 If you installed avalanchego with the workflow defined in the [Build Etna-enabled AvalancheGo](#build-etna-enabled-avalanchego) section, or according to [this tutorial](https://docs.avax.network/nodes/run-a-node/manually), the `avalancheGoBuildPath` should be `$GOPATH/src/github.com/ava-labs/avalanchego/build/avalanchego`.
@@ -89,7 +89,8 @@ Contract deployed into it!
 ./avalanche blockchain addValidator pos
 ```
 
-Follow the prompting, select **Yes** when asked if network is PoS
+Follow the prompting, 
+select **Yes** when asked if network is PoS
 
 ```bash
 ✔ Enter the amount of tokens to stake (in OWEN): 3
