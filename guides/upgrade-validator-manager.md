@@ -12,15 +12,16 @@ The admin of this `TransparentProxy` is a `ProxyAdmin` contract included in gene
 0xC0fFEE1234567890aBCdeF1234567890abcDef34
 ```
 
+The owner of the `ProxyAdmin` contract is decided when you select an owner during
+```
+avalanche blockchain create
+```
+
 The implementation for either PoA or PoS `ValidatorManager` (depending on what you choose in CLI) is included in genesis at the address:
 ```bash
 0x0C0DEbA5E0000000000000000000000000000000
 ```
 
-The owner of the `ProxyAdmin` contract is decided when you select an owner during
-```
-avalanche blockchain create
-```
 
 You can also use the flag `--proxy-contract-owner=<address>`
 
