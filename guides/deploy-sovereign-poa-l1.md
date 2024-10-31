@@ -1,4 +1,4 @@
-# How to Deploy a Sovereign L1 on the Etna Devnet
+# How to Deploy a PoA L1 on the Etna Devnet
 
 Use the CLI to create, deploy, and convert your L1 tracked by a locally run Node.
 
