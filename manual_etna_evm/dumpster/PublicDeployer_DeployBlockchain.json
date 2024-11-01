@@ -1,0 +1,75 @@
+{
+    "unsignedTx": {
+        "networkID": 76,
+        "blockchainID": "11111111111111111111111111111111LpoYY",
+        "outputs": [
+            {
+                "assetID": "22jjRVdyTJiAEtcZciAVR8bTFyVDUVoo1T3o5PiDspQSZ2maXR",
+                "fxID": "spdxUxVJQbX85MGxMHbKw1sHxMnSqJ3QBzDyDYEP3h6TLuxqQ",
+                "output": {
+                    "addresses": [
+                        "P-custom18jma8ppw3nhx5r4ap8clazz0dps7rv5u9xde7p"
+                    ],
+                    "amount": 224880887246,
+                    "locktime": 0,
+                    "threshold": 1
+                }
+            }
+        ],
+        "inputs": [
+            {
+                "txID": "Pj5UoFrCi68iwhexbEwD2obFWytzH9WN2xXhEaLYBEbtNkPXH",
+                "outputIndex": 0,
+                "assetID": "22jjRVdyTJiAEtcZciAVR8bTFyVDUVoo1T3o5PiDspQSZ2maXR",
+                "fxID": "spdxUxVJQbX85MGxMHbKw1sHxMnSqJ3QBzDyDYEP3h6TLuxqQ",
+                "input": {
+                    "amount": 1,
+                    "signatureIndices": [
+                        0
+                    ]
+                }
+            },
+            {
+                "txID": "nkPrJmDkpjxRJ71QjgXnnmKUSv5Vfy4GNsoKQcEq2oiTtPkSd",
+                "outputIndex": 0,
+                "assetID": "22jjRVdyTJiAEtcZciAVR8bTFyVDUVoo1T3o5PiDspQSZ2maXR",
+                "fxID": "spdxUxVJQbX85MGxMHbKw1sHxMnSqJ3QBzDyDYEP3h6TLuxqQ",
+                "input": {
+                    "amount": 224881002287,
+                    "signatureIndices": [
+                        0
+                    ]
+                }
+            }
+        ],
+        "memo": null,
+        "subnetID": "nkPrJmDkpjxRJ71QjgXnnmKUSv5Vfy4GNsoKQcEq2oiTtPkSd",
+        "chainName": "mynet",
+        "vmID": "qDNkrRvkeM1GrdrEhDbGZGz6Hiq5nQ4utodRih4x111KBqiC8",
+        "fxIDs": [],
+        "genesisData": "....REPLACED",
+        "subnetAuthorization": {
+            "signatureIndices": [
+                0
+            ]
+        }
+    },
+    "credentials": [
+        {
+            "signatures": [
+                "0x80640b759e8cba501dd1eef83f7338a742d2ba14af4f11410e53ffe22d8da3e302964c49c91b8423e7aa05aaf6b909a1575fc91d8a6cfb64f6b69bac580d32fd00"
+            ]
+        },
+        {
+            "signatures": [
+                "0x80640b759e8cba501dd1eef83f7338a742d2ba14af4f11410e53ffe22d8da3e302964c49c91b8423e7aa05aaf6b909a1575fc91d8a6cfb64f6b69bac580d32fd00"
+            ]
+        },
+        {
+            "signatures": [
+                "0x80640b759e8cba501dd1eef83f7338a742d2ba14af4f11410e53ffe22d8da3e302964c49c91b8423e7aa05aaf6b909a1575fc91d8a6cfb64f6b69bac580d32fd00"
+            ]
+        }
+    ],
+    "id": "2eDhc48ex58CqYgSyHkcpsxNBDdbj9KV8qDEucZaBZAhqhQnmx"
+}
