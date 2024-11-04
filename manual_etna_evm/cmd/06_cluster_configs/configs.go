@@ -80,6 +80,11 @@ func main() {
 		log.Fatalf("❌ Failed to write upgrade file: %s\n", err)
 	}
 
+	err = os.WriteFile("data/genesis.json", constants.EtnaDevnetGenesisData, 0644)
+	if err != nil {
+		log.Fatalf("❌ Failed to write genesis file: %s\n", err)
+	}
+
 	//FIXME: needs plugins
 	err = os.MkdirAll(filepath.Join("data", "plugins"), 0755)
 	if err != nil {
