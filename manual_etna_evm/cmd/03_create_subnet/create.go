@@ -55,9 +55,6 @@ func main() {
 	}
 	log.Printf("Synced wallet in %s\n", time.Since(walletSyncStartTime))
 
-	// Get the P-chain wallet
-	pWallet := wallet.P()
-
 	// Pull out useful constants to use when issuing transactions.
 	owner := &secp256k1fx.OutputOwners{
 		Locktime:  0,
@@ -66,7 +63,7 @@ func main() {
 	}
 
 	createSubnetStartTime := time.Now()
-	createSubnetTx, err := pWallet.IssueCreateSubnetTx(owner)
+	createSubnetTx, err := wallet.P().IssueCreateSubnetTx(owner)
 	if err != nil {
 		log.Fatalf("❌ Failed to issue create subnet transaction: %s\n", err)
 	}

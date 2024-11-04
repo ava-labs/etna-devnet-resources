@@ -14,25 +14,6 @@ import (
 	"github.com/ava-labs/avalanche-cli/pkg/constants"
 )
 
-type NodeConfig struct {
-	APIAdminEnabled          string `json:"api-admin-enabled"`
-	BootstrapIDs             string `json:"bootstrap-ids"`
-	BootstrapIPs             string `json:"bootstrap-ips"`
-	DataDir                  string `json:"data-dir"`
-	GenesisFile              string `json:"genesis-file"`
-	HealthCheckFrequency     string `json:"health-check-frequency"`
-	HTTPPort                 string `json:"http-port"`
-	IndexEnabled             string `json:"index-enabled"`
-	LogDisplayLevel          string `json:"log-display-level"`
-	LogLevel                 string `json:"log-level"`
-	NetworkID                string `json:"network-id"`
-	NetworkMaxReconnectDelay string `json:"network-max-reconnect-delay"`
-	PluginDir                string `json:"plugin-dir"`
-	PublicIP                 string `json:"public-ip"`
-	StakingPort              string `json:"staking-port"`
-	UpgradeFile              string `json:"upgrade-file"`
-}
-
 func main() {
 	err := os.MkdirAll(filepath.Join("data", "configs"), 0755)
 	if err != nil {
@@ -46,7 +27,7 @@ func main() {
 
 	for i := 0; i < lib.VALIDATORS_COUNT; i++ {
 
-		config := NodeConfig{
+		config := lib.NodeConfig{
 			APIAdminEnabled:          "true",
 			BootstrapIDs:             strings.Join(constants.EtnaDevnetBootstrapNodeIDs, ","),
 			BootstrapIPs:             strings.Join(constants.EtnaDevnetBootstrapIPs, ","),
