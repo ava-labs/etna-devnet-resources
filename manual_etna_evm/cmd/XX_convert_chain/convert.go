@@ -17,10 +17,12 @@ import (
 	"github.com/ava-labs/avalanche-cli/pkg/constants"
 	"github.com/ava-labs/avalanche-cli/pkg/models"
 	"github.com/ava-labs/avalanche-cli/pkg/utils"
+	"github.com/ava-labs/avalanche-cli/pkg/validatormanager"
 	"github.com/ava-labs/avalanchego/api/info"
 	"github.com/ava-labs/avalanchego/ids"
 	"github.com/ava-labs/avalanchego/vms/secp256k1fx"
 	"github.com/ava-labs/avalanchego/wallet/subnet/primary"
+	"github.com/ethereum/go-ethereum/common"
 )
 
 func main() {
@@ -94,9 +96,9 @@ func main() {
 		log.Fatalf("❌ Failed to convert to AvalancheGo subnet validator: %s\n", err)
 	}
 
-	unknownAddress := []byte{} //FIXME: not sure which address to use
+	managerAddress := common.HexToAddress(validatormanager.ValidatorContractAddress)
 
-	convertTx, err := wallet.P().IssueConvertSubnetTx(subnetID, chainID, unknownAddress, avaGoBootstrapValidators)
+	convertTx, err := wallet.P().IssueConvertSubnetTx(subnetID, chainID, managerAddress.Bytes(), avaGoBootstrapValidators)
 	if err != nil {
 		log.Fatalf("❌ Failed to issue convert subnet tx: %s\n", err)
 	}
