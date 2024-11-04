@@ -1,0 +1,84 @@
+package main
+
+import (
+	"encoding/json"
+	"fmt"
+	"log"
+	"mypkg/lib"
+	"os"
+	"path/filepath"
+	"strings"
+
+	_ "embed"
+
+	"github.com/ava-labs/avalanche-cli/pkg/constants"
+)
+
+type NodeConfig struct {
+	APIAdminEnabled          string `json:"api-admin-enabled"`
+	BootstrapIDs             string `json:"bootstrap-ids"`
+	BootstrapIPs             string `json:"bootstrap-ips"`
+	DataDir                  string `json:"data-dir"`
+	GenesisFile              string `json:"genesis-file"`
+	HealthCheckFrequency     string `json:"health-check-frequency"`
+	HTTPPort                 string `json:"http-port"`
+	IndexEnabled             string `json:"index-enabled"`
+	LogDisplayLevel          string `json:"log-display-level"`
+	LogLevel                 string `json:"log-level"`
+	NetworkID                string `json:"network-id"`
+	NetworkMaxReconnectDelay string `json:"network-max-reconnect-delay"`
+	PluginDir                string `json:"plugin-dir"`
+	PublicIP                 string `json:"public-ip"`
+	StakingPort              string `json:"staking-port"`
+	UpgradeFile              string `json:"upgrade-file"`
+}
+
+func main() {
+	err := os.MkdirAll(filepath.Join("data", "configs"), 0755)
+	if err != nil {
+		log.Fatalf("❌ Failed to create configs directory: %s\n", err)
+	}
+
+	openPorts, err := lib.FindMultipleFreePorts(lib.VALIDATORS_COUNT*2, 9650)
+	if err != nil {
+		log.Fatalf("❌ Failed to find free ports: %s\n", err)
+	}
+
+	for i := 0; i < lib.VALIDATORS_COUNT; i++ {
+
+		config := NodeConfig{
+			APIAdminEnabled:          "true",
+			BootstrapIDs:             strings.Join(constants.EtnaDevnetBootstrapNodeIDs, ","),
+			BootstrapIPs:             strings.Join(constants.EtnaDevnetBootstrapIPs, ","),
+			DataDir:                  fmt.Sprintf("/data/node%d", i),
+			GenesisFile:              "/data/genesis.json",
+			HealthCheckFrequency:     "2s",
+			HTTPPort:                 fmt.Sprintf("%d", openPorts[i*2]),
+			IndexEnabled:             "true",
+			LogDisplayLevel:          "INFO",
+			LogLevel:                 "INFO",
+			NetworkID:                "76",
+			NetworkMaxReconnectDelay: "1s",
+			PluginDir:                "/data/plugins/",
+			PublicIP:                 "127.0.0.1",
+			StakingPort:              fmt.Sprintf("%d", openPorts[i*2+1]),
+			UpgradeFile:              "/data/upgrade.json",
+		}
+
+		marshalled, err := json.MarshalIndent(config, "", "  ")
+		if err != nil {
+			log.Fatalf("❌ Failed to marshal config: %s\n", err)
+		}
+		err = os.WriteFile(filepath.Join("data", "configs", fmt.Sprintf("config-node%d.json", i)), marshalled, 0644)
+		if err != nil {
+			log.Fatalf("❌ Failed to write config: %s\n", err)
+		}
+	}
+
+	err = os.WriteFile("data/upgrade.json", constants.EtnaDevnetUpgradeData, 0644)
+	if err != nil {
+		log.Fatalf("❌ Failed to write upgrade file: %s\n", err)
+	}
+
+	fmt.Println("✅ Successfully created configs")
+}

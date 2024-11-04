@@ -9,4 +9,6 @@ const (
 
 	VALIDATOR_MANAGER_OWNER_KEY_PATH = "data/poa_validator_manager_owner_key.txt"
 	TELEPORTER_DEPLOYER_KEY_PATH     = "data/teleporter_deployer_key.txt"
+
+	VALIDATORS_COUNT = 5
 )
