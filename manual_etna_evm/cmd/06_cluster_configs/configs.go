@@ -80,5 +80,11 @@ func main() {
 		log.Fatalf("❌ Failed to write upgrade file: %s\n", err)
 	}
 
+	//FIXME: needs plugins
+	err = os.MkdirAll(filepath.Join("data", "plugins"), 0755)
+	if err != nil {
+		log.Fatalf("❌ Failed to create plugins directory: %s\n", err)
+	}
+
 	fmt.Println("✅ Successfully created configs")
 }

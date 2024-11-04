@@ -1,0 +1,26 @@
+services:
+  node0:
+    container_name: node0
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ../../data/:/data/
+    network_mode: host
+    command: /usr/local/bin/avalanchego --config-file=/data/configs/config-node0.json
+  node1:
+    container_name: node1
+    extends: node0
+    command: /usr/local/bin/avalanchego --config-file=/data/configs/config-node1.json
+  node2:
+    container_name: node2
+    extends: node0
+    command: /usr/local/bin/avalanchego --config-file=/data/configs/config-node2.json
+  node3:
+    container_name: node3
+    extends: node0
+    command: /usr/local/bin/avalanchego --config-file=/data/configs/config-node3.json
+  node4:
+    container_name: node4
+    extends: node0
+    command: /usr/local/bin/avalanchego --config-file=/data/configs/config-node4.json

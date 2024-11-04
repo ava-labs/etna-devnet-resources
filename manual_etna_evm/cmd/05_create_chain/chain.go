@@ -47,7 +47,7 @@ func main() {
 	vmID := constants.SubnetEVMID
 	name := "Step by step subnet"
 
-	genesisBytes, err := os.ReadFile("data/genesis.json")
+	genesisBytes, err := os.ReadFile("data/L1-genesis.json")
 	if err != nil {
 		log.Fatalf("❌ Failed to read genesis: %s\n", err)
 	}

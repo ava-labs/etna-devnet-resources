@@ -101,7 +101,7 @@ func main() {
 		log.Fatalf("❌ Failed to indent genesis: %s\n", err)
 	}
 
-	if err := os.WriteFile("data/genesis.json", prettyJSON.Bytes(), 0644); err != nil {
+	if err := os.WriteFile("data/L1-genesis.json", prettyJSON.Bytes(), 0644); err != nil {
 		log.Fatalf("❌ Failed to write genesis: %s\n", err)
 	}
 }
