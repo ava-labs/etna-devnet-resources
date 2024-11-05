@@ -12,6 +12,7 @@ import (
 	"github.com/ava-labs/avalanchego/ids"
 	"github.com/ava-labs/avalanchego/utils/constants"
 	"github.com/ava-labs/avalanchego/utils/set"
+	"github.com/ava-labs/avalanchego/utils/units"
 	"github.com/ava-labs/avalanchego/vms/secp256k1fx"
 	"github.com/ava-labs/avalanchego/wallet/chain/p/builder"
 	"github.com/ava-labs/avalanchego/wallet/chain/p/wallet"
@@ -83,18 +84,24 @@ func main() {
 	if err != nil {
 		log.Fatalf("failed to get balance: %s\n", err)
 	}
+	cChainBalance = cChainBalance.Div(cChainBalance, big.NewInt(int64(1e9)))
+	// The P chain balance is in nDEVAX (10-9), but the C-chain balance is in WEI (10-18)
+	// So we need to convert it to the same unit
 
 	log.Printf("Balance on c-chain at address %s: %s\n", ethAddr.Hex(), cChainBalance)
 
-	if cChainBalance.Cmp(big.NewInt(int64(lib.MIN_BALANCE))) < 0 {
-		log.Printf("❌ Balance %s is less than minimum balance: %d\n", cChainBalance, lib.MIN_BALANCE)
+	toImport := lib.MIN_BALANCE - pChainBalance.Uint64() + 100*units.MilliAvax
+
+	if cChainBalance.Uint64() < toImport {
+		log.Printf("❌ Balance %s is less than minimum balance: %d\n", cChainBalance, toImport)
 		log.Printf("Please visit " + lib.FAUCET_LINK)
 		log.Printf("Use this address to request funds: %s\n", ethAddr.Hex())
 		os.Exit(1)
+	} else {
+		log.Printf("C-chain balance sufficient: current %s, required %d\n", cChainBalance, toImport)
 	}
 
-	toImport := lib.MIN_BALANCE * 2
-	log.Printf("Transferring %d from C-chain to P-chain\n", cChainBalance, lib.MIN_BALANCE, toImport)
+	log.Printf("Transferring %d from C-chain to P-chain\n", toImport)
 
 	// Create keychain and wallet
 	kc := secp256k1fx.NewKeychain(key)

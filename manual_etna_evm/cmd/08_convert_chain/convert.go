@@ -17,12 +17,14 @@ import (
 	"github.com/ava-labs/avalanche-cli/pkg/constants"
 	"github.com/ava-labs/avalanche-cli/pkg/key"
 	"github.com/ava-labs/avalanche-cli/pkg/models"
+	"github.com/ava-labs/avalanche-cli/pkg/txutils"
 	"github.com/ava-labs/avalanche-cli/pkg/utils"
 	"github.com/ava-labs/avalanche-cli/pkg/validatormanager"
 	"github.com/ava-labs/avalanchego/api/info"
 	"github.com/ava-labs/avalanchego/ids"
 	"github.com/ava-labs/avalanchego/utils/formatting/address"
 	"github.com/ava-labs/avalanchego/utils/set"
+	"github.com/ava-labs/avalanchego/vms/platformvm/txs"
 	"github.com/ava-labs/avalanchego/vms/secp256k1fx"
 	"github.com/ava-labs/avalanchego/wallet/subnet/primary"
 	"github.com/ava-labs/avalanchego/wallet/subnet/primary/common"
@@ -43,20 +45,21 @@ func main() {
 	}
 	kc := secp256k1fx.NewKeychain(privKey)
 
-	wallet, err := primary.MakeWallet(context.Background(), &primary.WalletConfig{
-		URI:          lib.ETNA_RPC_URL,
-		AVAXKeychain: kc,
-		EthKeychain:  kc,
-	})
-	if err != nil {
-		log.Fatalf("❌ Failed to initialize wallet: %s\n", err)
-	}
-
 	subnetIDBytes, err := os.ReadFile("data/subnet.txt")
 	if err != nil {
 		log.Fatalf("❌ Failed to read subnet ID file: %s\n", err)
 	}
 	subnetID := ids.FromStringOrPanic(string(subnetIDBytes))
+
+	wallet, err := primary.MakeWallet(context.Background(), &primary.WalletConfig{
+		URI:          lib.ETNA_RPC_URL,
+		AVAXKeychain: kc,
+		EthKeychain:  kc,
+		SubnetIDs:    []ids.ID{subnetID},
+	})
+	if err != nil {
+		log.Fatalf("❌ Failed to initialize wallet: %s\n", err)
+	}
 
 	softKey, err := key.NewSoft(lib.NETWORK_ID, key.WithPrivateKey(privKey))
 	if err != nil {
@@ -112,13 +115,41 @@ func main() {
 	}
 
 	managerAddress := goethereumcommon.HexToAddress(validatormanager.ValidatorContractAddress)
-
-	convertTx, err := wallet.P().IssueConvertSubnetTx(subnetID, chainID, managerAddress.Bytes(), avaGoBootstrapValidators, getMultisigTxOptions(subnetAuthKeys, kc)...)
+	options := getMultisigTxOptions(subnetAuthKeys, kc)
+	unsignedTx, err := wallet.P().Builder().NewConvertSubnetTx(
+		subnetID,
+		chainID,
+		managerAddress.Bytes(),
+		avaGoBootstrapValidators,
+		options...,
+	)
 	if err != nil {
-		log.Fatalf("❌ Failed to issue convert subnet tx: %s\n", err)
+		log.Fatalf("❌ Failed to create convert subnet tx: %s\n", err)
 	}
 
-	_ = convertTx //TODO: remove
+	tx := txs.Tx{Unsigned: unsignedTx}
+	if err := wallet.P().Signer().Sign(context.Background(), &tx); err != nil {
+		log.Fatalf("❌ Failed to sign convert subnet tx: %s\n", err)
+	}
+
+	_, remainingSubnetAuthKeys, err := txutils.GetRemainingSigners(&tx, []string{changeOwnerAddress})
+	if err != nil {
+		log.Fatalf("❌ Failed to get remaining subnet auth keys: %s\n", err)
+	}
+	isFullySigned := len(remainingSubnetAuthKeys) == 0
+
+	id := tx.TxID
+	if isFullySigned {
+		fmt.Printf("Tx is fully signed with ID: %s\n", id)
+		err = wallet.P().IssueTx(&tx)
+		if err != nil {
+			log.Fatalf("❌ Failed to commit convert subnet tx: %s\n", err)
+		}
+	} else {
+		log.Fatalf("❌ Convert subnet tx is not fully signed")
+	}
+
+	fmt.Printf("✅ Convert subnet tx ID: %s\n", id)
 }
 
 func getMultisigTxOptions(subnetAuthKeys []ids.ShortID, kc *secp256k1fx.Keychain) []common.Option {
