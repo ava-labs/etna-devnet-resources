@@ -3,6 +3,7 @@ package lib
 import (
 	"encoding/hex"
 	"os"
+	"strings"
 
 	"github.com/ava-labs/avalanchego/utils/crypto/secp256k1"
 )
@@ -17,6 +18,9 @@ func LoadKeyFromFile(path string) (*secp256k1.PrivateKey, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	hexStr = []byte(strings.TrimSpace(string(hexStr)))
+
 	keyBytes, err := hex.DecodeString(string(hexStr))
 	if err != nil {
 		return nil, err
