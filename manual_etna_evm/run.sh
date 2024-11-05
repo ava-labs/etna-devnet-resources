@@ -33,6 +33,8 @@ echo $CMD
 $CMD
 
 echo -e "\n🚀 Launching nodes\n"
+export UID=$(id -u)
+export GID=$(id -g)
 CMD="docker compose -f ./cmd/07_launch_nodes/docker-compose.yml up -d --build"
 echo $CMD
 $CMD

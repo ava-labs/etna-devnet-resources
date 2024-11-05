@@ -10,4 +10,9 @@ RUN ./scripts/build.sh
 
 # Execution
 FROM debian:bookworm-slim
+
+# Create nobody group if it doesn't exist
+RUN groupadd -r nobody || true
+
 COPY --from=avalanchego-builder /app/avalanchego/build/avalanchego /usr/local/bin/avalanchego
+

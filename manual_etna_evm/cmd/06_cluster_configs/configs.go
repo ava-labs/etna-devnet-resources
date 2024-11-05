@@ -32,10 +32,12 @@ func main() {
 			BootstrapIDs:             strings.Join(constants.EtnaDevnetBootstrapNodeIDs, ","),
 			BootstrapIPs:             strings.Join(constants.EtnaDevnetBootstrapIPs, ","),
 			DataDir:                  fmt.Sprintf("/data/node%d", i),
+			DbDir:                    fmt.Sprintf("/data/node%d/db", i),
 			GenesisFile:              "/data/genesis.json",
 			HealthCheckFrequency:     "2s",
 			HTTPPort:                 fmt.Sprintf("%d", openPorts[i*2]),
 			IndexEnabled:             "true",
+			LogDir:                   fmt.Sprintf("/data/node%d/logs", i),
 			LogDisplayLevel:          "INFO",
 			LogLevel:                 "INFO",
 			NetworkID:                "76",
@@ -43,6 +45,7 @@ func main() {
 			PluginDir:                "/data/plugins/",
 			PublicIP:                 "127.0.0.1",
 			StakingPort:              fmt.Sprintf("%d", openPorts[i*2+1]),
+			TrackSubnets:             "",
 			UpgradeFile:              "/data/upgrade.json",
 		}
 
@@ -53,6 +56,14 @@ func main() {
 		err = os.WriteFile(filepath.Join("data", "configs", fmt.Sprintf("config-node%d.json", i)), marshalled, 0644)
 		if err != nil {
 			log.Fatalf("❌ Failed to write config: %s\n", err)
+		}
+
+		err = createMultipleFolders([]string{
+			config.DbDir[1:],
+			config.LogDir[1:],
+		})
+		if err != nil {
+			log.Fatalf("❌ Failed to create folders: %s\n", err)
 		}
 	}
 
@@ -73,4 +84,14 @@ func main() {
 	}
 
 	fmt.Println("✅ Successfully created configs")
+}
+
+func createMultipleFolders(folders []string) error {
+	for _, folder := range folders {
+		err := os.MkdirAll(folder, 0755)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
