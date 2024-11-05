@@ -17,8 +17,8 @@ CMD="go run ./cmd/03_create_subnet/"
 echo $CMD
 $CMD
 
-echo -e "\n🔗 Preparing chain\n"
-CMD="go run ./cmd/04_prep_chain/"
+echo -e "\n🧱 Generating genesis\n"
+CMD="go run ./cmd/04_gen_genesis/"
 echo $CMD
 $CMD
 
@@ -27,12 +27,17 @@ CMD="go run ./cmd/05_create_chain/"
 echo $CMD
 $CMD
 
-echo -e "\n⚙️  Setting up cluster configs\n"
+echo -e "\n🏗️  Setting up cluster configs\n"
 CMD="go run ./cmd/06_cluster_configs/"
 echo $CMD
 $CMD
 
 echo -e "\n🚀 Launching nodes\n"
 CMD="docker compose -f ./cmd/07_launch_nodes/docker-compose.yml up -d --build"
+echo $CMD
+$CMD
+
+echo -e "\n🔄 Converting chain\n"
+CMD="go run ./cmd/08_convert_chain/"
 echo $CMD
 $CMD

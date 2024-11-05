@@ -23,9 +23,6 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 )
 
-//go:embed genesis.sample.json
-var genesisBytes []byte
-
 var OneAvax = new(big.Int).SetUint64(1000000000000000000)
 var defaultEVMAirdropAmount = new(big.Int).Exp(big.NewInt(10), big.NewInt(24), nil) // 10^24
 var defaultPoAOwnerBalance = new(big.Int).Mul(OneAvax, big.NewInt(10))              // 10 Native Tokens
@@ -104,4 +101,5 @@ func main() {
 	if err := os.WriteFile("data/L1-genesis.json", prettyJSON.Bytes(), 0644); err != nil {
 		log.Fatalf("❌ Failed to write genesis: %s\n", err)
 	}
+	log.Printf("✅ Successfully wrote genesis to data/L1-genesis.json\n")
 }

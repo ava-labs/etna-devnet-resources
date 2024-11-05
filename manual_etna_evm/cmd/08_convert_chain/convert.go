@@ -15,14 +15,18 @@ import (
 
 	"github.com/ava-labs/avalanche-cli/cmd/blockchaincmd"
 	"github.com/ava-labs/avalanche-cli/pkg/constants"
+	"github.com/ava-labs/avalanche-cli/pkg/key"
 	"github.com/ava-labs/avalanche-cli/pkg/models"
 	"github.com/ava-labs/avalanche-cli/pkg/utils"
 	"github.com/ava-labs/avalanche-cli/pkg/validatormanager"
 	"github.com/ava-labs/avalanchego/api/info"
 	"github.com/ava-labs/avalanchego/ids"
+	"github.com/ava-labs/avalanchego/utils/formatting/address"
+	"github.com/ava-labs/avalanchego/utils/set"
 	"github.com/ava-labs/avalanchego/vms/secp256k1fx"
 	"github.com/ava-labs/avalanchego/wallet/subnet/primary"
-	"github.com/ethereum/go-ethereum/common"
+	"github.com/ava-labs/avalanchego/wallet/subnet/primary/common"
+	goethereumcommon "github.com/ethereum/go-ethereum/common"
 )
 
 func main() {
@@ -33,11 +37,11 @@ func main() {
 	}
 	chainID := ids.FromStringOrPanic(string(chainIDBytes))
 
-	key, err := lib.LoadKeyFromFile(lib.VALIDATOR_MANAGER_OWNER_KEY_PATH)
+	privKey, err := lib.LoadKeyFromFile(lib.VALIDATOR_MANAGER_OWNER_KEY_PATH)
 	if err != nil {
 		log.Fatalf("❌ Failed to load key from file: %s\n", err)
 	}
-	kc := secp256k1fx.NewKeychain(key)
+	kc := secp256k1fx.NewKeychain(privKey)
 
 	wallet, err := primary.MakeWallet(context.Background(), &primary.WalletConfig{
 		URI:          lib.ETNA_RPC_URL,
@@ -54,8 +58,21 @@ func main() {
 	}
 	subnetID := ids.FromStringOrPanic(string(subnetIDBytes))
 
+	softKey, err := key.NewSoft(lib.NETWORK_ID, key.WithPrivateKey(privKey))
+	if err != nil {
+		log.Fatalf("❌ Failed to create change owner address: %s\n", err)
+	}
+
+	changeOwnerAddress := softKey.P()[0]
+	fmt.Printf("Using changeOwnerAddress: %s\n", changeOwnerAddress)
+
+	subnetAuthKeys, err := address.ParseToIDs([]string{changeOwnerAddress})
+	if err != nil {
+		log.Fatalf("❌ Failed to parse subnet auth keys: %s\n", err)
+	}
+
 	validators := []models.SubnetValidator{}
-	for nodeNumber := 1; nodeNumber <= lib.VALIDATORS_COUNT; nodeNumber++ {
+	for nodeNumber := 0; nodeNumber < lib.VALIDATORS_COUNT; nodeNumber++ {
 		configBytes, err := os.ReadFile(filepath.Join("data", "configs", fmt.Sprintf("config-node%d.json", nodeNumber)))
 		if err != nil {
 			log.Fatalf("❌ Failed to read config file: %s\n", err)
@@ -78,8 +95,6 @@ func main() {
 		publicKey := "0x" + hex.EncodeToString(proofOfPossession.PublicKey[:])
 		pop := "0x" + hex.EncodeToString(proofOfPossession.ProofOfPossession[:])
 
-		changeOwnerAddress := key.Address().String() //FIXME: not sure which address to use
-
 		validator := models.SubnetValidator{
 			NodeID:               nodeID.String(),
 			Weight:               constants.BootstrapValidatorWeight,
@@ -96,12 +111,30 @@ func main() {
 		log.Fatalf("❌ Failed to convert to AvalancheGo subnet validator: %s\n", err)
 	}
 
-	managerAddress := common.HexToAddress(validatormanager.ValidatorContractAddress)
+	managerAddress := goethereumcommon.HexToAddress(validatormanager.ValidatorContractAddress)
 
-	convertTx, err := wallet.P().IssueConvertSubnetTx(subnetID, chainID, managerAddress.Bytes(), avaGoBootstrapValidators)
+	convertTx, err := wallet.P().IssueConvertSubnetTx(subnetID, chainID, managerAddress.Bytes(), avaGoBootstrapValidators, getMultisigTxOptions(subnetAuthKeys, kc)...)
 	if err != nil {
 		log.Fatalf("❌ Failed to issue convert subnet tx: %s\n", err)
 	}
 
 	_ = convertTx //TODO: remove
+}
+
+func getMultisigTxOptions(subnetAuthKeys []ids.ShortID, kc *secp256k1fx.Keychain) []common.Option {
+	options := []common.Option{}
+	walletAddrs := kc.Addresses().List()
+	changeAddr := walletAddrs[0]
+	// addrs to use for signing
+	customAddrsSet := set.Set[ids.ShortID]{}
+	customAddrsSet.Add(walletAddrs...)
+	customAddrsSet.Add(subnetAuthKeys...)
+	options = append(options, common.WithCustomAddresses(customAddrsSet))
+	// set change to go to wallet addr (instead of any other subnet auth key)
+	changeOwner := &secp256k1fx.OutputOwners{
+		Threshold: 1,
+		Addrs:     []ids.ShortID{changeAddr},
+	}
+	options = append(options, common.WithChangeOwner(changeOwner))
+	return options
 }

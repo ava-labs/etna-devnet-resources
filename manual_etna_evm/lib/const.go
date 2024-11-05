@@ -11,4 +11,5 @@ const (
 	TELEPORTER_DEPLOYER_KEY_PATH     = "data/teleporter_deployer_key.txt"
 
 	VALIDATORS_COUNT = 5
+	NETWORK_ID       = 76
 )
