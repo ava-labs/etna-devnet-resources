@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/hex"
 	"fmt"
 	"log"
 	"math/big"
@@ -9,6 +10,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/ava-labs/avalanche-cli/pkg/vm"
 	"github.com/ava-labs/avalanchego/ids"
 	"github.com/ava-labs/avalanchego/utils/constants"
 	"github.com/ava-labs/avalanchego/utils/set"
@@ -20,6 +22,10 @@ import (
 	"github.com/ava-labs/avalanchego/wallet/subnet/primary/common"
 	"github.com/ava-labs/coreth/ethclient"
 	"github.com/ava-labs/coreth/plugin/evm"
+	goethereumcommon "github.com/ethereum/go-ethereum/common"
+	goethereumtypes "github.com/ethereum/go-ethereum/core/types"
+	goethereumcrypto "github.com/ethereum/go-ethereum/crypto"
+	goethereumethclient "github.com/ethereum/go-ethereum/ethclient"
 )
 
 func checkPChainBalance(ctx context.Context, addr ids.ShortID) (*big.Int, error) {
@@ -93,10 +99,22 @@ func main() {
 	toImport := lib.MIN_BALANCE - pChainBalance.Uint64() + 100*units.MilliAvax
 
 	if cChainBalance.Uint64() < toImport {
-		log.Printf("❌ Balance %s is less than minimum balance: %d\n", cChainBalance, toImport)
-		log.Printf("Please visit " + lib.FAUCET_LINK)
-		log.Printf("Use this address to request funds: %s\n", ethAddr.Hex())
-		os.Exit(1)
+		log.Printf("Balance %s is less than minimum balance: %d\n", cChainBalance, toImport)
+		err := transferFromEwoq(ethAddr.Hex(), toImport)
+		if err != nil {
+			log.Fatalf("failed to transfer from ewoq: %s\n", err)
+		}
+		cChainBalance, err = cChainClient.BalanceAt(context.Background(), ethAddr, nil)
+		if err != nil {
+			log.Fatalf("failed to get balance: %s\n", err)
+		}
+		cChainBalance = cChainBalance.Div(cChainBalance, big.NewInt(int64(1e9)))
+		if cChainBalance.Uint64() < toImport {
+			log.Printf("❌ Balance %s is less than minimum balance: %d\n", cChainBalance, toImport)
+			log.Printf("Please visit " + lib.FAUCET_LINK)
+			log.Printf("Use this address to request funds: %s\n", ethAddr.Hex())
+			os.Exit(1)
+		}
 	} else {
 		log.Printf("C-chain balance sufficient: current %s, required %d\n", cChainBalance, toImport)
 	}
@@ -155,4 +173,62 @@ func main() {
 		log.Fatalf("❌ Final P-chain balance %s is less than minimum required %d\n", pChainBalance, lib.MIN_BALANCE)
 	}
 	log.Printf("✅ Final P-chain balance: %s (greater than minimum %d)\n", pChainBalance, lib.MIN_BALANCE)
+}
+
+func transferFromEwoq(receiverAddr string, amountNDevax uint64) error {
+	// Convert ewoq key to ECDSA private key
+	ewoqkeyBytes, err := hex.DecodeString(vm.PrefundedEwoqPrivate)
+	if err != nil {
+		return fmt.Errorf("failed to decode private key: %w", err)
+	}
+	sourceKey, err := goethereumcrypto.ToECDSA(ewoqkeyBytes)
+	if err != nil {
+		return fmt.Errorf("failed to convert to private key: %w", err)
+	}
+
+	// Convert receiver address string to address type
+	destAddr := goethereumcommon.HexToAddress(receiverAddr)
+
+	// Connect to the network
+	client, err := goethereumethclient.Dial(lib.ETNA_RPC_URL + "/ext/bc/C/rpc")
+	if err != nil {
+		return fmt.Errorf("failed to connect to network: %w", err)
+	}
+
+	// Get the sender's address and nonce
+	fromAddress := goethereumcrypto.PubkeyToAddress(sourceKey.PublicKey)
+	nonce, err := client.PendingNonceAt(context.Background(), fromAddress)
+	if err != nil {
+		return fmt.Errorf("failed to get nonce: %w", err)
+	}
+
+	// Convert amount from nDEVAX to wei (nDEVAX = 10^-9 AVAX, wei = 10^-18 AVAX)
+	// So we multiply by 10^9 to get to wei
+	value := new(big.Int).Mul(big.NewInt(int64(amountNDevax)), big.NewInt(1000000000))
+	gasLimit := uint64(21000)
+	gasPrice, err := client.SuggestGasPrice(context.Background())
+	if err != nil {
+		return fmt.Errorf("failed to get gas price: %w", err)
+	}
+
+	// Create and sign transaction
+	tx := goethereumtypes.NewTransaction(nonce, destAddr, value, gasLimit, gasPrice, nil)
+	chainID, err := client.NetworkID(context.Background())
+	if err != nil {
+		return fmt.Errorf("failed to get chain ID: %w", err)
+	}
+
+	signedTx, err := goethereumtypes.SignTx(tx, goethereumtypes.NewEIP155Signer(chainID), sourceKey)
+	if err != nil {
+		return fmt.Errorf("failed to sign transaction: %w", err)
+	}
+
+	// Send transaction
+	err = client.SendTransaction(context.Background(), signedTx)
+	if err != nil {
+		return fmt.Errorf("failed to send transaction: %w", err)
+	}
+
+	log.Printf("Transaction sent: %s", signedTx.Hash().Hex())
+	return nil
 }
