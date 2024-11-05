@@ -17,14 +17,12 @@ import (
 	"github.com/ava-labs/avalanche-cli/pkg/constants"
 	"github.com/ava-labs/avalanche-cli/pkg/key"
 	"github.com/ava-labs/avalanche-cli/pkg/models"
-	"github.com/ava-labs/avalanche-cli/pkg/txutils"
 	"github.com/ava-labs/avalanche-cli/pkg/utils"
 	"github.com/ava-labs/avalanche-cli/pkg/validatormanager"
 	"github.com/ava-labs/avalanchego/api/info"
 	"github.com/ava-labs/avalanchego/ids"
 	"github.com/ava-labs/avalanchego/utils/formatting/address"
 	"github.com/ava-labs/avalanchego/utils/set"
-	"github.com/ava-labs/avalanchego/vms/platformvm/txs"
 	"github.com/ava-labs/avalanchego/vms/secp256k1fx"
 	"github.com/ava-labs/avalanchego/wallet/subnet/primary"
 	"github.com/ava-labs/avalanchego/wallet/subnet/primary/common"
@@ -116,7 +114,7 @@ func main() {
 
 	managerAddress := goethereumcommon.HexToAddress(validatormanager.ValidatorContractAddress)
 	options := getMultisigTxOptions(subnetAuthKeys, kc)
-	unsignedTx, err := wallet.P().Builder().NewConvertSubnetTx(
+	tx, err := wallet.P().IssueConvertSubnetTx(
 		subnetID,
 		chainID,
 		managerAddress.Bytes(),
@@ -127,29 +125,12 @@ func main() {
 		log.Fatalf("❌ Failed to create convert subnet tx: %s\n", err)
 	}
 
-	tx := txs.Tx{Unsigned: unsignedTx}
-	if err := wallet.P().Signer().Sign(context.Background(), &tx); err != nil {
-		log.Fatalf("❌ Failed to sign convert subnet tx: %s\n", err)
-	}
-
-	_, remainingSubnetAuthKeys, err := txutils.GetRemainingSigners(&tx, []string{changeOwnerAddress})
+	err = os.WriteFile("./data/convert_subnet_tx_id.txt", []byte(tx.ID().String()), 0644)
 	if err != nil {
-		log.Fatalf("❌ Failed to get remaining subnet auth keys: %s\n", err)
-	}
-	isFullySigned := len(remainingSubnetAuthKeys) == 0
-
-	id := tx.TxID
-	if isFullySigned {
-		fmt.Printf("Tx is fully signed with ID: %s\n", id)
-		err = wallet.P().IssueTx(&tx)
-		if err != nil {
-			log.Fatalf("❌ Failed to commit convert subnet tx: %s\n", err)
-		}
-	} else {
-		log.Fatalf("❌ Convert subnet tx is not fully signed")
+		log.Fatalf("❌ Failed to save convert subnet tx ID: %s\n", err)
 	}
 
-	fmt.Printf("✅ Convert subnet tx ID: %s\n", id)
+	fmt.Printf("✅ Convert subnet tx ID: %s\n", tx.ID().String())
 }
 
 func getMultisigTxOptions(subnetAuthKeys []ids.ShortID, kc *secp256k1fx.Keychain) []common.Option {
