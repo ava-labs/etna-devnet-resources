@@ -12,17 +12,18 @@ import (
 	"mypkg/lib"
 	"os"
 	"path/filepath"
+	"time"
 
 	"github.com/ava-labs/avalanche-cli/cmd/blockchaincmd"
 	"github.com/ava-labs/avalanche-cli/pkg/constants"
 	"github.com/ava-labs/avalanche-cli/pkg/key"
 	"github.com/ava-labs/avalanche-cli/pkg/models"
-	"github.com/ava-labs/avalanche-cli/pkg/utils"
 	"github.com/ava-labs/avalanche-cli/pkg/validatormanager"
 	"github.com/ava-labs/avalanchego/api/info"
 	"github.com/ava-labs/avalanchego/ids"
 	"github.com/ava-labs/avalanchego/utils/formatting/address"
 	"github.com/ava-labs/avalanchego/utils/set"
+	"github.com/ava-labs/avalanchego/vms/platformvm/signer"
 	"github.com/ava-labs/avalanchego/vms/secp256k1fx"
 	"github.com/ava-labs/avalanchego/wallet/subnet/primary"
 	"github.com/ava-labs/avalanchego/wallet/subnet/primary/common"
@@ -86,12 +87,9 @@ func main() {
 
 		endpoint := fmt.Sprintf("http://%s:%s", nodeConfig.PublicIP, nodeConfig.HTTPPort)
 
-		infoClient := info.NewClient(endpoint)
-		ctx, cancel := utils.GetAPILargeContext()
-		defer cancel()
-		nodeID, proofOfPossession, err := infoClient.GetNodeID(ctx)
+		nodeID, proofOfPossession, err := getNodeInfoRetry(endpoint)
 		if err != nil {
-			log.Fatalf("❌ Failed to get node ID: %s\n", err)
+			log.Fatalf("❌ Failed to get node info: %s\n", err)
 		}
 		publicKey := "0x" + hex.EncodeToString(proofOfPossession.PublicKey[:])
 		pop := "0x" + hex.EncodeToString(proofOfPossession.ProofOfPossession[:])
@@ -131,6 +129,23 @@ func main() {
 	}
 
 	fmt.Printf("✅ Convert subnet tx ID: %s\n", tx.ID().String())
+}
+
+// Naively retries getting node info from the node until it succeeds
+func getNodeInfoRetry(endpoint string) (nodeID ids.NodeID, proofOfPossession *signer.ProofOfPossession, err error) {
+	infoClient := info.NewClient(endpoint)
+
+	for i := 0; i < 10; i++ {
+		ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
+		defer cancel()
+
+		nodeID, proofOfPossession, err = infoClient.GetNodeID(ctx)
+		if err == nil {
+			return
+		}
+		time.Sleep(time.Duration(i) * time.Second)
+	}
+	return ids.NodeID{}, nil, fmt.Errorf("failed to get node info after 10 retries")
 }
 
 func getMultisigTxOptions(subnetAuthKeys []ids.ShortID, kc *secp256k1fx.Keychain) []common.Option {
