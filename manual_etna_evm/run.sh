@@ -21,8 +21,8 @@ echo -e "\n🏗️  Setting up node configs\n"
 go run ./cmd/06_node_configs/
 
 echo -e "\n🚀 Launching nodes\n"
-export UID=$(id -u)
-export GID=$(id -g)
+export CURRENT_UID=$(id -u)
+export CURRENT_GID=$(id -g)
 docker compose -f ./cmd/07_launch_nodes/docker-compose.yml up -d --build
 
 echo -e "\n🔄 Converting chain\n"
@@ -35,5 +35,7 @@ echo -e "\n🚀 Stopping nodes\n"
 docker compose -f ./cmd/07_launch_nodes/docker-compose.yml down
 
 echo -e "\n🚀 Starting nodes again with a new subnet\n"
-docker compose -f ./cmd/07_launch_nodes/docker-compose.yml up -d --build
+docker compose -f ./cmd/07_launch_nodes/docker-compose.yml up -d
 
+echo -e "\n🏥 Checking subnet health\n"
+go run ./cmd/11_check_subnet_health/

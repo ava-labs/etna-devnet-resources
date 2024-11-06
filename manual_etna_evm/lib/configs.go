@@ -37,7 +37,7 @@ func FillNodeConfigs(trackSubnets string) error {
 			LogLevel:                 "INFO",
 			NetworkID:                "76",
 			NetworkMaxReconnectDelay: "1s",
-			PluginDir:                "/data/plugins/",
+			PluginDir:                "/plugins/",
 			PublicIP:                 "127.0.0.1",
 			StakingPort:              fmt.Sprintf("%d", openPorts[i*2+1]),
 			TrackSubnets:             trackSubnets,

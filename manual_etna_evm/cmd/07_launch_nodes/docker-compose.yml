@@ -8,7 +8,7 @@ services:
       - ../../data/:/data/
     network_mode: host
     command: /usr/local/bin/avalanchego --config-file=/data/configs/config-node0.json
-    user: "${UID}:${GID}"
+    user: "${CURRENT_UID}:${CURRENT_GID}"
   node1:
     container_name: node1
     extends: node0

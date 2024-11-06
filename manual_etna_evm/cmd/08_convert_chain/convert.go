@@ -31,6 +31,11 @@ import (
 )
 
 func main() {
+	convertTxIDPath := filepath.Join("data", "convert_subnet_tx_id.txt")
+	if txIDBytes, err := os.ReadFile(convertTxIDPath); err == nil {
+		log.Fatalf("❌ Subnet was already converted in transaction: %s", string(txIDBytes))
+	}
+
 	chainIDFilePath := filepath.Join("data", "chain.txt")
 	chainIDBytes, err := os.ReadFile(chainIDFilePath)
 	if err != nil {
@@ -123,7 +128,7 @@ func main() {
 		log.Fatalf("❌ Failed to create convert subnet tx: %s\n", err)
 	}
 
-	err = os.WriteFile("./data/convert_subnet_tx_id.txt", []byte(tx.ID().String()), 0644)
+	err = os.WriteFile(convertTxIDPath, []byte(tx.ID().String()), 0644)
 	if err != nil {
 		log.Fatalf("❌ Failed to save convert subnet tx ID: %s\n", err)
 	}
