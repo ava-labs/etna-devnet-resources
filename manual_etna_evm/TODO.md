@@ -1,0 +1,4 @@
+- Why do we have a separate teleporterKey?
+- How do we add/remove validators in PoA?
+- How to run PoA?
+- Where is the smart contract repo and how did we get the bytecode?
