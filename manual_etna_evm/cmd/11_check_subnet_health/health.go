@@ -19,22 +19,21 @@ func checkNodeHealth(nodeNumber int, rpcURL string) error {
 	for i := 0; i < maxAttempts; i++ {
 		ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
 		defer cancel()
-
 		client, err := evm.GetClient(rpcURL)
 		if err != nil {
-			fmt.Printf("⏳ Node%d RPC endpoint not responding (attempt %d/%d): %s\n", nodeNumber, i+1, maxAttempts, err)
+			fmt.Printf("🌱 Node%d is still booting up (try %d of %d) - waiting for RPC endpoint...\n", nodeNumber, i+1, maxAttempts)
 			time.Sleep(2 * time.Second)
 			continue
 		}
 
 		chainID, err := client.ChainID(ctx)
 		if err != nil {
-			fmt.Printf("⏳ Node%d RPC endpoint not responding (attempt %d/%d): %s\n", nodeNumber, i+1, maxAttempts, err)
-			time.Sleep(5 * time.Second)
+			fmt.Printf("🌱 Node%d is starting up (try %d of %d) - waiting for chain ID...\n", nodeNumber, i+1, maxAttempts)
+			time.Sleep(10 * time.Second)
 			continue
 		}
 
-		fmt.Printf("✅ Node%d RPC endpoint is healthy (chain ID: %s)\n", nodeNumber, chainID)
+		fmt.Printf("🌱 Node%d RPC endpoint is healthy (chain ID: %s)\n", nodeNumber, chainID)
 		return nil
 	}
 
