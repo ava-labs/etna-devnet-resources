@@ -10,7 +10,6 @@ import (
 	"os"
 	"time"
 
-	"github.com/ava-labs/avalanche-cli/pkg/teleporter/genesis"
 	"github.com/ava-labs/avalanche-cli/pkg/validatormanager"
 	blockchainSDK "github.com/ava-labs/avalanche-cli/sdk/blockchain"
 	"github.com/ava-labs/coreth/plugin/evm"
@@ -20,7 +19,6 @@ import (
 	"github.com/ava-labs/subnet-evm/params"
 	"github.com/ava-labs/subnet-evm/precompile/contracts/warp"
 	"github.com/ava-labs/subnet-evm/precompile/precompileconfig"
-	"github.com/ethereum/go-ethereum/common"
 )
 
 var OneAvax = new(big.Int).SetUint64(1000000000000000000)
@@ -40,11 +38,11 @@ func main() {
 	}
 	ethAddr := evm.PublicKeyToEthAddress(ownerKey.PublicKey())
 
-	teleporterKey, err := lib.LoadKeyFromFile(lib.TELEPORTER_DEPLOYER_KEY_PATH)
-	if err != nil {
-		log.Fatalf("failed to load key from file: %s\n", err)
-	}
-	teleporterEthAddr := evm.PublicKeyToEthAddress(teleporterKey.PublicKey())
+	// teleporterKey, err := lib.LoadKeyFromFile(lib.TELEPORTER_DEPLOYER_KEY_PATH)
+	// if err != nil {
+	// 	log.Fatalf("failed to load key from file: %s\n", err)
+	// }
+	// teleporterEthAddr := evm.PublicKeyToEthAddress(teleporterKey.PublicKey())
 
 	const CHAIN_ID = 12345
 	feeConfig := commontype.FeeConfig{
@@ -59,12 +57,15 @@ func main() {
 	}
 
 	allocation := core.GenesisAlloc{}
-	allocation[common.Address{}] = core.GenesisAccount{Balance: defaultPoAOwnerBalance}
 	allocation[ethAddr] = core.GenesisAccount{Balance: defaultEVMAirdropAmount}
-	allocation[teleporterEthAddr] = core.GenesisAccount{Balance: teleporterBalance}
 
-	genesis.AddICMMessengerContractToAllocations(allocation)
 	validatormanager.AddPoAValidatorManagerContractToAllocations(allocation)
+	validatormanager.AddTransparentProxyContractToAllocations(allocation, ethAddr.String())
+
+	// allocation[teleporterEthAddr] = core.GenesisAccount{Balance: teleporterBalance}
+
+	// genesis.AddICMMessengerContractToAllocations(allocation)
+	// validatormanager.AddPoAValidatorManagerContractToAllocations(allocation)
 
 	genesisTimestamp := utils.TimeToNewUint64(time.Now())
 
