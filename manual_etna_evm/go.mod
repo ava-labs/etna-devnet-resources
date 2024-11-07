@@ -20,7 +20,7 @@ require (
 	github.com/ProtonMail/go-crypto v1.0.0 // indirect
 	github.com/VictoriaMetrics/fastcache v1.12.1 // indirect
 	github.com/ava-labs/apm v1.0.0 // indirect
-	github.com/ava-labs/avalanche-cli v1.8.0-rc0.0.20241031155716-f8632c85e61c // indirect
+	github.com/ava-labs/avalanche-cli v1.7.8-rc1.0.20241106193055-9588b1235325 // indirect
 	github.com/ava-labs/avalanche-network-runner v1.8.4-0.20241023180457-5189aac811fb // indirect
 	github.com/ava-labs/awm-relayer v1.4.1-0.20241014222901-4b34ab86afd0 // indirect
 	github.com/ava-labs/ledger-avalanche/go v0.0.0-20241009183145-e6f90a8a1a60 // indirect
