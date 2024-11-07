@@ -39,3 +39,6 @@ docker compose -f ./cmd/07_launch_nodes/docker-compose.yml up -d
 
 echo -e "\n🏥 Checking subnet health\n"
 go run ./cmd/11_check_subnet_health/
+
+echo -e "\n💸 Sending some test coins\n"
+go run ./cmd/12_evm_transfer/
