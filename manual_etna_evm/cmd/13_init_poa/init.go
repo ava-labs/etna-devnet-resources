@@ -10,15 +10,15 @@ import (
 	"os"
 
 	"github.com/ava-labs/avalanche-cli/cmd/blockchaincmd"
-	blockchainSDK "github.com/ava-labs/avalanche-cli/sdk/blockchain"
 
 	"github.com/ava-labs/avalanchego/api/info"
 
-	"github.com/ava-labs/coreth/plugin/evm"
+	pluginEVM "github.com/ava-labs/coreth/plugin/evm"
 
 	"github.com/ava-labs/avalanche-cli/pkg/constants"
 	"github.com/ava-labs/avalanche-cli/pkg/key"
 	"github.com/ava-labs/avalanche-cli/pkg/models"
+	blockchainSDK "github.com/ava-labs/avalanche-cli/sdk/blockchain"
 	"github.com/ava-labs/avalanchego/ids"
 	"github.com/ava-labs/avalanchego/utils/logging"
 )
@@ -45,18 +45,7 @@ func main() {
 	}
 
 	// Convert to Ethereum address format
-	ownerEthAddress := evm.PublicKeyToEthAddress(ownerKey.PublicKey())
-
-	// Get node0's RPC URL from config
-	configBytes, err := os.ReadFile("data/configs/config-node0.json")
-	if err != nil {
-		log.Fatalf("❌ Failed to read config file: %s\n", err)
-	}
-	nodeConfig := lib.NodeConfig{}
-	if err := json.Unmarshal(configBytes, &nodeConfig); err != nil {
-		log.Fatalf("❌ Failed to unmarshal config: %s\n", err)
-	}
-	rpcURL := fmt.Sprintf("http://%s:%s", nodeConfig.PublicIP, nodeConfig.HTTPPort)
+	ownerEthAddress := pluginEVM.PublicKeyToEthAddress(ownerKey.PublicKey())
 
 	softKey, err := key.NewSoft(lib.NETWORK_ID, key.WithPrivateKey(ownerKey))
 	if err != nil {
@@ -64,7 +53,6 @@ func main() {
 	}
 
 	changeOwnerAddress := softKey.P()[0]
-	fmt.Printf("Using changeOwnerAddress: %s\n", changeOwnerAddress)
 
 	extraPeers := []string{}
 
@@ -113,9 +101,11 @@ func main() {
 		SubnetID:            subnetID,
 		BlockchainID:        blockchainID,
 		OwnerAddress:        &ownerEthAddress,
-		RPC:                 fmt.Sprintf("%s/ext/bc/%s/rpc", rpcURL, blockchainID),
+		RPC:                 fmt.Sprintf("%s/ext/bc/%s/rpc", extraPeers[0], blockchainID),
 		BootstrapValidators: avaGoBootstrapValidators,
 	}
+
+	subnetSDK.BootstrapValidators = avaGoBootstrapValidators
 
 	// Get private key hex string for genesis
 	genesisPrivateKey := hex.EncodeToString(ownerKey.Bytes())
@@ -123,7 +113,7 @@ func main() {
 	network := models.Network{
 		Kind:        models.EtnaDevnet,
 		ID:          lib.NETWORK_ID,
-		Endpoint:    lib.ETNA_RPC_URL,
+		Endpoint:    extraPeers[0],
 		ClusterName: "",
 	}
 
@@ -137,7 +127,7 @@ func main() {
 		network,
 		genesisPrivateKey,
 		peers,
-		logging.Info,
+		logging.Debug,
 	); err != nil {
 		log.Fatalf("❌ Failed to initialize Proof of Authority: %s\n", err)
 	}
