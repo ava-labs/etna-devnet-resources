@@ -9,10 +9,11 @@ export interface AbstractWallet {
         P: string;
     }>;
     addTxSignatures: (unsignedTx: UnsignedTx) => Promise<void>;
+    getAPIEndpoint: () => string;
 }
 
 
-export function getPrivateKeyWallet(privateKey: Uint8Array): AbstractWallet {
+export function getPrivateKeyWallet(privateKey: Uint8Array, apiEndpoint: string): AbstractWallet {
     const publicKey = secp256k1.getPublicKey(privateKey);
 
     const pChainAddress = `P-${utils.formatBech32(
@@ -34,11 +35,12 @@ export function getPrivateKeyWallet(privateKey: Uint8Array): AbstractWallet {
                 const signature = await secp256k1.sign(unsignedBytes, privateKey);
                 unsignedTx.addSignature(signature);
             }
-        }
+        },
+        getAPIEndpoint: () => apiEndpoint
     }
 }
 
-export function getLocalStorageWallet(): AbstractWallet {
+export function getLocalStorageWallet(apiEndpoint: string): AbstractWallet {
     let privateKeyHex = localStorage.getItem("privateKey");
     if (privateKeyHex === null) {
         privateKeyHex = bytesToHex(secp256k1.randomPrivateKey());
@@ -46,5 +48,5 @@ export function getLocalStorageWallet(): AbstractWallet {
     }
 
     const privateKey = hexToBytes(privateKeyHex as string);
-    return getPrivateKeyWallet(privateKey);
+    return getPrivateKeyWallet(privateKey, apiEndpoint);
 }
