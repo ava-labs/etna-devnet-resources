@@ -1,4 +1,4 @@
-import { pvm, Utxo } from '@avalabs/avalanchejs';
+import { pvm, Utxo } from 'avalanchejs-bleeding-edge';
 import { AbstractWallet } from '../../lib/wallet';
 import { useState } from 'react';
 import { exportTx } from '../../lib/exportUTXO';

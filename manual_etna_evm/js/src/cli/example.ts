@@ -1,6 +1,5 @@
 import { JsonRpcProvider } from 'ethers';
-import { addTxSignatures, Context, evm, utils } from '@avalabs/avalanchejs';
-
+import { addTxSignatures, Context, evm, utils } from 'avalanchejs-bleeding-edge'
 
 const C_CHAIN_ADDRESS = "0x700046af78cD0E55D5d25025bCEaE992B87A5686"
 const X_CHAIN_ADDRESS = "X-custom125uzjyu824gwlz6e4jqthvks9er6xwvx7ve80v"
@@ -10,7 +9,6 @@ const main = async (publicUrl: string) => {
     const provider = new JsonRpcProvider(publicUrl + '/ext/bc/C/rpc');
 
     const evmapi = new evm.EVMApi(publicUrl);
-
 
     const context = await Context.getContextFromURI(publicUrl);
     const txCount = await provider.getTransactionCount(C_CHAIN_ADDRESS);
@@ -27,8 +25,6 @@ const main = async (publicUrl: string) => {
         BigInt(txCount),
     );
 
-    console.log("tx is ", tx);
-
     await addTxSignatures({
         unsignedTx: tx,
         privateKeys: [utils.hexToBuffer(TEST_PRIVATE_KEY)],
@@ -39,10 +35,6 @@ const main = async (publicUrl: string) => {
     console.log("Done");
 };
 
-
-console.log(`\n\n\nExecuting on Fuji:\n\n\n`)
-const FUJI_PUBLIC_URL = "https://api.avax-test.network"
-await main(FUJI_PUBLIC_URL)
 
 console.log(`\n\n\nExecuting on Etna:\n\n\n`)
 const ETNA_PUBLIC_URL = "https://etna.avax-dev.network"

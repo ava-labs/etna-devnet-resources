@@ -1,8 +1,7 @@
 import { bytesToHex, hexToBytes } from '@noble/hashes/utils';
 import fs from "fs"
 import { getPrivateKeyWallet } from "../lib/wallet";
-import { secp256k1 } from '@avalabs/avalanchejs';
-import { exportUTXOFromCChain } from '../lib/exportUTXO';
+import { secp256k1 } from 'avalanchejs-bleeding-edge';
 
 
 let privateKeyBytes: Uint8Array
@@ -16,5 +15,4 @@ if (fs.existsSync("privateKey.txt")) {
 const wallet = getPrivateKeyWallet(privateKeyBytes);
 
 console.log(await wallet.getAddress());
-const utxos = await exportUTXOFromCChain(wallet, 0.1);
-console.log(utxos);
+
