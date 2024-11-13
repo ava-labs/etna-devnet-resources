@@ -144,6 +144,8 @@ func main() {
 		},
 	}
 
+	fmt.Println("constants.PlatformChainID", constants.PlatformChainID)
+
 	// Export from C-chain
 	exportTx, err := cWallet.IssueExportTx(
 		constants.PlatformChainID,
