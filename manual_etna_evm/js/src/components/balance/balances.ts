@@ -1,7 +1,7 @@
 
 export const P_CHAIN_DIVISOR = 1e9;
 export const C_CHAIN_DIVISOR = 1e18;
-export const MINIMUM_P_CHAIN_BALANCE = BigInt(5 * P_CHAIN_DIVISOR);
+export const MINIMUM_P_CHAIN_BALANCE_AVAX = 5.0
 
 async function makeGRPCRequest<T>(url: string, method: string, params: string[] | Record<string, string[]>): Promise<T> {
     const response = await fetch(url, {

@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import Balance from "./components/balance/Balance";
-import { MINIMUM_P_CHAIN_BALANCE } from "./components/balance/balances";
+import { MINIMUM_P_CHAIN_BALANCE_AVAX } from "./components/balance/balances";
 import { Keys } from "./components/keys/Keys";
 import Card from "./lib/Card";
 import { useWalletStore } from "./lib/store";
@@ -41,7 +41,7 @@ function App() {
       {cAddress && pAddress && <Card title="💰 Wallet Balance">
         <Balance />
       </Card>}
-      {pBalance > MINIMUM_P_CHAIN_BALANCE && <Card title="Create subnet">
+      {pBalance > MINIMUM_P_CHAIN_BALANCE_AVAX && <Card title="Create subnet">
         ...
       </Card>}
     </div >
