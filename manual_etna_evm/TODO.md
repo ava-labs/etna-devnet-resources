@@ -1,0 +1,5 @@
+- Why do we have a separate teleporterKey?
+- How do we add/remove validators in PoA?
+- How to run PoS?
+- Where is the smart contract repo and how did we get the bytecode?
+- Can we launch nodes only after convert complete? (try searching "!generateNodeID" in Avalanche CLI)
