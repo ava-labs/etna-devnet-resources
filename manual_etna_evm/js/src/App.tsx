@@ -3,7 +3,7 @@ import Balance from "./components/balance/Balance";
 import { MINIMUM_P_CHAIN_BALANCE_AVAX } from "./components/balance/balances";
 import { Keys } from "./components/keys/Keys";
 import Card from "./lib/Card";
-import { useWalletStore } from "./lib/store";
+import { useWalletStore } from "./components/balance/walletStore";
 import { getLocalStorageWallet } from "./lib/wallet";
 import { useAsync } from "./lib/hooks";
 import CreateSubnet from "./components/subnet/CreateSubnet";

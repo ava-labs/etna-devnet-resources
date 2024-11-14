@@ -1,6 +1,6 @@
 import Button from "../../lib/Button";
 import { useAsync } from "../../lib/hooks";
-import { useWalletStore } from "../../lib/store";
+import { useWalletStore } from "./walletStore";
 import { exportUTXO } from "./utxo";
 
 export default function ExportUTXO({ minAmount }: { minAmount: number }) {

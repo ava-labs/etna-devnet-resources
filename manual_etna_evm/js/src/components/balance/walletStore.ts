@@ -1,9 +1,9 @@
 import { create } from "zustand";
-import { AbstractWallet } from "./wallet";
+import { AbstractWallet } from "../../lib/wallet";
 import { Utxo } from "@avalabs/avalanchejs";
-import { getUTXOS } from "../components/balance/utxo";
-import { getCChainBalance } from "../components/balance/balances";
-import { getPChainbalance } from "../components/balance/balances";
+import { getUTXOS } from "./utxo";
+import { getCChainBalance } from "./balances";
+import { getPChainbalance } from "./balances";
 
 interface WalletState {
     pAddress: string;

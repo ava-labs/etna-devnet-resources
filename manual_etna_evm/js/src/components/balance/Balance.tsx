@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { UTXOs } from "./UTXOs";
 import { useAsync } from '../../lib/hooks';
 import { MINIMUM_P_CHAIN_BALANCE_AVAX, P_CHAIN_DIVISOR, C_CHAIN_DIVISOR } from "./balances";
-import { useWalletStore } from "../../lib/store";
+import { useWalletStore } from "./walletStore";
 
 
 export default function Balance() {

@@ -2,7 +2,7 @@ import { useAsync } from '../../lib/hooks';
 import { ImportUTXOs } from './ImportUTXOs';
 import { useEffect } from 'react';
 import ExportUTXO from './exportUTXO';
-import { useWalletStore } from '../../lib/store';
+import { useWalletStore } from './walletStore';
 
 
 export function UTXOs({ minAmount }: { minAmount: number }) {

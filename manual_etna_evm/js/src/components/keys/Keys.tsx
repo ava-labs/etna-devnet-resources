@@ -1,6 +1,6 @@
 import { useAsync } from "../../lib/hooks";
 import { useEffect } from 'react';
-import { useWalletStore } from "../../lib/store";
+import { useWalletStore } from "../balance/walletStore";
 
 export function Keys() {
     const wallet = useWalletStore(state => state.wallet);

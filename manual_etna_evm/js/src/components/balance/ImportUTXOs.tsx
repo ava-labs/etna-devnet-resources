@@ -2,7 +2,7 @@ import Button from "../../lib/Button";
 import { Utxo } from "@avalabs/avalanchejs";
 import { importUTXOs } from "./utxo";
 import { useAsync } from "../../lib/hooks";
-import { useWalletStore } from "../../lib/store";
+import { useWalletStore } from "./walletStore";
 
 export function ImportUTXOs({ UTXOs }: { UTXOs: Utxo[] }) {
     const wallet = useWalletStore(state => state.wallet);
