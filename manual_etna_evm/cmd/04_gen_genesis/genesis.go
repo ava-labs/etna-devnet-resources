@@ -4,6 +4,7 @@ import (
 	"bytes"
 	_ "embed"
 	"encoding/json"
+	"fmt"
 	"log"
 	"math/big"
 	"mypkg/lib"
@@ -37,6 +38,8 @@ func main() {
 		log.Fatalf("failed to load key from file: %s\n", err)
 	}
 	ethAddr := evm.PublicKeyToEthAddress(ownerKey.PublicKey())
+
+	fmt.Println("ethAddr", ethAddr)
 
 	// teleporterKey, err := lib.LoadKeyFromFile(lib.TELEPORTER_DEPLOYER_KEY_PATH)
 	// if err != nil {

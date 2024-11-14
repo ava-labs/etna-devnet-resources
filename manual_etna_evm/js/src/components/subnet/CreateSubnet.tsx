@@ -63,5 +63,5 @@ async function createSubnet(wallet: AbstractWallet): Promise<string> {
     await wallet.signRawTx(tx);
 
     const response = await pvmApi.issueSignedTx(tx.getSignedTx());
-    return response.txID;
+    return response.txID;//FIXME: I am not sure if txID is the subnetID
 }
