@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import Balance from "./components/balance/Balance";
-import { MINIMUM_P_CHAIN_BALANCE_AVAX } from "./components/balance/balances";
+import { MINIMUM_P_CHAIN_BALANCE_AVAX, P_CHAIN_DIVISOR } from "./components/balance/balances";
 import { Keys } from "./components/keys/Keys";
 import Card from "./lib/Card";
 import { useWalletStore } from "./components/balance/walletStore";
@@ -11,6 +11,8 @@ import { useSubnetStore } from "./components/subnet/subnetStore";
 import GenerateGenesis from "./components/genesis/GenerateGenesis";
 import { useGenesisStore } from "./components/genesis/genesisStore";
 import CreateChain from "./components/chain/CreateChain";
+import { useChainStore } from "./components/chain/chainStore";
+import ConvertChain from "./components/convert/ConvertChain";
 
 function App() {
   const wallet = useWalletStore(state => state.wallet);
@@ -19,6 +21,7 @@ function App() {
   const pBalance = useWalletStore(state => state.pBalance);
   const subnetId = useSubnetStore(state => state.subnetId);
   const genesis = useGenesisStore(state => state.genesis);
+  const chainId = useChainStore(state => state.chainId);
 
   const setWallet = useWalletStore(state => state.setWallet);
   const generateWalletPromise = useAsync(async () => {
@@ -34,6 +37,7 @@ function App() {
   const STEP_CREATE_SUBNET = 3;
   const STEP_GENERATE_GENESIS = 4;
   const STEP_CREATE_CHAIN = 5;
+  const STEP_CONVERT_CHAIN = 6;
 
   useEffect(() => {
     let step = STEP_GENERATE_KEYS;
@@ -42,7 +46,7 @@ function App() {
       step = STEP_WALLET_BALANCE;
     }
 
-    if (step === STEP_WALLET_BALANCE && pBalance > MINIMUM_P_CHAIN_BALANCE_AVAX) {
+    if (step === STEP_WALLET_BALANCE && pBalance > BigInt(MINIMUM_P_CHAIN_BALANCE_AVAX * P_CHAIN_DIVISOR)) {
       step = STEP_CREATE_SUBNET;
     }
 
@@ -54,8 +58,12 @@ function App() {
       step = STEP_CREATE_CHAIN;
     }
 
+    if (step === STEP_CREATE_CHAIN && chainId) {
+      step = STEP_CONVERT_CHAIN;
+    }
+
     setCurrentStep(step);
-  }, [cAddress, pAddress, pBalance]);
+  }, [cAddress, pAddress, pBalance, genesis, chainId]);
 
   useEffect(() => {
     if (!wallet) {
@@ -87,6 +95,9 @@ function App() {
       </Card>}
       {currentStep >= STEP_CREATE_CHAIN && <Card title="🔗 Create chain">
         <CreateChain />
+      </Card>}
+      {currentStep >= STEP_CONVERT_CHAIN && <Card title="🔄 Convert chain">
+        <ConvertChain />
       </Card>}
     </div >
   )

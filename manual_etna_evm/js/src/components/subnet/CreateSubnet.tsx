@@ -1,9 +1,10 @@
-import { Context, pvm, utils } from "@avalabs/avalanchejs";
+import { Context, pvm, utils } from "avalanchejs-bleeding-edge";
 import { useSubnetStore } from "./subnetStore";
 import { AbstractWallet } from "../../lib/wallet";
 import { useAsync } from "../../lib/hooks";
 import { useWalletStore } from "../balance/walletStore";
 import Button from "../../lib/Button";
+import { useEffect } from "react";
 
 export default function CreateSubnet() {
     const subnetId = useSubnetStore((state) => state.subnetId);
@@ -17,21 +18,39 @@ export default function CreateSubnet() {
         await reloadBalances();
     });
 
-    if (subnetId) {
-        return <div>✅ Subnet {subnetId} created!</div>
-    }
+    const getSubnetPromise = useAsync(async () => {
+        const pvmApi = new pvm.PVMApi(wallet!.getAPIEndpoint());
+        const { subnets } = await pvmApi.getSubnets({ ids: [subnetId] });
+        console.log("Subnets: ", subnets)
+        return subnets
+    })
+
+    useEffect(() => {
+        getSubnetPromise.execute()
+    }, [subnetId])
+
 
     if (createSubnetPromise.loading) {
         return <div>Creating subnet...</div>
     }
 
-    if (createSubnetPromise.error) {
-        return <div>Error creating subnet: {createSubnetPromise.error}</div>
+    if (getSubnetPromise.loading) return <div>Getting subnet...</div>
+
+    if (createSubnetPromise.error) return <div>Error creating subnet: {createSubnetPromise.error}</div>
+    if (getSubnetPromise.error) return <div>Error getting subnet: {getSubnetPromise.error}</div>
+
+    if (subnetId) {
+        return <>
+            <div className="mb-4">✅ Subnet {subnetId} created!</div>
+            <pre className="bg-gray-100 p-4 rounded-lg">{JSON.stringify(getSubnetPromise.data, null, 2)}</pre>
+        </>
+    } else {
+        return <>
+            <Button onClick={createSubnetPromise.execute}>Create Subnet</Button>
+        </>
     }
 
-    return <>
-        <Button onClick={createSubnetPromise.execute}>Create Subnet</Button>
-    </>
+
 }
 
 async function createSubnet(wallet: AbstractWallet): Promise<string> {

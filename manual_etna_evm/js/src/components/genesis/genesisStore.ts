@@ -15,9 +15,14 @@ interface GenesisState {
 export const useGenesisStore = create<GenesisState>()(persist<GenesisState>((set, get) => ({
     genesis: "",
     hasGeneratedGenesis: false,
-    generateGenesis: (params: GenerateGenesisParams) => {
+    generateGenesis: ({ userAddress }: GenerateGenesisParams) => {
         let genesisString = JSON.stringify(defaultgenesis, null, 2)
-        genesisString = genesisString.split("%REPLACE_ME%").join(params.userAddress);
+
+        if (userAddress.startsWith("0x")) {
+            userAddress = userAddress.slice(2);
+        }
+
+        genesisString = genesisString.split("%REPLACE_ME%").join(userAddress);
         set({ genesis: genesisString });
     },
     clearGenesis: () => {

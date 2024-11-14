@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { AbstractWallet } from "../../lib/wallet";
-import { Utxo } from "@avalabs/avalanchejs";
+import { Utxo } from "avalanchejs-bleeding-edge";
 import { getUTXOS } from "./utxo";
 import { getCChainBalance } from "./balances";
 import { getPChainbalance } from "./balances";

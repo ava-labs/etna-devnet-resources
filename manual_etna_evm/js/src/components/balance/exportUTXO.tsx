@@ -2,6 +2,7 @@ import Button from "../../lib/Button";
 import { useAsync } from "../../lib/hooks";
 import { useWalletStore } from "./walletStore";
 import { exportUTXO } from "./utxo";
+import { P_CHAIN_DIVISOR } from "./balances";
 
 export default function ExportUTXO({ minAmount }: { minAmount: number }) {
     const pBalance = useWalletStore(state => state.pBalance);
@@ -9,7 +10,7 @@ export default function ExportUTXO({ minAmount }: { minAmount: number }) {
     const reloadUTXOs = useWalletStore(state => state.reloadUTXOs);
     const reloadBalances = useWalletStore(state => state.reloadBalances);
 
-    const toExport = BigInt(minAmount * 1e9) - BigInt(pBalance)
+    const toExport = BigInt(minAmount * P_CHAIN_DIVISOR) - BigInt(pBalance)
 
     const exportPromise = useAsync(async () => {
         await exportUTXO(wallet!, minAmount)

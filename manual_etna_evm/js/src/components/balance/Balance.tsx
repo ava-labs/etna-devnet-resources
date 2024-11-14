@@ -26,7 +26,7 @@ export default function Balance() {
     return <>
         <div>C-Chain balance: {Number(cBalance) / C_CHAIN_DIVISOR} AVAX</div>
         <div>P-Chain balance: {Number(pBalance) / P_CHAIN_DIVISOR} AVAX</div>
-        {pBalance <= MINIMUM_P_CHAIN_BALANCE_AVAX && <div className="mt-4">
+        {pBalance <= BigInt(MINIMUM_P_CHAIN_BALANCE_AVAX * P_CHAIN_DIVISOR) && <div className="mt-4">
             <UTXOs minAmount={MINIMUM_P_CHAIN_BALANCE_AVAX} />
         </div>}
     </>;

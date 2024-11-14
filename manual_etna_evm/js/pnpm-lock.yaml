@@ -8,12 +8,12 @@ importers:
 
   .:
     dependencies:
-      '@avalabs/avalanchejs':
-        specifier: 4.1.0-alpha.18
-        version: 4.1.0-alpha.18
       '@noble/hashes':
         specifier: ^1.5.0
         version: 1.5.0
+      avalanchejs-bleeding-edge:
+        specifier: ^2024.11.14
+        version: 2024.11.14
       ethers:
         specifier: ^6.13.4
         version: 6.13.4
@@ -88,10 +88,6 @@ packages:
   '@ampproject/remapping@2.3.0':
     resolution: {integrity: sha512-30iZtAPgz+LTIYoeivqYo853f02jBYSd5uGnGpkFV0M3xOt9aN73erkgYAmZU43x4VfqcnLxW9Kpg3R5LC4YYw==}
     engines: {node: '>=6.0.0'}
-
-  '@avalabs/avalanchejs@4.1.0-alpha.18':
-    resolution: {integrity: sha512-erDvZwsst+hCegRF9qyVF03wM35EKplIz01W6FOMLq2jSE2tAy66QpVtB2Y5r9OphKU62Yx/7xtT0eqMDSosUA==}
-    engines: {node: '>=20'}
 
   '@babel/code-frame@7.26.2':
     resolution: {integrity: sha512-RJlIHRueQgwWitWgF8OdFYGZX328Ax5BCemNGlqHfplnRT9ESi8JkFlvaVYbS+UubVY6dpv87Fs2u5M29iNFVQ==}
@@ -669,6 +665,10 @@ packages:
     hasBin: true
     peerDependencies:
       postcss: ^8.1.0
+
+  avalanchejs-bleeding-edge@2024.11.14:
+    resolution: {integrity: sha512-A21sulWBw7mA7Ng0eI40FQk2VxUVZeN6WnK50I5E0wk7PxOX3ik/9K0Edf9zyPzy+w8C8cYkBjPcmJZ9eYtDZA==}
+    engines: {node: '>=20'}
 
   balanced-match@1.0.2:
     resolution: {integrity: sha512-3oSeUO0TMV67hN1AmbXsK4yaqU7tjiHlbxRDZOpH0KW9+CeX4bRAaX0Anxt0tx2MrpRpWwQaPwIlISEJhYU5Pw==}
@@ -1467,14 +1467,6 @@ snapshots:
       '@jridgewell/gen-mapping': 0.3.5
       '@jridgewell/trace-mapping': 0.3.25
 
-  '@avalabs/avalanchejs@4.1.0-alpha.18':
-    dependencies:
-      '@noble/curves': 1.3.0
-      '@noble/hashes': 1.3.3
-      '@noble/secp256k1': 2.0.0
-      '@scure/base': 1.1.5
-      micro-eth-signer: 0.7.2
-
   '@babel/code-frame@7.26.2':
     dependencies:
       '@babel/helper-validator-identifier': 7.25.9
@@ -2002,6 +1994,14 @@ snapshots:
       picocolors: 1.1.1
       postcss: 8.4.49
       postcss-value-parser: 4.2.0
+
+  avalanchejs-bleeding-edge@2024.11.14:
+    dependencies:
+      '@noble/curves': 1.3.0
+      '@noble/hashes': 1.3.3
+      '@noble/secp256k1': 2.0.0
+      '@scure/base': 1.1.5
+      micro-eth-signer: 0.7.2
 
   balanced-match@1.0.2: {}
 

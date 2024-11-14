@@ -10,8 +10,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@avalabs/avalanchejs": "4.1.0-alpha.18",
     "@noble/hashes": "^1.5.0",
+    "avalanchejs-bleeding-edge": "^2024.11.14",
     "ethers": "^6.13.4",
     "micro-eth-signer": "^0.12.2",
     "react": "^18.3.1",

@@ -1,4 +1,4 @@
-import { secp256k1, UnsignedTx, utils } from '@avalabs/avalanchejs';
+import { secp256k1, UnsignedTx, utils } from 'avalanchejs-bleeding-edge';
 import { bytesToHex, hexToBytes } from '@noble/hashes/utils';
 import { addr } from 'micro-eth-signer';
 
@@ -39,6 +39,7 @@ export function getPrivateKeyWallet(privateKey: Uint8Array, apiEndpoint: string)
         },
         getAPIEndpoint: () => apiEndpoint,
         signRawTx: async (unsignedTx: UnsignedTx) => {
+            console.log("DEBUG: unsignedTx.hasPubkey", unsignedTx.hasPubkey(secp256k1.getPublicKey(privateKey)));
             const unsignedBytes = unsignedTx.toBytes();
             const signature = await secp256k1.sign(unsignedBytes, privateKey);
             unsignedTx.addSignature(signature)
