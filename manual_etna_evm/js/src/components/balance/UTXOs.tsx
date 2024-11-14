@@ -1,29 +1,29 @@
-import { AbstractWallet } from '../../lib/wallet';
-import { exportUTXO, getUTXOS } from './utxo';
 import { useAsync } from '../../lib/hooks';
 import { ImportUTXOs } from './ImportUTXOs';
 import { useEffect } from 'react';
+import ExportUTXO from './exportUTXO';
+import { useWalletStore } from '../../lib/store';
 
-export function UTXOs({ wallet, minAmount }: { wallet: AbstractWallet, minAmount: number }) {
-    const loadUTXOs = useAsync(() => getUTXOS(wallet));
+
+export function UTXOs({ minAmount }: { minAmount: number }) {
+    const reloadUTXOs = useWalletStore(state => state.reloadUTXOs);
+    const reloadUTXOsPromise = useAsync(reloadUTXOs);
+    const utxos = useWalletStore(state => state.utxos);
 
     useEffect(() => {
-        loadUTXOs.execute();
-    }, [wallet]);
+        reloadUTXOsPromise.execute();
+    }, []);
 
+    if (reloadUTXOsPromise.error) return <div className="error">Error: {reloadUTXOsPromise.error}</div>;
+    if (reloadUTXOsPromise.loading) return <div>Loading...</div>;
 
-    if (loadUTXOs.error) return <div className="error">Error: {loadUTXOs.error}</div>;
-    if (loadUTXOs.loading) return <div>Loading...</div>;
-
-    if (loadUTXOs.data && loadUTXOs.data.length > 0) {
+    if (utxos.length > 0) {
         return <>
-            <ImportUTXOs wallet={wallet} UTXOs={loadUTXOs.data} />
+            <ImportUTXOs UTXOs={utxos} />
         </>;
     }
 
     return <>
-        <div className="text-lg font-bold">
-            TODO: not implemented
-        </div>
+        <ExportUTXO minAmount={minAmount} />
     </>;
 }

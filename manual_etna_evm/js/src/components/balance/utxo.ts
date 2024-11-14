@@ -1,8 +1,9 @@
-import { addTxSignatures, pvm, Utxo } from "@avalabs/avalanchejs";
+import { pvm, Utxo } from "@avalabs/avalanchejs";
 
 import { JsonRpcProvider } from 'ethers';
 import { Context, evm, utils } from '@avalabs/avalanchejs'
 import { AbstractWallet } from '../../lib/wallet';
+
 
 export async function exportUTXO(wallet: AbstractWallet, amount: number) {
     const provider = new JsonRpcProvider(wallet.getAPIEndpoint() + '/ext/bc/C/rpc');

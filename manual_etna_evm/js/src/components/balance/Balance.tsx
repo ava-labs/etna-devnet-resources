@@ -1,4 +1,3 @@
-import { AbstractWallet } from "../../lib/wallet";
 import { useEffect } from "react";
 import { UTXOs } from "./UTXOs";
 import { useAsync } from '../../lib/hooks';
@@ -8,7 +7,8 @@ import { useWalletStore } from "../../lib/store";
 
 const MINIMUM_BALANCE = 5.1;
 
-export default function Balance({ wallet }: { wallet: AbstractWallet }) {
+export default function Balance() {
+    const wallet = useWalletStore(state => state.wallet);
     const setCBalance = useWalletStore(state => state.setCBalance);
     const setPBalance = useWalletStore(state => state.setPBalance);
     const cAddress = useWalletStore(state => state.cAddress);
@@ -45,7 +45,7 @@ export default function Balance({ wallet }: { wallet: AbstractWallet }) {
         <div>C-Chain balance: {Number(cBalance) / C_CHAIN_DIVISOR} AVAX</div>
         <div>P-Chain balance: {Number(pBalance) / P_CHAIN_DIVISOR} AVAX</div>
         {pBalance <= MINIMUM_P_CHAIN_BALANCE && <div className="mt-4">
-            <UTXOs wallet={wallet} minAmount={MINIMUM_BALANCE} />
+            <UTXOs minAmount={MINIMUM_BALANCE} />
         </div>}
     </>;
 }

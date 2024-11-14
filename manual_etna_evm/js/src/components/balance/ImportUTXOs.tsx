@@ -1,23 +1,17 @@
-import { AbstractWallet } from "../../lib/wallet";
 import Button from "../../lib/Button";
 import { Utxo } from "@avalabs/avalanchejs";
 import { importUTXOs } from "./utxo";
 import { useAsync } from "../../lib/hooks";
 import { useWalletStore } from "../../lib/store";
-import { getCChainBalance, getPChainbalance } from "./balances";
 
-export function ImportUTXOs({ wallet, UTXOs }: { wallet: AbstractWallet, UTXOs: Utxo[] }) {
-    const address = useWalletStore(state => state.address);
-
-    const setCBalance = useWalletStore(state => state.setCBalance);
-    const setPBalance = useWalletStore(state => state.setPBalance);
+export function ImportUTXOs({ UTXOs }: { UTXOs: Utxo[] }) {
+    const wallet = useWalletStore(state => state.wallet);
+    const reloadUTXOs = useWalletStore(state => state.reloadUTXOs);
+    const reloadBalances = useWalletStore(state => state.reloadBalances);
 
     const importPromise = useAsync(async () => {
-        await importUTXOs(wallet, UTXOs)
-        const balance = await getCChainBalance(address.C)
-        setCBalance(balance)
-        const pBalance = await getPChainbalance(address.P)
-        setPBalance(pBalance)
+        await importUTXOs(wallet!, UTXOs)
+        await Promise.all([reloadUTXOs(), reloadBalances()])
     });
 
     if (importPromise.loading) {
