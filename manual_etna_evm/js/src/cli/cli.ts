@@ -1,7 +1,7 @@
 import { bytesToHex, hexToBytes } from '@noble/hashes/utils';
 import fs from "fs"
 import { getPrivateKeyWallet } from "../lib/wallet";
-import { secp256k1 } from 'avalanchejs-bleeding-edge';
+import { secp256k1 } from '@avalabs/avalanchejs';
 
 
 let privateKeyBytes: Uint8Array

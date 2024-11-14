@@ -1,4 +1,4 @@
-import { secp256k1, UnsignedTx, utils } from 'avalanchejs-bleeding-edge';
+import { secp256k1, UnsignedTx, utils } from '@avalabs/avalanchejs';
 import { bytesToHex, hexToBytes } from '@noble/hashes/utils';
 import { addr } from 'micro-eth-signer';
 
@@ -10,6 +10,7 @@ export interface AbstractWallet {
     }>;
     addTxSignatures: (unsignedTx: UnsignedTx) => Promise<void>;
     getAPIEndpoint: () => string;
+    signRawTx: (unsignedTx: UnsignedTx) => Promise<void>;
 }
 
 
@@ -36,7 +37,12 @@ export function getPrivateKeyWallet(privateKey: Uint8Array, apiEndpoint: string)
                 unsignedTx.addSignature(signature);
             }
         },
-        getAPIEndpoint: () => apiEndpoint
+        getAPIEndpoint: () => apiEndpoint,
+        signRawTx: async (unsignedTx: UnsignedTx) => {
+            const unsignedBytes = unsignedTx.toBytes();
+            const signature = await secp256k1.sign(unsignedBytes, privateKey);
+            unsignedTx.addSignature(signature)
+        }
     }
 }
 

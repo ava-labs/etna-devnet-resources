@@ -1,5 +1,5 @@
 import { JsonRpcProvider } from 'ethers';
-import { addTxSignatures, Context, evm, utils } from 'avalanchejs-bleeding-edge'
+import { addTxSignatures, Context, evm, utils } from '@avalabs/avalanchejs'
 
 const C_CHAIN_ADDRESS = "0x700046af78cD0E55D5d25025bCEaE992B87A5686"
 const X_CHAIN_ADDRESS = "X-custom125uzjyu824gwlz6e4jqthvks9er6xwvx7ve80v"

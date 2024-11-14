@@ -10,13 +10,14 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@avalabs/avalanchejs": "4.1.0-alpha.18",
     "@noble/hashes": "^1.5.0",
-    "avalanchejs-bleeding-edge": "2024.11.13",
     "ethers": "^6.13.4",
     "micro-eth-signer": "^0.12.2",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "utils": "link:@noble/hashes/utils"
+    "utils": "link:@noble/hashes/utils",
+    "zustand": "^5.0.1"
   },
   "devDependencies": {
     "@eslint/js": "^9.13.0",
