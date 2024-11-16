@@ -4,13 +4,13 @@ import (
 	"bytes"
 	_ "embed"
 	"encoding/json"
-	"fmt"
 	"log"
 	"math/big"
 	"mypkg/lib"
 	"os"
 	"time"
 
+	icmgenesis "github.com/ava-labs/avalanche-cli/pkg/teleporter/genesis"
 	"github.com/ava-labs/avalanche-cli/pkg/validatormanager"
 	blockchainSDK "github.com/ava-labs/avalanche-cli/sdk/blockchain"
 	"github.com/ava-labs/coreth/plugin/evm"
@@ -20,16 +20,21 @@ import (
 	"github.com/ava-labs/subnet-evm/params"
 	"github.com/ava-labs/subnet-evm/precompile/contracts/warp"
 	"github.com/ava-labs/subnet-evm/precompile/precompileconfig"
+	"github.com/ethereum/go-ethereum/common"
 )
 
-var OneAvax = new(big.Int).SetUint64(1000000000000000000)
-var defaultEVMAirdropAmount = new(big.Int).Exp(big.NewInt(10), big.NewInt(24), nil) // 10^24
-var defaultPoAOwnerBalance = new(big.Int).Mul(OneAvax, big.NewInt(10))              // 10 Native Tokens
+var (
+	OneAvax                = new(big.Int).SetUint64(1000000000000000000)
+	defaultPoAOwnerBalance = new(big.Int).Mul(OneAvax, big.NewInt(10))
+)
 
 var (
 	// 600 AVAX: to deploy teleporter contract, registry contract, and fund
 	// starting relayer operations
 	teleporterBalance = big.NewInt(0).Mul(big.NewInt(1e18), big.NewInt(600))
+	// 1000 AVAX: to deploy teleporter contract, registry contract, fund
+	// starting relayer operations, and deploy bridge contracts
+	externalGasTokenBalance = big.NewInt(0).Mul(big.NewInt(1e18), big.NewInt(1000))
 )
 
 func main() {
@@ -39,15 +44,8 @@ func main() {
 	}
 	ethAddr := evm.PublicKeyToEthAddress(ownerKey.PublicKey())
 
-	fmt.Println("ethAddr", ethAddr)
-
-	// teleporterKey, err := lib.LoadKeyFromFile(lib.TELEPORTER_DEPLOYER_KEY_PATH)
-	// if err != nil {
-	// 	log.Fatalf("failed to load key from file: %s\n", err)
-	// }
-	// teleporterEthAddr := evm.PublicKeyToEthAddress(teleporterKey.PublicKey())
-
 	const CHAIN_ID = 12345
+
 	feeConfig := commontype.FeeConfig{
 		GasLimit:                 big.NewInt(12000000),
 		TargetBlockRate:          2,
@@ -59,16 +57,17 @@ func main() {
 		BlockGasCostStep:         big.NewInt(200000),
 	}
 
-	allocation := core.GenesisAlloc{}
-	allocation[ethAddr] = core.GenesisAccount{Balance: defaultEVMAirdropAmount}
+	allocation := core.GenesisAlloc{
+		common.Address{}: core.GenesisAccount{Balance: teleporterBalance},
+	}
+	allocation[ethAddr] = core.GenesisAccount{Balance: defaultPoAOwnerBalance}
+	icmgenesis.AddICMMessengerContractToAllocations(allocation)
+
+	teleporterAddress := common.HexToAddress("0x2656b6eb2ba42b6e0b5be696021f94de4d8a16d8")
+	// TODO: figure out how to get the address of the teleporter contract
+	allocation[teleporterAddress] = core.GenesisAccount{Balance: teleporterBalance}
 
 	validatormanager.AddPoAValidatorManagerContractToAllocations(allocation)
-	validatormanager.AddTransparentProxyContractToAllocations(allocation, ethAddr.String())
-
-	// allocation[teleporterEthAddr] = core.GenesisAccount{Balance: teleporterBalance}
-
-	// genesis.AddICMMessengerContractToAllocations(allocation)
-	// validatormanager.AddPoAValidatorManagerContractToAllocations(allocation)
 
 	genesisTimestamp := utils.TimeToNewUint64(time.Now())
 
