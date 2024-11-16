@@ -117,7 +117,7 @@ func main() {
 		ClusterName: "",
 	}
 
-	peers, err := blockchaincmd.GetAggregatorExtraPeers(string(network.Kind), extraPeers)
+	peers, err := blockchaincmd.ConvertURIToPeers(extraPeers)
 	if err != nil {
 		log.Fatalf("❌ Failed to get extra peers: %s\n", err)
 	}
