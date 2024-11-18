@@ -30,20 +30,4 @@ func main() {
 		}
 		log.Println("✅ POA validator manager keys generated and saved in ./data/ folder")
 	}
-
-	// Generate teleporter deployer key if it doesn't exist
-	if _, err := os.Stat(lib.TELEPORTER_DEPLOYER_KEY_PATH); err == nil {
-		log.Println("Teleporter deployer keys were previously generated in ./data/ folder")
-	} else {
-		key, err := secp256k1.NewPrivateKey()
-		if err != nil {
-			log.Fatalf("failed to generate teleporter deployer private key: %s\n", err)
-		}
-
-		err = lib.SaveKeyToFile(key, lib.TELEPORTER_DEPLOYER_KEY_PATH)
-		if err != nil {
-			log.Fatalf("failed to save teleporter deployer key to file: %s\n", err)
-		}
-		log.Println("✅ Teleporter deployer keys generated and saved in ./data/ folder")
-	}
 }

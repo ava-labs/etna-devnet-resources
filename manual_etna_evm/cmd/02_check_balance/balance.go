@@ -96,11 +96,9 @@ func main() {
 
 	log.Printf("Balance on c-chain at address %s: %s\n", ethAddr.Hex(), cChainBalance)
 
-	toImport := lib.MIN_BALANCE - pChainBalance.Uint64() + 100*units.MilliAvax
-
-	if cChainBalance.Uint64() < toImport {
-		log.Printf("Balance %s is less than minimum balance: %d\n", cChainBalance, toImport)
-		err := transferFromEwoq(ethAddr.Hex(), toImport)
+	if cChainBalance.Uint64() < lib.MIN_BALANCE {
+		log.Printf("Balance %s is less than minimum balance: %d\n", cChainBalance, lib.MIN_BALANCE)
+		err := transferFromEwoq(ethAddr.Hex(), lib.MIN_BALANCE*2)
 		if err != nil {
 			log.Fatalf("failed to transfer from ewoq: %s\n", err)
 		}
@@ -109,17 +107,17 @@ func main() {
 			log.Fatalf("failed to get balance: %s\n", err)
 		}
 		cChainBalance = cChainBalance.Div(cChainBalance, big.NewInt(int64(1e9)))
-		if cChainBalance.Uint64() < toImport {
-			log.Printf("❌ Balance %s is less than minimum balance: %d\n", cChainBalance, toImport)
+		if cChainBalance.Uint64() < lib.MIN_BALANCE {
+			log.Printf("❌ Balance %s is less than minimum balance: %d\n", cChainBalance, lib.MIN_BALANCE)
 			log.Printf("Please visit " + lib.FAUCET_LINK)
 			log.Printf("Use this address to request funds: %s\n", ethAddr.Hex())
 			os.Exit(1)
 		}
 	} else {
-		log.Printf("C-chain balance sufficient: current %s, required %d\n", cChainBalance, toImport)
+		log.Printf("C-chain balance sufficient: current %s, required %d\n", cChainBalance, lib.MIN_BALANCE)
 	}
 
-	log.Printf("Transferring %d from C-chain to P-chain\n", toImport)
+	log.Printf("Transferring %d from C-chain to P-chain\n", lib.MIN_BALANCE)
 
 	// Create keychain and wallet
 	kc := secp256k1fx.NewKeychain(key)
@@ -150,7 +148,7 @@ func main() {
 	exportTx, err := cWallet.IssueExportTx(
 		constants.PlatformChainID,
 		[]*secp256k1fx.TransferOutput{{
-			Amt:          toImport,
+			Amt:          lib.MIN_BALANCE + units.MilliAvax*100,
 			OutputOwners: owner,
 		}},
 	)

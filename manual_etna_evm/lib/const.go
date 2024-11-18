@@ -8,7 +8,6 @@ const (
 	FAUCET_LINK  = "https://core.app/tools/testnet-faucet/?subnet=cdevnet&token=cdevnet"
 
 	VALIDATOR_MANAGER_OWNER_KEY_PATH = "data/poa_validator_manager_owner_key.txt"
-	TELEPORTER_DEPLOYER_KEY_PATH     = "data/teleporter_deployer_key.txt"
 
 	VALIDATORS_COUNT = 1
 	NETWORK_ID       = 76
