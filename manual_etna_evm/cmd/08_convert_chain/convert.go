@@ -139,6 +139,7 @@ func main() {
 // Naively retries getting node info from the node until it succeeds
 func getNodeInfoRetry(endpoint string) (nodeID ids.NodeID, proofOfPossession *signer.ProofOfPossession, err error) {
 	infoClient := info.NewClient(endpoint)
+	fmt.Printf("Getting node info from %s\n", endpoint)
 
 	for i := 0; i < 10; i++ {
 		ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)

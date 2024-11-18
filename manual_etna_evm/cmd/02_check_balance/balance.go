@@ -98,7 +98,7 @@ func main() {
 
 	toImport := lib.MIN_BALANCE - pChainBalance.Uint64() + 100*units.MilliAvax
 
-	if cChainBalance.Uint64() <= toImport {
+	if cChainBalance.Uint64() < toImport {
 		log.Printf("Balance %s is less than minimum balance: %d\n", cChainBalance, toImport)
 		err := transferFromEwoq(ethAddr.Hex(), toImport)
 		if err != nil {
@@ -143,6 +143,8 @@ func main() {
 			pChainAddr,
 		},
 	}
+
+	fmt.Println("constants.PlatformChainID", constants.PlatformChainID)
 
 	// Export from C-chain
 	exportTx, err := cWallet.IssueExportTx(
