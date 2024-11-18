@@ -20,17 +20,6 @@
     "@jridgewell/gen-mapping" "^0.3.5"
     "@jridgewell/trace-mapping" "^0.3.24"
 
-"avalanchejs-bleeding-edge@4.1.0-alpha.18":
-  version "4.1.0-alpha.18"
-  resolved "https://registry.yarnpkg.com/avalanchejs-bleeding-edge/-/avalanchejs-4.1.0-alpha.18.tgz#5bdefefebf456bdd9cfce1f1c1abe26f9277fbb7"
-  integrity sha512-erDvZwsst+hCegRF9qyVF03wM35EKplIz01W6FOMLq2jSE2tAy66QpVtB2Y5r9OphKU62Yx/7xtT0eqMDSosUA==
-  dependencies:
-    "@noble/curves" "1.3.0"
-    "@noble/hashes" "1.3.3"
-    "@noble/secp256k1" "2.0.0"
-    "@scure/base" "1.1.5"
-    micro-eth-signer "0.7.2"
-
 "@babel/code-frame@^7.25.9", "@babel/code-frame@^7.26.0":
   version "7.26.2"
   resolved "https://registry.yarnpkg.com/@babel/code-frame/-/code-frame-7.26.2.tgz#4b5fab97d33338eff916235055f0ebc21e573a85"
@@ -351,9 +340,9 @@
   integrity sha512-BsWiH1yFGjXXS2yvrf5LyuoSIIbPrGUWob917o+BTKuZ7qJdxX8aJLRxs1fS9n6r7vESrq1OUqb68dANcFXuQQ==
 
 "@eslint/plugin-kit@^0.2.0":
-  version "0.2.2"
-  resolved "https://registry.yarnpkg.com/@eslint/plugin-kit/-/plugin-kit-0.2.2.tgz#5eff371953bc13e3f4d88150e2c53959f64f74f6"
-  integrity sha512-CXtq5nR4Su+2I47WPOlWud98Y5Lv8Kyxp2ukhgFx/eW6Blm18VXJO5WuQylPugRo8nbluoi6GvvxBLqHcvqUUw==
+  version "0.2.3"
+  resolved "https://registry.yarnpkg.com/@eslint/plugin-kit/-/plugin-kit-0.2.3.tgz#812980a6a41ecf3a8341719f92a6d1e784a2e0e8"
+  integrity sha512-2b/g5hRmpbb1o4GnTZax9N9m0FXzz9OV42ZzI4rDDMDuHUqigAiQCEWChBWCY4ztAGVRjoWT19v0yMmc5/L5kA==
   dependencies:
     levn "^0.4.1"
 
@@ -844,6 +833,17 @@ autoprefixer@^10.4.20:
     normalize-range "^0.1.2"
     picocolors "^1.0.1"
     postcss-value-parser "^4.2.0"
+
+avalanchejs-bleeding-edge@^2024.11.14:
+  version "2024.11.14"
+  resolved "https://registry.yarnpkg.com/avalanchejs-bleeding-edge/-/avalanchejs-bleeding-edge-2024.11.14.tgz#e724a9a4a5bace2af8b2528fef1e32357caeb2d8"
+  integrity sha512-A21sulWBw7mA7Ng0eI40FQk2VxUVZeN6WnK50I5E0wk7PxOX3ik/9K0Edf9zyPzy+w8C8cYkBjPcmJZ9eYtDZA==
+  dependencies:
+    "@noble/curves" "1.3.0"
+    "@noble/hashes" "1.3.3"
+    "@noble/secp256k1" "2.0.0"
+    "@scure/base" "1.1.5"
+    micro-eth-signer "0.7.2"
 
 balanced-match@^1.0.0:
   version "1.0.2"
@@ -2077,7 +2077,6 @@ util-deprecate@^1.0.2:
 
 "utils@link:@noble/hashes/utils":
   version "0.0.0"
-  uid ""
 
 vite@^5.4.10:
   version "5.4.11"
