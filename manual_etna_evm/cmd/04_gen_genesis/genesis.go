@@ -104,5 +104,6 @@ func main() {
 	if err := os.WriteFile("data/L1-genesis.json", prettyJSON.Bytes(), 0644); err != nil {
 		log.Fatalf("❌ Failed to write genesis: %s\n", err)
 	}
+
 	log.Printf("✅ Successfully wrote genesis to data/L1-genesis.json\n")
 }

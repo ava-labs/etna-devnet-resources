@@ -43,5 +43,8 @@ go run ./cmd/11_check_subnet_health/
 echo -e "\n💸 Sending some test coins\n"
 go run ./cmd/12_evm_transfer/
 
+echo -e "\n🔄 Waiting for the transaction to be included\n"
+sleep 20
+
 echo -e "\n🔄 Initializing PoA\n"
 go run ./cmd/13_init_poa/
