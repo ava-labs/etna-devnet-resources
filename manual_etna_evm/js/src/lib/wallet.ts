@@ -1,4 +1,4 @@
-import { secp256k1, UnsignedTx, utils } from 'avalanchejs-bleeding-edge';
+import { secp256k1, UnsignedTx, utils } from '@avalabs/avalanchejs';
 import { bytesToHex, hexToBytes } from '@noble/hashes/utils';
 import { addr } from 'micro-eth-signer';
 

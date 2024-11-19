@@ -1,5 +1,5 @@
 import Button from "../../lib/Button";
-import { Utxo } from "avalanchejs-bleeding-edge";
+import { Utxo } from "@avalabs/avalanchejs";
 import { importUTXOs } from "./utxo";
 import { useAsync } from "../../lib/hooks";
 import { useWalletStore } from "./walletStore";

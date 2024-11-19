@@ -5,7 +5,7 @@ import { useWalletStore } from "../balance/walletStore";
 import { useSubnetStore } from "../subnet/subnetStore";
 import { useGenesisStore } from "../genesis/genesisStore";
 import Button from "../../lib/Button";
-import { pvm } from "avalanchejs-bleeding-edge";
+import { pvm } from "@avalabs/avalanchejs";
 
 export default function CreateChain() {
     const chainStore = useChainStore();

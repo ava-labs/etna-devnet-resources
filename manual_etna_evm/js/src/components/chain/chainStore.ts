@@ -1,9 +1,9 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from 'zustand/middleware';
 import { AbstractWallet } from "../../lib/wallet";
-import { utils } from "avalanchejs-bleeding-edge";
-import { Context } from "avalanchejs-bleeding-edge";
-import { pvm } from "avalanchejs-bleeding-edge";
+import { utils } from "@avalabs/avalanchejs";
+import { Context } from "@avalabs/avalanchejs";
+import { pvm } from "@avalabs/avalanchejs";
 
 const SUBNET_EVM_ID = 'srEXiWaHuhNyGwPUi444Tu47ZEDwxTWrbQiuD7FmgSAQ6X7Dy'
 

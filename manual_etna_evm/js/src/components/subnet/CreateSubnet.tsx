@@ -1,4 +1,4 @@
-import { Context, pvm, utils } from "avalanchejs-bleeding-edge";
+import { Context, pvm, utils } from "@avalabs/avalanchejs";
 import { useSubnetStore } from "./subnetStore";
 import { AbstractWallet } from "../../lib/wallet";
 import { useAsync } from "../../lib/hooks";

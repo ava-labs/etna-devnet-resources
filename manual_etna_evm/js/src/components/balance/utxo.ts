@@ -1,7 +1,7 @@
-import { pvm, Utxo } from "avalanchejs-bleeding-edge";
+import { pvm, Utxo } from "@avalabs/avalanchejs";
 
 import { JsonRpcProvider } from 'ethers';
-import { Context, evm, utils } from 'avalanchejs-bleeding-edge'
+import { Context, evm, utils } from '@avalabs/avalanchejs'
 import { AbstractWallet } from '../../lib/wallet';
 
 
