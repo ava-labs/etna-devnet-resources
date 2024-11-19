@@ -51,12 +51,12 @@ You can find the Postman Collection and an Example Environment in the [resources
 
 To run an AvalancheGo node connected to the Etna DevNet:
 
-1. Ensure that you are using an AvalancheGo build from the `v1.12.0-initial-poc.6` tag or later.
+1. Ensure that you are using an AvalancheGo build from the `v1.11.13` tag or later.
 
 ```zsh
 ➜  avalanchego git:(master) git pull
-➜  avalanchego git:(master) git checkout v1.12.0-initial-poc.6
-➜  avalanchego git:(v1.12.0-initial-poc.6) ./scripts/build.sh
+➜  avalanchego git:(master) git checkout v1.11.13
+➜  avalanchego git:(v1.11.13) ./scripts/build.sh
 ```
 
 For more info on the setup required to run a Node, see this [tutorial](https://docs.avax.network/nodes/run-a-node/manually).
@@ -80,11 +80,11 @@ If you require more, please reach out to our team in the relevant Telegram/Slack
 
 ## Testing New Transaction Types
 
-Ensure you are locally running an AvalancheGo node. 
+Ensure you are locally running an AvalancheGo node.
 
-The AvalancheGo [wallet](https://github.com/ava-labs/avalanchego/tree/v1.12.0-initial-poc.6/wallet) folder contains example scripts written in Golang for testing common workflows. 
+The AvalancheGo [wallet](https://github.com/ava-labs/avalanchego/tree/v1.11.13/wallet) folder contains example scripts written in Golang for testing common workflows.
 
-Inside `wallet/subnet/primary/examples` [folder](https://github.com/ava-labs/avalanchego/tree/v1.12.0-initial-poc.6/wallet/subnet/primary/examples), you will find scripts you can run locally. To test creating a new L1 on Etna Devnet, you can run:
+Inside `wallet/subnet/primary/examples` [folder](https://github.com/ava-labs/avalanchego/tree/v1.11.13/wallet/subnet/primary/examples), you will find scripts you can run locally. To test creating a new L1 on Etna Devnet, you can run:
 
 `go run wallet/subnet/primary/examples/create-subnet/main.go`
 
@@ -92,4 +92,4 @@ Inside `wallet/subnet/primary/examples` [folder](https://github.com/ava-labs/ava
 
 `go run wallet/subnet/primary/examples/convert-subnet/main.go`
 
-Some of the values in the scripts (such as `subnetID`) are hard-coded, and will need to be adjusted based on the output of each consecutive transaction in order to function properly. 
+Some of the values in the scripts (such as `subnetID`) are hard-coded, and will need to be adjusted based on the output of each consecutive transaction in order to function properly.

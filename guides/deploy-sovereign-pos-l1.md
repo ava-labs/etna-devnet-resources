@@ -13,7 +13,7 @@ mkdir -p $GOPATH/src/github.com/ava-labs
 cd $GOPATH/src/github.com/ava-labs
 git clone https://github.com/ava-labs/avalanchego.git
 cd $GOPATH/src/github.com/ava-labs/avalanchego
-git checkout v1.12.0-initial-poc.6
+git checkout v1.11.13
 ./scripts/build.sh
 ```
 
@@ -41,6 +41,7 @@ You can use the following command to create the blockchain:
 ```
 Enter reward basis points for PoS Reward Calculator: 100
 ```
+
 We include an [ExampleRewardCalculator](https://github.com/ava-labs/teleporter/blob/main/contracts/validator-manager/ExampleRewardCalculator.sol) in the genesis with storage for rewardBasisPoints set to this parameter
 
 You can include the `--reward-basis-points` flag instead to skip this prompt.
@@ -90,14 +91,16 @@ By the end of your command, you should have a running sovereign L1 with a Proof 
 Contract deployed into it!
 
 ## Notice
-The initial validator set is still treated as a Proof of Authority network, in order for validators to receive rewards they must first be cycled (removed from validator set and added again). 
+
+The initial validator set is still treated as a Proof of Authority network, in order for validators to receive rewards they must first be cycled (removed from validator set and added again).
 
 ## Add Validator
+
 ```bash
 ./avalanche blockchain addValidator pos
 ```
 
-Follow the prompting, 
+Follow the prompting,
 select **Yes** when asked if network is PoS
 
 ```bash
@@ -109,7 +112,7 @@ Validator weight: 3
 ValidationID: nJTTNdofYhZttdjH234BiGKHeSpi9L5wtLmyxhkoL4iyaJWJY
 RegisterSubnetValidatorTX fee: 0.000001546 AVAX
 RegisterSubnetValidatorTx ID: XVsUBdXSE3ixqkwjoDP6dYDqNMrnMLjKGmhKFveTjgmxZVb8T
-Waiting for P-Chain to update validator information ... 100% [===============]           
+Waiting for P-Chain to update validator information ... 100% [===============]
   NodeID: NodeID-C3Cbvw4wDtGuWRCJh2v3LttdiLdNWYwox
   Network: Cluster pos-local-node
   Weight: 3
@@ -127,7 +130,8 @@ To tear down your local Avalanche Nodes, run:
 
 `nodeClusterName` is in the form of <chainName>-local-node
 
-or 
+or
+
 ```zsh
 killall avalanche
 ```
