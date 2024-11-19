@@ -24,6 +24,12 @@ import (
 )
 
 func main() {
+	poaInitializedFilepath := "data/poa_initialized.txt"
+	if _, err := os.Stat(poaInitializedFilepath); err == nil {
+		fmt.Println("✅ PoA already initialized")
+		return
+	}
+
 	// Read subnet ID
 	subnetIDBytes, err := os.ReadFile("data/subnet.txt")
 	if err != nil {
@@ -133,4 +139,9 @@ func main() {
 	}
 
 	fmt.Println("✅ Successfully initialized Proof of Authority")
+
+	// Create file to indicate that PoA is initialized
+	if err := os.WriteFile(poaInitializedFilepath, []byte("true"), 0644); err != nil {
+		log.Fatalf("❌ Failed to create PoA initialized file: %s\n", err)
+	}
 }
