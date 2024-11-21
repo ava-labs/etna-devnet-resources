@@ -10,7 +10,6 @@ import (
 	"os"
 	"time"
 
-	"github.com/ava-labs/avalanche-cli/pkg/vm"
 	"github.com/ava-labs/avalanchego/ids"
 	"github.com/ava-labs/avalanchego/utils/constants"
 	"github.com/ava-labs/avalanchego/utils/set"
@@ -27,6 +26,8 @@ import (
 	goethereumcrypto "github.com/ethereum/go-ethereum/crypto"
 	goethereumethclient "github.com/ethereum/go-ethereum/ethclient"
 )
+
+const PrefundedEwoqPrivate = "56289e99c94b6912bfc12adc093c9b51124f0dc54ac7a766b2bc5ccf558d8027"
 
 func checkPChainBalance(ctx context.Context, addr ids.ShortID) (*big.Int, error) {
 	uri := lib.ETNA_RPC_URL
@@ -177,7 +178,7 @@ func main() {
 
 func transferFromEwoq(receiverAddr string, amountNDevax uint64) error {
 	// Convert ewoq key to ECDSA private key
-	ewoqkeyBytes, err := hex.DecodeString(vm.PrefundedEwoqPrivate)
+	ewoqkeyBytes, err := hex.DecodeString(PrefundedEwoqPrivate)
 	if err != nil {
 		return fmt.Errorf("failed to decode private key: %w", err)
 	}

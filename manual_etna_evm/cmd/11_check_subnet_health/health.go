@@ -10,8 +10,8 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/ava-labs/avalanche-cli/pkg/evm"
 	"github.com/ava-labs/avalanchego/ids"
+	"github.com/ava-labs/subnet-evm/ethclient"
 )
 
 func checkNodeHealth(nodeNumber int, rpcURL string) error {
@@ -19,7 +19,7 @@ func checkNodeHealth(nodeNumber int, rpcURL string) error {
 	for i := 0; i < maxAttempts; i++ {
 		ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
 		defer cancel()
-		client, err := evm.GetClient(rpcURL)
+		client, err := ethclient.DialContext(ctx, rpcURL)
 		if err != nil {
 			fmt.Printf("🌱 Node%d is still booting up (try %d of %d) - waiting for RPC endpoint...\n", nodeNumber, i+1, maxAttempts)
 			time.Sleep(2 * time.Second)
