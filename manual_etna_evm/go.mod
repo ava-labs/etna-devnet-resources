@@ -4,9 +4,9 @@ go 1.22.8
 
 require (
 	github.com/ava-labs/avalanche-cli v1.7.8-0.20241114184904-96f015ccf716
-	github.com/ava-labs/avalanchego v1.12.0-initial-poc.6
+	github.com/ava-labs/avalanchego v1.12.0-fuji
 	github.com/ava-labs/coreth v0.13.8
-	github.com/ava-labs/subnet-evm v0.6.11
+	github.com/ava-labs/subnet-evm v0.6.12
 	github.com/ethereum/go-ethereum v1.13.14
 )
 

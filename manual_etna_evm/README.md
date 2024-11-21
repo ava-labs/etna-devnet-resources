@@ -3,21 +3,24 @@
 This repo helps you create and update L1 on Avalanche after Etna upgrade. But heads up - you probably want to use `avalanche-cli` instead (it's much easier!).
 
 Quick start:
+
 - Run `./run.sh` to start a new L1 on Devnet
 - Run `./cleanup.sh` to clean up (keeps your keys)
 
 **What this does**: Creates a single-validator L1 chain, uses Devnet and gets AVAX automatically from the Ewoq key
 
 TODO (PRs welcome):
+
 - Add and remove validators
 
 Example log below:
+
 ```bash
-vscode ➜ .../Projects/ava-labs/etna-devnet-resources/manual_etna_evm (manual-checrry-pick) $ 
+vscode ➜ .../Projects/ava-labs/etna-devnet-resources/manual_etna_evm (manual-checrry-pick) $
 echo -e "\n🔑 Generating keys\n"
 go run ./cmd/01_generate_keys/
 
-echo -e "\n💰 Checking balance\n" 
+echo -e "\n💰 Checking balance\n"
 go run ./cmd/02_check_balance/
 
 echo -e "\n🕸️  Creating subnet\n"
@@ -101,12 +104,12 @@ constants.PlatformChainID 11111111111111111111111111111111LpoYY
  => CACHED [node0 subnet-evm-builder 2/6] WORKDIR /app                                                                                                         0.0s
  => CACHED [node0 avalanchego-builder 3/6] RUN git clone https://github.com/ava-labs/avalanchego.git                                                           0.0s
  => CACHED [node0 avalanchego-builder 4/6] WORKDIR /app/avalanchego                                                                                            0.0s
- => CACHED [node0 avalanchego-builder 5/6] RUN git checkout v1.12.0-initial-poc.6                                                                              0.0s
+ => CACHED [node0 avalanchego-builder 5/6] RUN git checkout v1.12.0-fuji                                                                              0.0s
  => CACHED [node0 avalanchego-builder 6/6] RUN ./scripts/build.sh                                                                                              0.0s
  => CACHED [node0 stage-2 3/4] COPY --from=avalanchego-builder /app/avalanchego/build/avalanchego /usr/local/bin/avalanchego                                   0.0s
  => CACHED [node0 subnet-evm-builder 3/6] RUN git clone https://github.com/ava-labs/subnet-evm.git                                                             0.0s
  => CACHED [node0 subnet-evm-builder 4/6] WORKDIR /app/subnet-evm                                                                                              0.0s
- => CACHED [node0 subnet-evm-builder 5/6] RUN git checkout v0.6.11                                                                                             0.0s
+ => CACHED [node0 subnet-evm-builder 5/6] RUN git checkout v0.6.12                                                                                             0.0s
  => CACHED [node0 subnet-evm-builder 6/6] RUN go build -v -o /app/srEXiWaHuhNyGwPUi444Tu47ZEDwxTWrbQiuD7FmgSAQ6X7Dy ./plugin                                   0.0s
  => CACHED [node0 stage-2 4/4] COPY --from=subnet-evm-builder /app/srEXiWaHuhNyGwPUi444Tu47ZEDwxTWrbQiuD7FmgSAQ6X7Dy /plugins/srEXiWaHuhNyGwPUi444Tu47ZEDwxTW  0.0s
  => [node0] exporting to image                                                                                                                                 0.0s
@@ -115,7 +118,7 @@ constants.PlatformChainID 11111111111111111111111111111111LpoYY
  => => naming to docker.io/library/07_launch_nodes-node0                                                                                                       0.0s
  => [node0] resolving provenance for metadata file                                                                                                             0.0s
 [+] Running 1/1
- ✔ Container node0  Started                                                                                                                                    0.2s 
+ ✔ Container node0  Started                                                                                                                                    0.2s
 
 🔄 Converting chain
 
@@ -130,12 +133,12 @@ Getting node info from http://127.0.0.1:9650
 🚀 Stopping nodes
 
 [+] Running 1/0
- ✔ Container node0  Removed                                                                                                                                    0.1s 
+ ✔ Container node0  Removed                                                                                                                                    0.1s
 
 🚀 Starting nodes again with a new subnet
 
 [+] Running 1/1
- ✔ Container node0  Started                                                                                                                                    0.1s 
+ ✔ Container node0  Started                                                                                                                                    0.1s
 
 🏥 Checking subnet health
 
