@@ -6,6 +6,17 @@ Warning: this flow is in active development. None of the following should be use
 
 In this guide, we will be creating a sovereign L1 with locally run Avalanche Nodes as its bootstrap validators.
 
+### Setup Instructions for Ubuntu Virtual Machines
+If you are working on an Ubuntu virtual machine, follow these steps to install the necessary development tools:
+
+Install essential build tools and Go:
+```zsh
+sudo apt update
+sudo apt install build-essential golang-go
+```
+These commands install the build-essential package (which includes tools like gcc necessary for compiling software) and the golang-go package to set up Go programming language support.
+
+
 ## Build Etna-enabled AvalancheGo
 
 ```zsh
