@@ -10,8 +10,8 @@ import (
 	"os"
 	"time"
 
-	icmgenesis "github.com/ava-labs/avalanche-cli/pkg/teleporter/genesis"
 	"github.com/ava-labs/avalanche-cli/pkg/validatormanager"
+	"github.com/ava-labs/avalanche-cli/pkg/vm"
 	blockchainSDK "github.com/ava-labs/avalanche-cli/sdk/blockchain"
 	"github.com/ava-labs/coreth/plugin/evm"
 	"github.com/ava-labs/coreth/utils"
@@ -20,12 +20,11 @@ import (
 	"github.com/ava-labs/subnet-evm/params"
 	"github.com/ava-labs/subnet-evm/precompile/contracts/warp"
 	"github.com/ava-labs/subnet-evm/precompile/precompileconfig"
-	"github.com/ethereum/go-ethereum/common"
 )
 
 var (
-	OneAvax                = new(big.Int).SetUint64(1000000000000000000)
-	defaultPoAOwnerBalance = new(big.Int).Mul(OneAvax, big.NewInt(10))
+	defaultPoAOwnerBalance  = new(big.Int).Mul(vm.OneAvax, big.NewInt(10))          // 10 Native Tokens
+	defaultEVMAirdropAmount = new(big.Int).Exp(big.NewInt(10), big.NewInt(24), nil) // 10^24
 )
 
 var (
@@ -58,16 +57,14 @@ func main() {
 	}
 
 	allocation := core.GenesisAlloc{
-		common.Address{}: core.GenesisAccount{Balance: teleporterBalance},
+		// FIXME: This is definitely a bug in the CLI, CLI allocates funds to a zero address here
+		// It is filled in here: https://github.com/ava-labs/avalanche-cli/blob/6debe4169dce2c64352d8c9d0d0acac49e573661/pkg/vm/evm_prompts.go#L178
+		ethAddr: core.GenesisAccount{Balance: defaultPoAOwnerBalance},
 	}
-	allocation[ethAddr] = core.GenesisAccount{Balance: defaultPoAOwnerBalance}
-	icmgenesis.AddICMMessengerContractToAllocations(allocation)
-
-	teleporterAddress := common.HexToAddress("0x2656b6eb2ba42b6e0b5be696021f94de4d8a16d8")
-	// TODO: figure out how to get the address of the teleporter contract
-	allocation[teleporterAddress] = core.GenesisAccount{Balance: teleporterBalance}
+	allocation[vm.PrefundedEwoqAddress] = core.GenesisAccount{Balance: defaultEVMAirdropAmount}
 
 	validatormanager.AddPoAValidatorManagerContractToAllocations(allocation)
+	validatormanager.AddTransparentProxyContractToAllocations(allocation, "0x0000000000000000000000000000000000000000")
 
 	genesisTimestamp := utils.TimeToNewUint64(time.Now())
 

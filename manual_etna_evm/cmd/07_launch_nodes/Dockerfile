@@ -6,10 +6,7 @@ FROM golang:1.22-bookworm AS avalanchego-builder
 
 WORKDIR /app
 
-RUN git clone https://github.com/ava-labs/avalanchego.git
-WORKDIR /app/avalanchego
-RUN git checkout v1.12.0-initial-poc.6
-RUN ./scripts/build.sh
+RUN git clone https://github.com/ava-labs/avalanchego.git && cd avalanchego && git checkout v1.12.0-fuji && ./scripts/build.sh
 
 # # # # # # # # # # # # # # 
 # Subnet-EVM builder
@@ -17,12 +14,9 @@ RUN ./scripts/build.sh
 
 FROM golang:1.22-bookworm AS subnet-evm-builder
 
-WORKDIR /app
-RUN git clone https://github.com/ava-labs/subnet-evm.git
-WORKDIR /app/subnet-evm
-RUN git checkout v0.6.11
+RUN git clone https://github.com/ava-labs/subnet-evm.git /app/subnet-evm && cd /app/subnet-evm && git checkout v0.6.12
 
-RUN go build -v -o /app/srEXiWaHuhNyGwPUi444Tu47ZEDwxTWrbQiuD7FmgSAQ6X7Dy ./plugin
+RUN cd /app/subnet-evm && go build -v -o /app/srEXiWaHuhNyGwPUi444Tu47ZEDwxTWrbQiuD7FmgSAQ6X7Dy ./plugin
 
 # # # # # # # # # # # # # # 
 # Execution

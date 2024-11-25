@@ -117,7 +117,7 @@ func main() {
 
 	managerAddress := goethereumcommon.HexToAddress(validatorManagerSDK.ValidatorContractAddress)
 	options := getMultisigTxOptions(subnetAuthKeys, kc)
-	tx, err := wallet.P().IssueConvertSubnetTx(
+	tx, err := wallet.P().IssueConvertSubnetToL1Tx(
 		subnetID,
 		chainID,
 		managerAddress.Bytes(),

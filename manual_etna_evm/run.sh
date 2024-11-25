@@ -23,6 +23,7 @@ go run ./cmd/06_node_configs/
 echo -e "\n🚀 Launching nodes\n"
 export CURRENT_UID=$(id -u)
 export CURRENT_GID=$(id -g)
+docker compose -f ./cmd/07_launch_nodes/docker-compose.yml down
 docker compose -f ./cmd/07_launch_nodes/docker-compose.yml up -d --build
 
 echo -e "\n🔄 Converting chain\n"
@@ -44,7 +45,7 @@ echo -e "\n💸 Sending some test coins\n"
 go run ./cmd/12_evm_transfer/
 
 echo -e "\n🔄 Waiting for the transaction to be included\n"
-sleep 20
+sleep 30
 
 echo -e "\n🔄 Initializing PoA\n"
 go run ./cmd/13_init_poa/
