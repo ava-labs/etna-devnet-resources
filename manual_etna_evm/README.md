@@ -1,36 +1,36 @@
-## Guide to Etna L1s for golang devs
+## Guide to Etna L1s for Go Developers
 
-This repo provides a detailed, code-first guide for integrating L1 subnet management into your services on Avalanche Fuji after the Etna upgrade. For end-user subnet management, check out [avalanche-cli](https://github.com/ava-labs/avalanche-cli).
+This repository provides a detailed, code-first guide for integrating L1 subnet management into your services on Avalanche Fuji after the Etna upgrade. For end-user subnet management, check out [avalanche-cli](https://github.com/ava-labs/avalanche-cli).
 
-** Requirements: **
-- Fresh Docker (check by running `docker compose ls` without any dashes)
+**Requirements:**
+- Fresh Docker installation (verify by running `docker compose ls` without any dashes)
 - Go 1.22.8+
 
-Run all together: `./run.sh` to start a new L1 on Devnet, `./cleanup.sh` to clean up (keeps your keys)
+Run everything at once: `./run.sh` to start a new L1 on Devnet, `./cleanup.sh` to clean up (preserves your keys)
 
-### 1. 🔑 Generating keys
+### 1. 🔑 Generating Keys
 
 Source code: [01_generate_keys/generate.go](./01_generate_keys/generate.go)
 
-Generates a validator manager private key, if you don't have one yet.
+Generates a validator manager private key if you don't have one yet.
 
-What you are looking for is method `secp256k1.NewPrivateKey()` from package `github.com/ava-labs/avalanchego/utils/crypto/secp256k1`.
+The key method you'll need is `secp256k1.NewPrivateKey()` from package `github.com/ava-labs/avalanchego/utils/crypto/secp256k1`.
 
 ### 2. 💰 Checking balance
 
 Source code: [02_check_balance/balance.go](./02_check_balance/balance.go)
 
-- Checks your P-chain balance.
-- Tries to export funds from C chain to P Chain, if less than 1.1 AVAX (which is required to create a subnet)
-- If not enough funds, recommends you to [visit Fuji faucet](https://test.core.app/tools/testnet-faucet/?subnet=c&token=c). 
+- Checks your P-chain balance
+- Attempts to export funds from C-chain to P-chain if balance is less than 1.1 AVAX (required for subnet creation)
+- If insufficient funds, directs you to the [Fuji faucet](https://test.core.app/tools/testnet-faucet/?subnet=c&token=c)
 
-A good example of checking balances and moving AVAX between C and P chains.
+This provides a good example of checking balances and transferring AVAX between C and P chains.
 
 ### 3. 🕸️ Creating subnet
 
 Source code: [03_create_subnet/create.go](./03_create_subnet/create.go)
 
-Creating subnet requires only an owner. Here is the gist of it:
+Creating a subnet requires only an owner. Here's how it works:
 
 ```golang
 owner := &secp256k1fx.OutputOwners{
@@ -42,18 +42,17 @@ owner := &secp256k1fx.OutputOwners{
 createSubnetTx, err := wallet.P().IssueCreateSubnetTx(owner)
 ```
 
-Subnet is a group of validators agreed to validate the same chains. One chain can be only in one subnet, but one subnet could have multiple chains, and each validator has to validate all chains of a subnet. At the same time a validator can be a part of 2 different subnets. 
-
+A subnet is a group of validators that agree to validate the same chains. A chain can only belong to one subnet, but a subnet can have multiple chains. Each validator must validate all chains within their subnet. Validators can participate in multiple subnets simultaneously.
 
 ### 4. 🧱 Generating genesis
 
 Source code: [04_L1_genesis/genesis.go](./04_L1_genesis/genesis.go)
 
-Here we generate Genesis fo our new L1. We will put it in a P chain create chain transaction in the next step. 
+Here we generate the Genesis for our new L1. We will include it in a P-chain create chain transaction in the next step.
 
-Do not confuse your L1 genesis and Avalanche Fuji genesis. For your node you'll need both of them.
+Note: Don't confuse your L1 genesis with the Avalanche Fuji genesis. Your node will need both.
 
-It does fill a lot of diferent params, but the most important function calls are `validatormanager.AddPoAValidatorManagerContractToAllocations` and `validatormanager.AddTransparentProxyContractToAllocations` from `github.com/ava-labs/avalanche-cli/pkg/validatormanager` package.
+The most important function calls are `validatormanager.AddPoAValidatorManagerContractToAllocations` and `validatormanager.AddTransparentProxyContractToAllocations` from the `github.com/ava-labs/avalanche-cli/pkg/validatormanager` package.
 
 ### 5. ⛓️  Creating chain
 
@@ -63,8 +62,8 @@ Source code: [05_create_chain/chain.go](./05_create_chain/chain.go)
 createChainTx, err := pWallet.IssueCreateChainTx(
     subnetID,               // Transaction id from 2 steps ago
     genesisBytes,           // L1 genesis
-    constants.SubnetEVMID,  // Really could be any cb58 sting, but for EVM you should use 
-    nil,                    // TODO: figure out what fixture extension is
+    constants.SubnetEVMID,  // Really could be any cb58 string, but for EVM you should use 
+    nil,                    // TODO: Document fixture extension usage
     "My L1",                // Just a string
 )
 ```
@@ -73,14 +72,14 @@ createChainTx, err := pWallet.IssueCreateChainTx(
 
 Source code: [06_launch_nodes/launch.sh](./06_launch_nodes/launch.sh)
 
-Preparation: 
-- Writes [06_launch_nodes/evm_debug_config.json](./06_launch_nodes/evm_debug_config.json) into `data/chains/[chainID]/config.json` to enable debug in EVM. Will be used later with flag `--chain-config-dir` in avalanchego. 
-- `CURRENT_UID` and `CURRENT_GID` are used to avoid write access right problems. Not avalanchego specific.
-- `TRACK_SUBNETS` loads current subnetID, so the node could track the subnet and all chains that belong to this subnet
+Setup Steps:
+- Writes [06_launch_nodes/evm_debug_config.json](./06_launch_nodes/evm_debug_config.json) to `data/chains/[chainID]/config.json` to enable EVM debugging. This will be used later with the `--chain-config-dir` flag in avalanchego.
+- Uses `CURRENT_UID` and `CURRENT_GID` to prevent write access permission issues. This is not specific to avalanchego.
+- `TRACK_SUBNETS` loads the current subnet ID so the node can track the subnet and all chains belonging to it.
 
 Launches [06_launch_nodes/docker-compose.yml](./06_launch_nodes/docker-compose.yml). It contains only one node for simplicity. Mounts local `./data/` folder as `/data/`
 
-### 7. 🔄 Converting chain
+### 7. 🔮 Converting chain
 
 Source code: [07_convert_chain/convert.go](./07_convert_chain/convert.go)
 
@@ -90,16 +89,31 @@ TODO: Describe
 
 Source code: none
 
-Runs step 6 again so nodes could pick up changes after upgrade
+Runs step 6 again so nodes can pick up changes after the upgrade
 
 ### 9. 🏥 Checking subnet health
 
 Source code: [9_check_subnet_health/health.go](./9_check_subnet_health/health.go)
 
-Knocks on `http://127.0.0.1:6550/ext/bc/[CHAIN_ID]/rpc` and asks for an EVM chainID intill gets an answer. Once the node is fully booted and synced, it will be available. It might take a couple menites. Monitor with `docker logs -f node0`. 
+Polls `http://127.0.0.1:6550/ext/bc/[CHAIN_ID]/rpc` and requests the EVM chainID until it receives a response. The endpoint becomes available once the node is fully booted and synced, which can take a few minutes. You can monitor progress with `docker logs -f node0`.
 
 ### 10. 💸 Sending some test coins
 
 Source code: [9_check_subnet_health/health.go](9_check_subnet_health/health.go)
 
-Sending a test transfer using generic EVM API. Just double checks that's the chain is operational. 
+Sends a test transfer using the generic EVM API. This double checks that the chain is operational.
+
+### 11. 🎯 Activate ProposerVM fork
+
+Sends test transactions to activate the ProposerVM fork.
+
+- TODO: Add more details about ProposerVM
+- TODO: Investigate if this can be combined with EVM transfers to eliminate this step
+
+### 12. Initialize PoA validator manager contract
+
+TODO: Implementation pending
+
+### 13. Initialize validator set
+
+TODO: Implementation pending
