@@ -117,3 +117,11 @@ TODO: Implementation pending
 ### 13. Initialize validator set
 
 TODO: Implementation pending
+
+### 14. Add 2 more validators
+
+TODO: Implementation pending
+
+### 15. Remove a validator
+
+TODO: Implementation pending
