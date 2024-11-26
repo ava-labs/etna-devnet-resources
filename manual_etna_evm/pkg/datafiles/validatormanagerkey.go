@@ -1,4 +1,4 @@
-package validatormanagerkey
+package datafiles
 
 import (
 	"encoding/hex"
@@ -9,10 +9,10 @@ import (
 	"github.com/ava-labs/avalanchego/utils/crypto/secp256k1"
 )
 
-const PATH = "data/validator_manager_owner_key.txt"
+const VALIDATOR_MANAGER_KEY_PATH = "data/validator_manager_owner_key.txt"
 
-func Exists() (bool, error) {
-	_, err := os.Stat(PATH)
+func ValidatorManagerKeyExists() (bool, error) {
+	_, err := os.Stat(VALIDATOR_MANAGER_KEY_PATH)
 	if errors.Is(err, os.ErrNotExist) {
 		return false, nil
 	}
@@ -22,17 +22,17 @@ func Exists() (bool, error) {
 	return true, nil
 }
 
-func GenerateAndSave() error {
+func GenerateValidatorManagerKeyAndSave() error {
 	key, err := secp256k1.NewPrivateKey()
 	if err != nil {
 		return err
 	}
 	hexStr := hex.EncodeToString(key.Bytes())
-	return os.WriteFile(PATH, []byte(hexStr), 0644)
+	return os.WriteFile(VALIDATOR_MANAGER_KEY_PATH, []byte(hexStr), 0644)
 }
 
-func Load() (*secp256k1.PrivateKey, error) {
-	hexStr, err := os.ReadFile(PATH)
+func LoadValidatorManagerKey() (*secp256k1.PrivateKey, error) {
+	hexStr, err := os.ReadFile(VALIDATOR_MANAGER_KEY_PATH)
 	if err != nil {
 		return nil, err
 	}

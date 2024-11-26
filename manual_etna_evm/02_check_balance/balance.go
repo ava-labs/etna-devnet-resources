@@ -5,7 +5,8 @@ import (
 	"fmt"
 	"log"
 	"math/big"
-	"mypkg/lib"
+	"mypkg/config"
+	"mypkg/pkg/datafiles"
 	"os"
 	"time"
 
@@ -22,7 +23,8 @@ import (
 	"github.com/ava-labs/coreth/plugin/evm"
 )
 
-var MIN_BALANCE = units.Avax*lib.VALIDATORS_COUNT + 100*units.MilliAvax
+var MIN_BALANCE = units.Avax + 100*units.MilliAvax
+var MIN_BALANCE_STRING = getBalanceString(big.NewInt(int64(MIN_BALANCE)), 9)
 
 func getBalanceString(balance *big.Int, decimals int) string {
 	divisor := new(big.Int).Exp(big.NewInt(10), big.NewInt(int64(decimals)), nil)
@@ -32,39 +34,33 @@ func getBalanceString(balance *big.Int, decimals int) string {
 }
 
 func main() {
-	key, err := lib.LoadKeyFromFile(lib.VALIDATOR_MANAGER_OWNER_KEY_PATH)
+	key, err := datafiles.LoadValidatorManagerKey()
 	if err != nil {
 		log.Fatalf("failed to load key from file: %s\n", err)
 	}
 
-	//has to check balance on P-chain, if less than MIN_BALANCE, then check balance on C-chain
-	//If not enough balance on C-chain, then exit with message to visit faucet
-	//If enough balance on C-chain, then transfer MIN_BALANCE from C-chain to P-chain
-	// if initially enough balance on P-chain, then exit 0
-
 	pChainAddr := key.Address()
+	cChainAddr := evm.PublicKeyToEthAddress(key.PublicKey())
 
 	pChainBalance, err := checkPChainBalance(context.Background(), pChainAddr)
 	if err != nil {
 		log.Printf("Failed to check P-chain balance: %s\n", err)
 	} else {
 		log.Printf("P-chain balance: %s AVAX\n", getBalanceString(pChainBalance, 9))
-		if pChainBalance.Cmp(big.NewInt(int64(lib.MIN_BALANCE))) >= 0 {
+		if pChainBalance.Cmp(big.NewInt(int64(MIN_BALANCE))) >= 0 {
 			log.Printf("✅ P-chain balance sufficient")
 			os.Exit(0)
 		}
 	}
 
-	log.Printf("P-chain balance insufficient on address %s: %s < %d\n", pChainAddr.String(), pChainBalance, lib.MIN_BALANCE)
+	log.Printf("P-chain balance insufficient on address %s: %s < %s\n", pChainAddr.String(), getBalanceString(pChainBalance, 9), MIN_BALANCE_STRING)
 
-	ethAddr := evm.PublicKeyToEthAddress(key.PublicKey())
-
-	cChainClient, err := ethclient.Dial(lib.RPC_URL + "/ext/bc/C/rpc")
+	cChainClient, err := ethclient.Dial(config.RPC_URL + "/ext/bc/C/rpc")
 	if err != nil {
 		log.Fatalf("failed to connect to c-chain: %s\n", err)
 	}
 
-	cChainBalance, err := cChainClient.BalanceAt(context.Background(), ethAddr, nil)
+	cChainBalance, err := cChainClient.BalanceAt(context.Background(), cChainAddr, nil)
 	if err != nil {
 		log.Fatalf("failed to get balance: %s\n", err)
 	}
@@ -72,23 +68,23 @@ func main() {
 	// So we need to convert it to the same unit
 	cChainBalance = cChainBalance.Div(cChainBalance, big.NewInt(int64(1e9)))
 
-	log.Printf("Balance on c-chain at address %s: %s\n", ethAddr.Hex(), cChainBalance)
+	log.Printf("Balance on c-chain at address %s: %s\n", cChainAddr.Hex(), getBalanceString(cChainBalance, 9))
 
-	if cChainBalance.Uint64() < lib.MIN_BALANCE {
-		log.Printf("❌ Balance %s is less than minimum balance: %d\n", cChainBalance, lib.MIN_BALANCE)
+	if cChainBalance.Uint64() < MIN_BALANCE {
+		log.Printf("❌ Balance %s is less than minimum balance: %s\n", getBalanceString(cChainBalance, 9), MIN_BALANCE_STRING)
 		log.Printf("Please visit https://core.app/tools/testnet-faucet/?subnet=c&token=c \n")
-		log.Printf("Use this address to request funds: %s\n", ethAddr.Hex())
+		log.Printf("Use this address to request funds: %s\n", cChainAddr.Hex())
 		os.Exit(1)
 	} else {
-		log.Printf("C-chain balance sufficient: current %s, required %d\n", cChainBalance, lib.MIN_BALANCE)
+		log.Printf("C-chain balance sufficient: current %s, required %s\n", getBalanceString(cChainBalance, 9), MIN_BALANCE_STRING)
 	}
 
-	log.Printf("Transferring %d from C-chain to P-chain\n", lib.MIN_BALANCE)
+	log.Printf("Transferring %s from C-chain to P-chain\n", MIN_BALANCE_STRING)
 
 	// Create keychain and wallet
 	kc := secp256k1fx.NewKeychain(key)
 	wallet, err := primary.MakeWallet(context.Background(), &primary.WalletConfig{
-		URI:          lib.RPC_URL,
+		URI:          config.RPC_URL,
 		AVAXKeychain: kc,
 		EthKeychain:  kc,
 	})
@@ -114,7 +110,7 @@ func main() {
 	exportTx, err := cWallet.IssueExportTx(
 		constants.PlatformChainID,
 		[]*secp256k1fx.TransferOutput{{
-			Amt:          lib.MIN_BALANCE + units.MilliAvax*100,
+			Amt:          MIN_BALANCE,
 			OutputOwners: owner,
 		}},
 	)
@@ -135,17 +131,17 @@ func main() {
 	if err != nil {
 		log.Fatalf("failed to get P-chain balance: %s\n", err)
 	}
-	if pChainBalance.Cmp(new(big.Int).SetUint64(lib.MIN_BALANCE)) < 0 {
-		log.Fatalf("❌ Final P-chain balance %s is less than minimum required %d\n", pChainBalance, lib.MIN_BALANCE)
+	if pChainBalance.Cmp(big.NewInt(int64(MIN_BALANCE))) < 0 {
+		log.Fatalf("❌ Final P-chain balance %s is less than minimum required %s\n", getBalanceString(pChainBalance, 9), MIN_BALANCE_STRING)
 	}
-	log.Printf("✅ Final P-chain balance: %s (greater than minimum %d)\n", pChainBalance, lib.MIN_BALANCE)
+	log.Printf("✅ Final P-chain balance: %s (greater than minimum %s)\n", getBalanceString(pChainBalance, 9), MIN_BALANCE_STRING)
 }
 
 func checkPChainBalance(ctx context.Context, addr ids.ShortID) (*big.Int, error) {
 	addresses := set.Of(addr)
 
 	fetchStartTime := time.Now()
-	state, err := primary.FetchState(ctx, lib.RPC_URL, addresses)
+	state, err := primary.FetchState(ctx, config.RPC_URL, addresses)
 	if err != nil {
 		return nil, fmt.Errorf("failed to fetch state: %w", err)
 	}

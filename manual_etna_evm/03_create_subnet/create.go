@@ -5,11 +5,9 @@ package main
 
 import (
 	"context"
-	"errors"
 	"log"
-	"mypkg/lib"
-	"os"
-	"path/filepath"
+	"mypkg/config"
+	"mypkg/pkg/datafiles"
 	"time"
 
 	"github.com/ava-labs/avalanchego/ids"
@@ -18,21 +16,17 @@ import (
 )
 
 func main() {
-	subnetIDFilePath := filepath.Join("data", "subnet.txt")
-
-	// Try to load existing subnet ID first
-	subnetIDBytes, err := os.ReadFile(subnetIDFilePath)
-	if errors.Is(err, os.ErrNotExist) {
-		log.Println("Subnet ID file does not exist, let's create a new subnet")
-	} else if err != nil {
-		log.Fatalf("❌ Failed to read subnet ID file: %s\n", err)
-	} else {
-		log.Printf("📝 Existing subnet ID found: %s\n", ids.FromStringOrPanic(string(subnetIDBytes)))
+	exists, err := datafiles.SubnetIDExists()
+	if err != nil {
+		log.Fatalf("❌ Failed to check if subnet ID exists: %s\n", err)
+	}
+	if exists {
+		log.Println("Subnet already exists, exiting")
 		return
 	}
 
 	// If we get here, we need to create a new subnet
-	key, err := lib.LoadKeyFromFile(lib.VALIDATOR_MANAGER_OWNER_KEY_PATH)
+	key, err := datafiles.LoadValidatorManagerKey()
 	if err != nil {
 		log.Fatalf("❌ Failed to load key from file: %s\n", err)
 	}
@@ -46,7 +40,7 @@ func main() {
 	// [uri] is hosting.
 	walletSyncStartTime := time.Now()
 	wallet, err := primary.MakeWallet(ctx, &primary.WalletConfig{
-		URI:          lib.RPC_URL,
+		URI:          config.RPC_URL,
 		AVAXKeychain: kc,
 		EthKeychain:  kc,
 	})
@@ -70,7 +64,7 @@ func main() {
 	log.Printf("✅ Created new subnet %s in %s\n", createSubnetTx.ID(), time.Since(createSubnetStartTime))
 
 	// Save the subnet ID to file
-	err = os.WriteFile(subnetIDFilePath, []byte(createSubnetTx.ID().String()), 0644)
+	err = datafiles.SaveSubnetID(createSubnetTx.ID())
 	if err != nil {
 		log.Printf("❌ Failed to save subnet ID to file: %s\n", err)
 	}
