@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"os/exec"
+	"strings"
 	"time"
 
 	"github.com/ava-labs/avalanche-cli/pkg/evm"
@@ -28,6 +30,13 @@ func main() {
 		client, err := evm.GetClient(rpcURL)
 		if err != nil {
 			fmt.Printf("🌱 Node is still booting up (try %d of %d) - waiting for RPC endpoint...\n", i+1, maxAttempts)
+
+			lastLine, err := getLastLineOfDockerLogs("node1")
+			if err != nil {
+				log.Fatalf("❌ Failed to get last line of Docker logs: %s\n", err)
+			}
+			fmt.Printf("Last line of Docker logs: %s\n", lastLine)
+
 			time.Sleep(2 * time.Second)
 			continue
 		}
@@ -44,4 +53,22 @@ func main() {
 	}
 
 	log.Fatalf("❌ Node failed health check after %d attempts", maxAttempts)
+}
+
+func getLastLineOfDockerLogs(containerName string) (string, error) {
+	logs, err := exec.Command("docker", "logs", containerName).Output()
+	if err != nil {
+		return "", err
+	}
+	lines := strings.Split(string(logs), "\n")
+	if len(lines) == 0 {
+		return "", nil
+	}
+	// Get last non-empty line
+	for i := len(lines) - 1; i >= 0; i-- {
+		if lines[i] != "" {
+			return lines[i], nil
+		}
+	}
+	return "", nil
 }
