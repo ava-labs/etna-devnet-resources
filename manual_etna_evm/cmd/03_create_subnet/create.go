@@ -46,7 +46,7 @@ func main() {
 	// [uri] is hosting.
 	walletSyncStartTime := time.Now()
 	wallet, err := primary.MakeWallet(ctx, &primary.WalletConfig{
-		URI:          lib.ETNA_RPC_URL,
+		URI:          lib.RPC_URL,
 		AVAXKeychain: kc,
 		EthKeychain:  kc,
 	})

@@ -56,7 +56,7 @@ func main() {
 	subnetID := ids.FromStringOrPanic(string(subnetIDBytes))
 
 	wallet, err := primary.MakeWallet(context.Background(), &primary.WalletConfig{
-		URI:          lib.ETNA_RPC_URL,
+		URI:          lib.RPC_URL,
 		AVAXKeychain: kc,
 		EthKeychain:  kc,
 		SubnetIDs:    []ids.ID{subnetID},
