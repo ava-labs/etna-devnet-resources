@@ -99,7 +99,7 @@ Polls `http://127.0.0.1:6550/ext/bc/[CHAIN_ID]/rpc` and requests the EVM chainID
 
 ### 10. 💸 Sending some test coins
 
-Source code: [9_check_subnet_health/health.go](9_check_subnet_health/health.go)
+Source code: [10_evm_transfer/transfer.go](./10_evm_transfer/transfer.go)
 
 Sends a test transfer using the generic EVM API. This double checks that the chain is operational.
 
