@@ -1,0 +1,11 @@
+services:
+  node0:
+    container_name: node0
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ../data/:/data/
+    network_mode: host
+    command: /usr/local/bin/avalanchego --chain-config-dir=/data/chains --network-id=fuji --data-dir=/data/node0 --plugin-dir=/plugins/ --http-port=9650 --staking-port=9651 --track-subnets=${TRACK_SUBNETS}
+    user: "${CURRENT_UID}:${CURRENT_GID}"
