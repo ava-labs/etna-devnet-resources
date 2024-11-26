@@ -59,8 +59,6 @@ It does fill a lot of diferent params, but the most important function calls are
 
 Source code: [05_create_chain/chain.go](./05_create_chain/chain.go)
 
-The gist of it: 
-
 ```golang
 createChainTx, err := pWallet.IssueCreateChainTx(
     subnetID,               // Transaction id from 2 steps ago
@@ -70,3 +68,38 @@ createChainTx, err := pWallet.IssueCreateChainTx(
     "My L1",                // Just a string
 )
 ```
+
+### 6. 🚀 Launching nodes
+
+Source code: [06_launch_nodes/launch.sh](./06_launch_nodes/launch.sh)
+
+Preparation: 
+- Writes [06_launch_nodes/evm_debug_config.json](./06_launch_nodes/evm_debug_config.json) into `data/chains/[chainID]/config.json` to enable debug in EVM. Will be used later with flag `--chain-config-dir` in avalanchego. 
+- `CURRENT_UID` and `CURRENT_GID` are used to avoid write access right problems. Not avalanchego specific.
+- `TRACK_SUBNETS` loads current subnetID, so the node could track the subnet and all chains that belong to this subnet
+
+Launches [06_launch_nodes/docker-compose.yml](./06_launch_nodes/docker-compose.yml). It contains only one node for simplicity. Mounts local `./data/` folder as `/data/`
+
+### 7. 🔄 Converting chain
+
+Source code: [07_convert_chain/convert.go](./07_convert_chain/convert.go)
+
+TODO: Describe
+
+### 8. 🔃 Restarting nodes
+
+Source code: none
+
+Runs step 6 again so nodes could pick up changes after upgrade
+
+### 9. 🏥 Checking subnet health
+
+Source code: [9_check_subnet_health/health.go](./9_check_subnet_health/health.go)
+
+Knocks on `http://127.0.0.1:6550/ext/bc/[CHAIN_ID]/rpc` and asks for an EVM chainID intill gets an answer. Once the node is fully booted and synced, it will be available. It might take a couple menites. Monitor with `docker logs -f node0`. 
+
+### 10. 💸 Sending some test coins
+
+Source code: [9_check_subnet_health/health.go](9_check_subnet_health/health.go)
+
+Sending a test transfer using generic EVM API. Just double checks that's the chain is operational. 
