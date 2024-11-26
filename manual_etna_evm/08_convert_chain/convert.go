@@ -67,12 +67,14 @@ func main() {
 		log.Fatalf("❌ Failed to initialize wallet: %s\n", err)
 	}
 
+	//TODO: replace with address.Format
 	softKey, err := key.NewSoft(avagoconstants.TestnetID, key.WithPrivateKey(privKey))
 	if err != nil {
 		log.Fatalf("❌ Failed to create change owner address: %s\n", err)
 	}
 
 	changeOwnerAddress := softKey.P()[0]
+
 	fmt.Printf("Using changeOwnerAddress: %s\n", changeOwnerAddress)
 
 	subnetAuthKeys, err := address.ParseToIDs([]string{changeOwnerAddress})

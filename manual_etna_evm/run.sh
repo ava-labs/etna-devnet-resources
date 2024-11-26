@@ -30,10 +30,10 @@ echo -e "\n🚀 Starting nodes again with a new subnet\n"
 ./07_launch_nodes/launch.sh
 
 echo -e "\n🏥 Checking subnet health\n"
-go run ./11_check_subnet_health/
+go run ./10_check_subnet_health/
 
 echo -e "\n💸 Sending some test coins\n"
-go run ./12_evm_transfer/
+go run ./11_evm_transfer/
 
 # echo -e "\n🔄 Waiting for the transaction to be included\n"
 # sleep 30

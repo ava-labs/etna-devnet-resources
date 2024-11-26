@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
-	"mypkg/lib"
 	"os"
 
 	"github.com/ava-labs/avalanche-cli/cmd/blockchaincmd"

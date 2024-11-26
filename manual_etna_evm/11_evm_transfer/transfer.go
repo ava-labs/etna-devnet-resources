@@ -8,9 +8,9 @@ import (
 	"mypkg/helpers"
 	"time"
 
-	goethereumtypes "github.com/ethereum/go-ethereum/core/types"
+	"github.com/ava-labs/coreth/core/types"
+	"github.com/ava-labs/coreth/ethclient"
 	goethereumcrypto "github.com/ethereum/go-ethereum/crypto"
-	goethereumethclient "github.com/ethereum/go-ethereum/ethclient"
 )
 
 func main() {
@@ -33,14 +33,14 @@ func main() {
 	fmt.Printf("Generated destination address: %s\n", destAddr.Hex())
 
 	node0URL := fmt.Sprintf("http://%s:%s/ext/bc/%s/rpc", "127.0.0.1", "9650", chainID)
-	client, err := goethereumethclient.Dial(node0URL)
+	client, err := ethclient.Dial(node0URL)
 	if err != nil {
 		log.Fatalf("failed to connect to node0: %s\n", err)
 	}
 
 	// Get the sender's address and nonce
 	fromAddress := goethereumcrypto.PubkeyToAddress(key.PublicKey)
-	nonce, err := client.PendingNonceAt(context.Background(), fromAddress)
+	nonce, err := client.NonceAt(context.Background(), fromAddress, nil)
 	if err != nil {
 		log.Fatalf("failed to get nonce: %s\n", err)
 	}
@@ -54,13 +54,13 @@ func main() {
 	}
 
 	// Create and sign transaction
-	tx := goethereumtypes.NewTransaction(nonce, destAddr, value, gasLimit, gasPrice, nil)
+	tx := types.NewTransaction(nonce, destAddr, value, gasLimit, gasPrice, nil)
 	chainIDInt, err := client.NetworkID(context.Background())
 	if err != nil {
 		log.Fatalf("failed to get chain ID: %s\n", err)
 	}
 
-	signedTx, err := goethereumtypes.SignTx(tx, goethereumtypes.NewEIP155Signer(chainIDInt), key)
+	signedTx, err := types.SignTx(tx, types.NewEIP155Signer(chainIDInt), key)
 	if err != nil {
 		log.Fatalf("failed to sign transaction: %s\n", err)
 	}
