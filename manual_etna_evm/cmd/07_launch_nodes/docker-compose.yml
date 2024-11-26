@@ -7,7 +7,7 @@ services:
     volumes:
       - ../../data/:/data/
     network_mode: host
-    command: /usr/local/bin/avalanchego --config-file=/data/configs/config-node0.json --chain-config-dir=/data/chains
+    command: /usr/local/bin/avalanchego --chain-config-dir=/data/chains --network-id=fuji --data-dir=/data/node0 --plugin-dir=/plugins/ --http-port=9650 --staking-port=9651 --track-subnets=2uteTaPwnKurZtV6Jy6ydZyRTxVTmznYMPn48TQ5nGHnFv3xzd
     user: "${CURRENT_UID}:${CURRENT_GID}"
   # node1:
   #   container_name: node1

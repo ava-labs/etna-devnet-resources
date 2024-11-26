@@ -3,13 +3,11 @@ package main
 import (
 	"context"
 	"encoding/hex"
-	"encoding/json"
 	"fmt"
 	"log"
 	"math/big"
 	"mypkg/lib"
 	"os"
-	"path/filepath"
 	"strings"
 	"time"
 
@@ -48,18 +46,7 @@ func main() {
 	}
 	destAddr := goethereumcrypto.PubkeyToAddress(destKey.PublicKey)
 
-	// Connect to node0
-	configBytes, err := os.ReadFile(filepath.Join("data", "configs", "config-node0.json"))
-	if err != nil {
-		log.Fatalf("❌ Failed to read config file: %s\n", err)
-	}
-	nodeConfig := lib.NodeConfig{}
-	err = json.Unmarshal(configBytes, &nodeConfig)
-	if err != nil {
-		log.Fatalf("❌ Failed to unmarshal config: %s\n", err)
-	}
-
-	node0URL := fmt.Sprintf("http://%s:%s/ext/bc/%s/rpc", nodeConfig.PublicIP, nodeConfig.HTTPPort, chainID)
+	node0URL := fmt.Sprintf("http://%s:%s/ext/bc/%s/rpc", "127.0.0.1", "9650", chainID)
 	client, err := goethereumethclient.Dial(node0URL)
 	if err != nil {
 		log.Fatalf("failed to connect to node0: %s\n", err)
@@ -105,17 +92,8 @@ func main() {
 
 	// Check balance on all nodes
 	for nodeNumber := 0; nodeNumber < lib.VALIDATORS_COUNT; nodeNumber++ {
-		configBytes, err := os.ReadFile(filepath.Join("data", "configs", fmt.Sprintf("config-node%d.json", nodeNumber)))
-		if err != nil {
-			log.Fatalf("❌ Failed to read config file: %s\n", err)
-		}
-		nodeConfig := lib.NodeConfig{}
-		err = json.Unmarshal(configBytes, &nodeConfig)
-		if err != nil {
-			log.Fatalf("❌ Failed to unmarshal config: %s\n", err)
-		}
 
-		nodeURL := fmt.Sprintf("http://%s:%s/ext/bc/%s/rpc", nodeConfig.PublicIP, nodeConfig.HTTPPort, chainID)
+		nodeURL := fmt.Sprintf("http://%s:%s/ext/bc/%s/rpc", "127.0.0.1", fmt.Sprintf("%d", 9650+nodeNumber*2), chainID)
 		client, err := goethereumethclient.Dial(nodeURL)
 		if err != nil {
 			log.Fatalf("failed to connect to node%d: %s\n", nodeNumber, err)

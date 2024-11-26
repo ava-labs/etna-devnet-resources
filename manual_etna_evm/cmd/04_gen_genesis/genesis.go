@@ -10,6 +10,8 @@ import (
 	"os"
 	"time"
 
+	_ "embed"
+
 	"github.com/ava-labs/avalanche-cli/pkg/validatormanager"
 	"github.com/ava-labs/avalanche-cli/pkg/vm"
 	blockchainSDK "github.com/ava-labs/avalanche-cli/sdk/blockchain"
@@ -26,6 +28,9 @@ var (
 	defaultPoAOwnerBalance  = new(big.Int).Mul(vm.OneAvax, big.NewInt(10))          // 10 Native Tokens
 	defaultEVMAirdropAmount = new(big.Int).Exp(big.NewInt(10), big.NewInt(24), nil) // 10^24
 )
+
+//go:embed genesis_fuji.json
+var genesisFuji []byte
 
 var (
 	// 600 AVAX: to deploy teleporter contract, registry contract, and fund
@@ -99,6 +104,11 @@ func main() {
 	}
 
 	if err := os.WriteFile("data/L1-genesis.json", prettyJSON.Bytes(), 0644); err != nil {
+		log.Fatalf("❌ Failed to write genesis: %s\n", err)
+	}
+
+	err = os.WriteFile("data/genesis_fuji.json", genesisFuji, 0644)
+	if err != nil {
 		log.Fatalf("❌ Failed to write genesis: %s\n", err)
 	}
 

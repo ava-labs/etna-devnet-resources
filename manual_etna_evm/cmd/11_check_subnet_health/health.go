@@ -60,7 +60,7 @@ func main() {
 			log.Fatalf("❌ Failed to unmarshal config: %s\n", err)
 		}
 
-		rpcURL := fmt.Sprintf("http://%s:%s/ext/bc/%s/rpc", nodeConfig.PublicIP, nodeConfig.HTTPPort, chainID)
+		rpcURL := fmt.Sprintf("http://%s:%s/ext/bc/%s/rpc", "127.0.0.1", "9650", chainID)
 		fmt.Printf("Checking RPC endpoint for node%d: %s\n", nodeNumber, rpcURL)
 
 		if err := checkNodeHealth(nodeNumber, rpcURL); err != nil {

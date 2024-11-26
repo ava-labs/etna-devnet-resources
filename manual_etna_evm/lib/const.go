@@ -1,6 +1,9 @@
 package lib
 
-import "github.com/ava-labs/avalanchego/utils/units"
+import (
+	avagoconstants "github.com/ava-labs/avalanchego/utils/constants"
+	"github.com/ava-labs/avalanchego/utils/units"
+)
 
 const (
 	RPC_URL     = "https://api.avax-test.network"
@@ -9,5 +12,5 @@ const (
 	VALIDATOR_MANAGER_OWNER_KEY_PATH = "data/poa_validator_manager_owner_key.txt"
 
 	VALIDATORS_COUNT = 1
-	NETWORK_ID       = 76
+	NETWORK_ID       = avagoconstants.TestnetID
 )

@@ -16,8 +16,8 @@ func FillNodeConfigs(trackSubnets string) error {
 		return fmt.Errorf("failed to create configs directory: %w", err)
 	}
 
-	openPorts, err := FindMultipleFreePorts(VALIDATORS_COUNT*2, 9650)
-	if err != nil {
+	openPorts := []int{9650, 9651} //FindMultipleFreePorts(VALIDATORS_COUNT*2, 9650)
+	if len(openPorts) != VALIDATORS_COUNT*2 {
 		return fmt.Errorf("failed to find free ports: %w", err)
 	}
 
@@ -28,14 +28,14 @@ func FillNodeConfigs(trackSubnets string) error {
 			BootstrapIPs:             strings.Join(constants.EtnaDevnetBootstrapIPs, ","),
 			DataDir:                  fmt.Sprintf("/data/node%d", i),
 			DbDir:                    fmt.Sprintf("/data/node%d/db", i),
-			GenesisFile:              "/data/genesis.json",
+			GenesisFile:              "/data/genesis_fuji.json",
 			HealthCheckFrequency:     "2s",
 			HTTPPort:                 fmt.Sprintf("%d", openPorts[i*2]),
 			IndexEnabled:             "true",
 			LogDir:                   fmt.Sprintf("/data/node%d/logs", i),
 			LogDisplayLevel:          "INFO",
 			LogLevel:                 "INFO",
-			NetworkID:                "76",
+			NetworkID:                fmt.Sprintf("%d", NETWORK_ID),
 			NetworkMaxReconnectDelay: "1s",
 			PluginDir:                "/plugins/",
 			PublicIP:                 "127.0.0.1",
@@ -60,16 +60,6 @@ func FillNodeConfigs(trackSubnets string) error {
 		if err != nil {
 			return fmt.Errorf("failed to create folders: %w", err)
 		}
-	}
-
-	err = os.WriteFile("data/upgrade.json", constants.EtnaDevnetUpgradeData, 0644)
-	if err != nil {
-		return fmt.Errorf("failed to write upgrade file: %w", err)
-	}
-
-	err = os.WriteFile("data/genesis.json", constants.EtnaDevnetGenesisData, 0644)
-	if err != nil {
-		return fmt.Errorf("failed to write genesis file: %w", err)
 	}
 
 	//FIXME: needs plugins

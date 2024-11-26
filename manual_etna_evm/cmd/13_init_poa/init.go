@@ -117,7 +117,7 @@ func main() {
 	genesisPrivateKey := hex.EncodeToString(ownerKey.Bytes())
 
 	network := models.Network{
-		Kind:        models.EtnaDevnet,
+		Kind:        models.Fuji,
 		ID:          lib.NETWORK_ID,
 		Endpoint:    extraPeers[0],
 		ClusterName: "",
