@@ -93,7 +93,7 @@ Runs step 6 again so nodes can pick up changes after the upgrade
 
 ### 9. 🏥 Checking subnet health
 
-Source code: [9_check_subnet_health/health.go](./9_check_subnet_health/health.go)
+Source code: [09_check_subnet_health/health.go](./09_check_subnet_health/health.go)
 
 Polls `http://127.0.0.1:6550/ext/bc/[CHAIN_ID]/rpc` and requests the EVM chainID until it receives a response. The endpoint becomes available once the node is fully booted and synced, which can take a few minutes. You can monitor progress with `docker logs -f node0`.
 
