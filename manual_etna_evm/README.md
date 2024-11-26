@@ -1,13 +1,11 @@
 ## Create L1 manually with Go
 
-This repo helps you create and update L1 on Avalanche after Etna upgrade. But heads up - you probably want to use `avalanche-cli` instead (it's much easier!).
+This repo helps you create and update L1 on Avalanche Fuji after Etna upgrade. But heads up - you probably want to use `avalanche-cli` instead (it's much easier!).
 
 Quick start:
 
 - Run `./run.sh` to start a new L1 on Devnet
 - Run `./cleanup.sh` to clean up (keeps your keys)
-
-**What this does**: Creates a single-validator L1 chain, uses Devnet and gets AVAX automatically from the Ewoq key
 
 TODO (PRs welcome):
 

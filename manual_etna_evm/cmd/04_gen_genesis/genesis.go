@@ -66,7 +66,6 @@ func main() {
 		// It is filled in here: https://github.com/ava-labs/avalanche-cli/blob/6debe4169dce2c64352d8c9d0d0acac49e573661/pkg/vm/evm_prompts.go#L178
 		ethAddr: core.GenesisAccount{Balance: defaultPoAOwnerBalance},
 	}
-	allocation[vm.PrefundedEwoqAddress] = core.GenesisAccount{Balance: defaultEVMAirdropAmount}
 
 	validatormanager.AddPoAValidatorManagerContractToAllocations(allocation)
 	validatormanager.AddTransparentProxyContractToAllocations(allocation, "0x0000000000000000000000000000000000000000")

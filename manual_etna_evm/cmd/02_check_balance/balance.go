@@ -22,6 +22,8 @@ import (
 	"github.com/ava-labs/coreth/plugin/evm"
 )
 
+var MIN_BALANCE = units.Avax*lib.VALIDATORS_COUNT + 100*units.MilliAvax
+
 func getBalanceString(balance *big.Int, decimals int) string {
 	divisor := new(big.Int).Exp(big.NewInt(10), big.NewInt(int64(decimals)), nil)
 	quotient := new(big.Int).Div(balance, divisor)

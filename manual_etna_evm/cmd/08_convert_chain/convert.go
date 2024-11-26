@@ -21,6 +21,7 @@ import (
 	validatorManagerSDK "github.com/ava-labs/avalanche-cli/sdk/validatormanager"
 	"github.com/ava-labs/avalanchego/api/info"
 	"github.com/ava-labs/avalanchego/ids"
+	avagoconstants "github.com/ava-labs/avalanchego/utils/constants"
 	"github.com/ava-labs/avalanchego/utils/formatting/address"
 	"github.com/ava-labs/avalanchego/utils/set"
 	"github.com/ava-labs/avalanchego/vms/platformvm/signer"
@@ -65,7 +66,7 @@ func main() {
 		log.Fatalf("❌ Failed to initialize wallet: %s\n", err)
 	}
 
-	softKey, err := key.NewSoft(lib.NETWORK_ID, key.WithPrivateKey(privKey))
+	softKey, err := key.NewSoft(avagoconstants.TestnetID, key.WithPrivateKey(privKey))
 	if err != nil {
 		log.Fatalf("❌ Failed to create change owner address: %s\n", err)
 	}

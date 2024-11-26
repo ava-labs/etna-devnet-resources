@@ -20,6 +20,7 @@ import (
 	"github.com/ava-labs/avalanche-cli/pkg/models"
 	blockchainSDK "github.com/ava-labs/avalanche-cli/sdk/blockchain"
 	"github.com/ava-labs/avalanchego/ids"
+	avagoconstants "github.com/ava-labs/avalanchego/utils/constants"
 	"github.com/ava-labs/avalanchego/utils/logging"
 )
 
@@ -53,7 +54,7 @@ func main() {
 	// Convert to Ethereum address format
 	ownerEthAddress := pluginEVM.PublicKeyToEthAddress(ownerKey.PublicKey())
 
-	softKey, err := key.NewSoft(lib.NETWORK_ID, key.WithPrivateKey(ownerKey))
+	softKey, err := key.NewSoft(avagoconstants.TestnetID, key.WithPrivateKey(ownerKey))
 	if err != nil {
 		log.Fatalf("❌ Failed to create change owner address: %s\n", err)
 	}
@@ -118,7 +119,7 @@ func main() {
 
 	network := models.Network{
 		Kind:        models.Fuji,
-		ID:          lib.NETWORK_ID,
+		ID:          avagoconstants.TestnetID,
 		Endpoint:    extraPeers[0],
 		ClusterName: "",
 	}
