@@ -72,7 +72,7 @@ func main() {
 
 	if cChainBalance.Uint64() < MIN_BALANCE {
 		log.Printf("❌ Balance %s is less than minimum balance: %s\n", getBalanceString(cChainBalance, 9), MIN_BALANCE_STRING)
-		log.Printf("Please visit https://core.app/tools/testnet-faucet/?subnet=c&token=c \n")
+		log.Printf("Please visit https://test.core.app/tools/testnet-faucet/?subnet=c&token=c \n")
 		log.Printf("Use this address to request funds: %s\n", cChainAddr.Hex())
 		os.Exit(1)
 	} else {

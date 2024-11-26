@@ -38,6 +38,12 @@ func main() {
 	}
 	fmt.Printf("Initial block height: %d\n", blockHeight)
 
+	//FIXME: How to check if the fork is already activated? PRs are welcome!
+	if blockHeight >= 3 {
+		fmt.Printf("Block height is already greater than or equal to 3, skipping activation\n")
+		return
+	}
+
 	if err := evm.IssueTxsToActivateProposerVMFork(client, evmChainID, key); err != nil {
 		log.Fatalf("failed to activate proposer VM fork: %s\n", err)
 	}

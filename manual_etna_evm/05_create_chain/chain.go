@@ -39,10 +39,7 @@ func main() {
 	}
 	subnetID := ids.FromStringOrPanic(string(subnetIDBytes))
 
-	vmID := constants.SubnetEVMID
-	name := "Step by step subnet"
-
-	log.Printf("Using vmID: %s\n", vmID)
+	log.Printf("Using vmID: %s\n", constants.SubnetEVMID)
 
 	genesisBytes, err := os.ReadFile("data/L1-genesis.json")
 	if err != nil {
@@ -72,9 +69,9 @@ func main() {
 	createChainTx, err := pWallet.IssueCreateChainTx(
 		subnetID,
 		genesisBytes,
-		vmID,
+		constants.SubnetEVMID,
 		nil,
-		name,
+		"My L1",
 	)
 	if err != nil {
 		log.Fatalf("❌ Failed to issue create chain transaction: %s\n", err)
