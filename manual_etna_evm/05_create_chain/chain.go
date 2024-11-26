@@ -5,11 +5,10 @@ package main
 
 import (
 	"context"
-	"errors"
 	"log"
-	"mypkg/lib"
+	"mypkg/config"
+	"mypkg/helpers"
 	"os"
-	"path/filepath"
 	"time"
 
 	"github.com/ava-labs/avalanchego/ids"
@@ -19,20 +18,16 @@ import (
 )
 
 func main() {
-	chainIDFilePath := filepath.Join("data", "chain.txt")
-
-	// Try to load existing chain ID first
-	chainIDBytes, err := os.ReadFile(chainIDFilePath)
-	if errors.Is(err, os.ErrNotExist) {
-		log.Println("🔍 Chain ID file does not exist, let's create a new chain")
-	} else if err != nil {
-		log.Fatalf("❌ Failed to read chain ID file: %s\n", err)
-	} else {
-		log.Printf("📝 Existing chain ID found: %s\n", ids.FromStringOrPanic(string(chainIDBytes)))
+	exists, err := helpers.IdFileExists("chain")
+	if err != nil {
+		log.Fatalf("❌ Failed to check if chain ID exists: %s\n", err)
+	}
+	if exists {
+		log.Println("✅ Chain already exists, exiting")
 		return
 	}
 
-	key, err := lib.LoadKeyFromFile(lib.VALIDATOR_MANAGER_OWNER_KEY_PATH)
+	key, err := helpers.LoadValidatorManagerKey()
 	if err != nil {
 		log.Fatalf("❌ Failed to load key from file: %s\n", err)
 	}
@@ -60,7 +55,7 @@ func main() {
 	// [uri] is hosting and registers [subnetID].
 	walletSyncStartTime := time.Now()
 	wallet, err := primary.MakeWallet(ctx, &primary.WalletConfig{
-		URI:          lib.RPC_URL,
+		URI:          config.RPC_URL,
 		AVAXKeychain: kc,
 		EthKeychain:  kc,
 		SubnetIDs:    []ids.ID{subnetID},
@@ -87,10 +82,10 @@ func main() {
 	log.Printf("✅ Created new chain %s in %s\n", createChainTx.ID(), time.Since(createChainStartTime))
 
 	// Save the chain ID to file
-	err = os.WriteFile(chainIDFilePath, []byte(createChainTx.ID().String()), 0644)
+	err = helpers.SaveId("chain", createChainTx.ID())
 	if err != nil {
 		log.Printf("❌ Failed to save chain ID to file: %s\n", err)
 	}
 
-	log.Println("Saved chain ID to file " + chainIDFilePath)
+	log.Println("✅ Saved chain ID to file")
 }

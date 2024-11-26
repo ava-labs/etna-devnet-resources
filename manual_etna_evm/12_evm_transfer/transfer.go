@@ -2,41 +2,26 @@ package main
 
 import (
 	"context"
-	"encoding/hex"
 	"fmt"
 	"log"
 	"math/big"
-	"mypkg/lib"
-	"os"
-	"strings"
+	"mypkg/helpers"
 	"time"
 
-	"github.com/ava-labs/avalanchego/ids"
 	goethereumtypes "github.com/ethereum/go-ethereum/core/types"
 	goethereumcrypto "github.com/ethereum/go-ethereum/crypto"
 	goethereumethclient "github.com/ethereum/go-ethereum/ethclient"
 )
 
 func main() {
-	chainIDBytes, err := os.ReadFile("data/chain.txt")
+	key, err := helpers.LoadValidatorManagerKeyECDSA()
 	if err != nil {
-		log.Fatalf("❌ Failed to read chain ID file: %s\n", err)
-	}
-	chainID := ids.FromStringOrPanic(string(chainIDBytes))
-
-	// Load validator manager key to use as source of funds
-	keyHex, err := os.ReadFile(lib.VALIDATOR_MANAGER_OWNER_KEY_PATH)
-	if err != nil {
-		log.Fatalf("failed to read key file: %s\n", err)
-	}
-	keyBytes, err := hex.DecodeString(strings.TrimSpace(string(keyHex)))
-	if err != nil {
-		log.Fatalf("failed to decode key: %s\n", err)
+		log.Fatalf("failed to load validator manager key: %s\n", err)
 	}
 
-	key, err := goethereumcrypto.ToECDSA(keyBytes)
+	chainID, err := helpers.LoadId("chain")
 	if err != nil {
-		log.Fatalf("failed to convert to ECDSA key: %s\n", err)
+		log.Fatalf("failed to load chain ID: %s\n", err)
 	}
 
 	// Generate random destination address
@@ -45,6 +30,7 @@ func main() {
 		log.Fatalf("failed to generate random key: %s\n", err)
 	}
 	destAddr := goethereumcrypto.PubkeyToAddress(destKey.PublicKey)
+	fmt.Printf("Generated destination address: %s\n", destAddr.Hex())
 
 	node0URL := fmt.Sprintf("http://%s:%s/ext/bc/%s/rpc", "127.0.0.1", "9650", chainID)
 	client, err := goethereumethclient.Dial(node0URL)
@@ -87,26 +73,15 @@ func main() {
 
 	fmt.Printf("✅ Sent 1 AVAX from %s to %s in tx %s\n", fromAddress.Hex(), destAddr.Hex(), signedTx.Hash().Hex())
 
-	// Wait for transaction to be mined
-	time.Sleep(5 * time.Second)
+	time.Sleep(10 * time.Second)
 
-	// Check balance on all nodes
-	for nodeNumber := 0; nodeNumber < lib.VALIDATORS_COUNT; nodeNumber++ {
-
-		nodeURL := fmt.Sprintf("http://%s:%s/ext/bc/%s/rpc", "127.0.0.1", fmt.Sprintf("%d", 9650+nodeNumber*2), chainID)
-		client, err := goethereumethclient.Dial(nodeURL)
-		if err != nil {
-			log.Fatalf("failed to connect to node%d: %s\n", nodeNumber, err)
-		}
-
-		balance, err := client.BalanceAt(context.Background(), destAddr, nil)
-		if err != nil {
-			log.Fatalf("failed to get balance from node%d: %s\n", nodeNumber, err)
-		}
-
-		if balance.Cmp(value) != 0 {
-			log.Fatalf("❌ Balance on node%d is %s, expected %s\n", nodeNumber, balance, value)
-		}
-		fmt.Printf("✅ Balance on node%d matches expected value\n", nodeNumber)
+	balance, err := client.BalanceAt(context.Background(), destAddr, nil)
+	if err != nil {
+		log.Fatalf("failed to get balance: %s\n", err)
 	}
+
+	if balance.Cmp(value) != 0 {
+		log.Fatalf("❌ Balance is %s, expected %s\n", balance, value)
+	}
+	fmt.Printf("✅ Balance matches expected value: %s\n", balance)
 }

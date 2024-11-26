@@ -6,7 +6,8 @@ import (
 	"encoding/json"
 	"log"
 	"math/big"
-	"mypkg/lib"
+	"mypkg/config"
+	"mypkg/helpers"
 	"os"
 	"time"
 
@@ -25,30 +26,16 @@ import (
 )
 
 var (
-	defaultPoAOwnerBalance  = new(big.Int).Mul(vm.OneAvax, big.NewInt(10))          // 10 Native Tokens
-	defaultEVMAirdropAmount = new(big.Int).Exp(big.NewInt(10), big.NewInt(24), nil) // 10^24
-)
-
-//go:embed genesis_fuji.json
-var genesisFuji []byte
-
-var (
-	// 600 AVAX: to deploy teleporter contract, registry contract, and fund
-	// starting relayer operations
-	teleporterBalance = big.NewInt(0).Mul(big.NewInt(1e18), big.NewInt(600))
-	// 1000 AVAX: to deploy teleporter contract, registry contract, fund
-	// starting relayer operations, and deploy bridge contracts
-	externalGasTokenBalance = big.NewInt(0).Mul(big.NewInt(1e18), big.NewInt(1000))
+	defaultPoAOwnerBalance = new(big.Int).Mul(vm.OneAvax, big.NewInt(10)) // 10 Native Tokens
 )
 
 func main() {
-	ownerKey, err := lib.LoadKeyFromFile(lib.VALIDATOR_MANAGER_OWNER_KEY_PATH)
+	ownerKey, err := helpers.LoadValidatorManagerKey()
 	if err != nil {
 		log.Fatalf("failed to load key from file: %s\n", err)
 	}
-	ethAddr := evm.PublicKeyToEthAddress(ownerKey.PublicKey())
 
-	const CHAIN_ID = 12345
+	ethAddr := evm.PublicKeyToEthAddress(ownerKey.PublicKey())
 
 	feeConfig := commontype.FeeConfig{
 		GasLimit:                 big.NewInt(12000000),
@@ -62,13 +49,13 @@ func main() {
 	}
 
 	allocation := core.GenesisAlloc{
-		// FIXME: This is definitely a bug in the CLI, CLI allocates funds to a zero address here
+		// FIXME: This looks like a bug in the CLI, CLI allocates funds to a zero address here
 		// It is filled in here: https://github.com/ava-labs/avalanche-cli/blob/6debe4169dce2c64352d8c9d0d0acac49e573661/pkg/vm/evm_prompts.go#L178
 		ethAddr: core.GenesisAccount{Balance: defaultPoAOwnerBalance},
 	}
 
 	validatormanager.AddPoAValidatorManagerContractToAllocations(allocation)
-	validatormanager.AddTransparentProxyContractToAllocations(allocation, "0x0000000000000000000000000000000000000000")
+	validatormanager.AddTransparentProxyContractToAllocations(allocation, ethAddr.String()) //TODO: might need to be zero address
 
 	genesisTimestamp := utils.TimeToNewUint64(time.Now())
 
@@ -84,7 +71,7 @@ func main() {
 	subnetConfig, err := blockchainSDK.New(
 		&blockchainSDK.SubnetParams{
 			SubnetEVM: &blockchainSDK.SubnetEVMParams{
-				ChainID:     new(big.Int).SetUint64(CHAIN_ID),
+				ChainID:     new(big.Int).SetUint64(config.L1_CHAIN_ID),
 				FeeConfig:   feeConfig,
 				Allocation:  allocation,
 				Precompiles: precompiles,
@@ -103,11 +90,6 @@ func main() {
 	}
 
 	if err := os.WriteFile("data/L1-genesis.json", prettyJSON.Bytes(), 0644); err != nil {
-		log.Fatalf("❌ Failed to write genesis: %s\n", err)
-	}
-
-	err = os.WriteFile("data/genesis_fuji.json", genesisFuji, 0644)
-	if err != nil {
 		log.Fatalf("❌ Failed to write genesis: %s\n", err)
 	}
 

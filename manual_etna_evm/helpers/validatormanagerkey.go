@@ -1,12 +1,15 @@
-package datafiles
+package helpers
 
 import (
+	"crypto/ecdsa"
 	"encoding/hex"
 	"errors"
 	"os"
 	"strings"
 
 	"github.com/ava-labs/avalanchego/utils/crypto/secp256k1"
+
+	goethereumcrypto "github.com/ethereum/go-ethereum/crypto"
 )
 
 const VALIDATOR_MANAGER_KEY_PATH = "data/validator_manager_owner_key.txt"
@@ -45,4 +48,21 @@ func LoadValidatorManagerKey() (*secp256k1.PrivateKey, error) {
 	}
 
 	return secp256k1.ToPrivateKey(keyBytes)
+}
+
+func LoadValidatorManagerKeyECDSA() (*ecdsa.PrivateKey, error) {
+	keyHex, err := os.ReadFile(VALIDATOR_MANAGER_KEY_PATH)
+	if err != nil {
+		return nil, err
+	}
+	keyBytes, err := hex.DecodeString(strings.TrimSpace(string(keyHex)))
+	if err != nil {
+		return nil, err
+	}
+
+	key, err := goethereumcrypto.ToECDSA(keyBytes)
+	if err != nil {
+		return nil, err
+	}
+	return key, nil
 }

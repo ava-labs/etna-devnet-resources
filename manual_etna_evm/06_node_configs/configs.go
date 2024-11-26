@@ -3,13 +3,10 @@ package main
 import (
 	"fmt"
 	"log"
-	"mypkg/lib"
+	"mypkg/helpers"
 	"os"
-	"path/filepath"
 
 	_ "embed"
-
-	"github.com/ava-labs/avalanchego/ids"
 )
 
 //go:embed chain.json
@@ -19,18 +16,10 @@ var defaultEVMSubnetChainJson []byte
 var upgradesJSON []byte
 
 func main() {
-	if err := lib.FillNodeConfigs(""); err != nil {
-		log.Fatalf("❌ Failed to fill node configs: %s", err)
-	}
-	fmt.Println("✅ Successfully created configs")
-
-	chainIDFilePath := filepath.Join("data", "chain.txt")
-	chainIDBytes, err := os.ReadFile(chainIDFilePath)
+	chainID, err := helpers.LoadId("chain")
 	if err != nil {
-		log.Fatalf("❌ Failed to read chain ID file: %s\n", err)
+		log.Fatalf("❌ Failed to load chain ID: %s\n", err)
 	}
-
-	chainID := ids.FromStringOrPanic(string(chainIDBytes))
 
 	if err := os.MkdirAll(fmt.Sprintf("data/chains/%s", chainID), 0755); err != nil {
 		log.Fatalf("❌ Failed to create chains directory: %s\n", err)

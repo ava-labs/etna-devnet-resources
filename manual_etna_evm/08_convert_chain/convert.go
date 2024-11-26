@@ -6,12 +6,11 @@ package main
 import (
 	"context"
 	"encoding/hex"
-	"encoding/json"
 	"fmt"
 	"log"
-	"mypkg/lib"
+	"mypkg/config"
+	"mypkg/helpers"
 	"os"
-	"path/filepath"
 	"time"
 
 	"github.com/ava-labs/avalanche-cli/cmd/blockchaincmd"
@@ -32,32 +31,34 @@ import (
 )
 
 func main() {
-	convertTxIDPath := filepath.Join("data", "convert_subnet_tx_id.txt")
-	if txIDBytes, err := os.ReadFile(convertTxIDPath); err == nil {
-		log.Fatalf("❌ Subnet was already converted in transaction: %s", string(txIDBytes))
-	}
-
-	chainIDFilePath := filepath.Join("data", "chain.txt")
-	chainIDBytes, err := os.ReadFile(chainIDFilePath)
+	exists, err := helpers.IdFileExists("conversion_id")
 	if err != nil {
-		log.Fatalf("❌ Failed to read chain ID file: %s\n", err)
+		log.Fatalf("❌ Failed to check if conversion_id.txt exists: %s\n", err)
 	}
-	chainID := ids.FromStringOrPanic(string(chainIDBytes))
 
-	privKey, err := lib.LoadKeyFromFile(lib.VALIDATOR_MANAGER_OWNER_KEY_PATH)
+	if exists {
+		log.Println("✅ Subnet was already converted to L1")
+		os.Exit(0)
+	}
+
+	chainID, err := helpers.LoadId("chain")
+	if err != nil {
+		log.Fatalf("❌ Failed to load chain ID: %s\n", err)
+	}
+
+	privKey, err := helpers.LoadValidatorManagerKey()
 	if err != nil {
 		log.Fatalf("❌ Failed to load key from file: %s\n", err)
 	}
 	kc := secp256k1fx.NewKeychain(privKey)
 
-	subnetIDBytes, err := os.ReadFile("data/subnet.txt")
+	subnetID, err := helpers.LoadId("subnet")
 	if err != nil {
-		log.Fatalf("❌ Failed to read subnet ID file: %s\n", err)
+		log.Fatalf("❌ Failed to load subnet ID: %s\n", err)
 	}
-	subnetID := ids.FromStringOrPanic(string(subnetIDBytes))
 
 	wallet, err := primary.MakeWallet(context.Background(), &primary.WalletConfig{
-		URI:          lib.RPC_URL,
+		URI:          config.RPC_URL,
 		AVAXKeychain: kc,
 		EthKeychain:  kc,
 		SubnetIDs:    []ids.ID{subnetID},
@@ -80,36 +81,24 @@ func main() {
 	}
 
 	validators := []models.SubnetValidator{}
-	for nodeNumber := 0; nodeNumber < lib.VALIDATORS_COUNT; nodeNumber++ {
-		configBytes, err := os.ReadFile(filepath.Join("data", "configs", fmt.Sprintf("config-node%d.json", nodeNumber)))
-		if err != nil {
-			log.Fatalf("❌ Failed to read config file: %s\n", err)
-		}
-		nodeConfig := lib.NodeConfig{}
-		err = json.Unmarshal(configBytes, &nodeConfig)
-		if err != nil {
-			log.Fatalf("❌ Failed to unmarshal config: %s\n", err)
-		}
+	endpoint := fmt.Sprintf("http://%s:%s", "127.0.0.1", "9650")
 
-		endpoint := fmt.Sprintf("http://%s:%s", nodeConfig.PublicIP, nodeConfig.HTTPPort)
-
-		nodeID, proofOfPossession, err := getNodeInfoRetry(endpoint)
-		if err != nil {
-			log.Fatalf("❌ Failed to get node info: %s\n", err)
-		}
-		publicKey := "0x" + hex.EncodeToString(proofOfPossession.PublicKey[:])
-		pop := "0x" + hex.EncodeToString(proofOfPossession.ProofOfPossession[:])
-
-		validator := models.SubnetValidator{
-			NodeID:               nodeID.String(),
-			Weight:               constants.BootstrapValidatorWeight,
-			Balance:              constants.BootstrapValidatorBalance,
-			BLSPublicKey:         publicKey,
-			BLSProofOfPossession: pop,
-			ChangeOwnerAddr:      changeOwnerAddress,
-		}
-		validators = append(validators, validator)
+	nodeID, proofOfPossession, err := getNodeInfoRetry(endpoint)
+	if err != nil {
+		log.Fatalf("❌ Failed to get node info: %s\n", err)
 	}
+	publicKey := "0x" + hex.EncodeToString(proofOfPossession.PublicKey[:])
+	pop := "0x" + hex.EncodeToString(proofOfPossession.ProofOfPossession[:])
+
+	validator := models.SubnetValidator{
+		NodeID:               nodeID.String(),
+		Weight:               constants.BootstrapValidatorWeight,
+		Balance:              constants.BootstrapValidatorBalance,
+		BLSPublicKey:         publicKey,
+		BLSProofOfPossession: pop,
+		ChangeOwnerAddr:      changeOwnerAddress,
+	}
+	validators = append(validators, validator)
 
 	avaGoBootstrapValidators, err := blockchaincmd.ConvertToAvalancheGoSubnetValidator(validators)
 	if err != nil {
@@ -118,6 +107,35 @@ func main() {
 
 	managerAddress := goethereumcommon.HexToAddress(validatorManagerSDK.ValidatorContractAddress)
 	options := getMultisigTxOptions(subnetAuthKeys, kc)
+
+	convertLog := fmt.Sprintf("Issuing convert subnet tx\n"+
+		"subnetID: %s\n"+
+		"chainID: %s\n"+
+		"managerAddress: %x\n"+
+		"avaGoBootstrapValidators[0]:\n"+
+		"\tNodeID: %x\n"+
+		"\tBLS Public Key: %x\n"+
+		"\tWeight: %d\n"+
+		"\tBalance: %d\n",
+		subnetID.String(),
+		chainID.String(),
+		managerAddress[:],
+		avaGoBootstrapValidators[0].NodeID[:],
+		avaGoBootstrapValidators[0].Signer.PublicKey[:],
+		int(avaGoBootstrapValidators[0].Weight),
+		int(avaGoBootstrapValidators[0].Balance),
+	)
+
+	fmt.Println(convertLog)
+	err = os.WriteFile("./data/convert_log.txt", []byte(convertLog), 0644)
+	if err != nil {
+		log.Fatalf("❌ Failed to write convert log: %s\n", err)
+	}
+
+	if len(avaGoBootstrapValidators) > 1 {
+		fmt.Printf("⚠️ WARNING! Only the first validator's info is printed\n")
+	}
+
 	tx, err := wallet.P().IssueConvertSubnetToL1Tx(
 		subnetID,
 		chainID,
@@ -129,7 +147,7 @@ func main() {
 		log.Fatalf("❌ Failed to create convert subnet tx: %s\n", err)
 	}
 
-	err = os.WriteFile(convertTxIDPath, []byte(tx.ID().String()), 0644)
+	err = helpers.SaveId("conversion_id", tx.ID())
 	if err != nil {
 		log.Fatalf("❌ Failed to save convert subnet tx ID: %s\n", err)
 	}

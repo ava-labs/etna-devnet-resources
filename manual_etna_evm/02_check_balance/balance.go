@@ -6,7 +6,7 @@ import (
 	"log"
 	"math/big"
 	"mypkg/config"
-	"mypkg/pkg/datafiles"
+	"mypkg/helpers"
 	"os"
 	"time"
 
@@ -34,7 +34,7 @@ func getBalanceString(balance *big.Int, decimals int) string {
 }
 
 func main() {
-	key, err := datafiles.LoadValidatorManagerKey()
+	key, err := helpers.LoadValidatorManagerKey()
 	if err != nil {
 		log.Fatalf("failed to load key from file: %s\n", err)
 	}

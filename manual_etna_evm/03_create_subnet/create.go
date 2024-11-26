@@ -7,7 +7,7 @@ import (
 	"context"
 	"log"
 	"mypkg/config"
-	"mypkg/pkg/datafiles"
+	"mypkg/helpers"
 	"time"
 
 	"github.com/ava-labs/avalanchego/ids"
@@ -16,7 +16,7 @@ import (
 )
 
 func main() {
-	exists, err := datafiles.SubnetIDExists()
+	exists, err := helpers.IdFileExists("subnet")
 	if err != nil {
 		log.Fatalf("❌ Failed to check if subnet ID exists: %s\n", err)
 	}
@@ -26,7 +26,7 @@ func main() {
 	}
 
 	// If we get here, we need to create a new subnet
-	key, err := datafiles.LoadValidatorManagerKey()
+	key, err := helpers.LoadValidatorManagerKey()
 	if err != nil {
 		log.Fatalf("❌ Failed to load key from file: %s\n", err)
 	}
@@ -64,7 +64,7 @@ func main() {
 	log.Printf("✅ Created new subnet %s in %s\n", createSubnetTx.ID(), time.Since(createSubnetStartTime))
 
 	// Save the subnet ID to file
-	err = datafiles.SaveSubnetID(createSubnetTx.ID())
+	err = helpers.SaveId("subnet", createSubnetTx.ID())
 	if err != nil {
 		log.Printf("❌ Failed to save subnet ID to file: %s\n", err)
 	}
