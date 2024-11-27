@@ -52,10 +52,11 @@ Here we generate the Genesis for our new L1. We will include it in a P-chain cre
 
 Note: Don't confuse your L1 genesis with the Avalanche Fuji genesis. Your node will need both.
 
-The most important function calls are `validatormanager.AddPoAValidatorManagerContractToAllocations` and `validatormanager.AddTransparentProxyContractToAllocations` from the `github.com/ava-labs/avalanche-cli/pkg/validatormanager` package.
- 
-TODO: Get the manager contract out of Genesis into a separate step to make the deployment process more transparent
-TODO: Minimize the amount of allocations in genesis
+~~The most important function calls are `validatormanager.AddPoAValidatorManagerContractToAllocations` and `validatormanager.AddTransparentProxyContractToAllocations` from the `github.com/ava-labs/avalanche-cli/pkg/validatormanager` package.~~
+
+Read more about genesis here: [https://docs.avax.network/avalanche-l1s/upgrade/customize-avalanche-l1](https://docs.avax.network/avalanche-l1s/upgrade/customize-avalanche-l1).
+
+> Normally, you would want to include the Transparent Proxy and Validator manager contracts in genesis, but in this tutorial, for the purpose of a more granular workflow, we are going to deploy them manually in the later steps.
 
 ### 5. ⛓️  Creating chain
 
@@ -66,7 +67,7 @@ createChainTx, err := pWallet.IssueCreateChainTx(
     subnetID,               // Transaction id from 2 steps ago
     genesisBytes,           // L1 genesis
     constants.SubnetEVMID,  // Could be any cb58 string, but for EVM you should use this one
-    nil,                    // TODO: Document fixture extension usage
+    nil,                    // FIXME: Document fixture extension usage
     "My L1",                // Just a string
 )
 ```
@@ -120,6 +121,8 @@ Source code: [09_check_subnet_health/health.go](./09_check_subnet_health/health.
 
 Polls `http://127.0.0.1:6550/ext/bc/[CHAIN_ID]/rpc` and requests the EVM chainID until it receives a response. The endpoint becomes available once the node is fully booted and synced, which can take a few minutes. You can monitor progress with `docker logs -f node0`.
 
+FIXME: [Health API](https://docs.avax.network/api-reference/health-api) is a better option.
+
 ### 10. 💸 Sending some test coins
 
 Source code: [10_evm_transfer/transfer.go](./10_evm_transfer/transfer.go)
@@ -130,8 +133,8 @@ Sends a test transfer using the generic EVM API. This double checks that the cha
 
 Sends test transactions to activate the ProposerVM fork.
 
-- TODO: Add more details about ProposerVM
-- TODO: Investigate if this can be combined with EVM transfers to eliminate this step
+- FIXME: Add more details about ProposerVM fork
+- FIXME: Investigate if this can be combined with EVM transfers to eliminate this step
 
 ### 12. Initialize PoA validator manager contract
 
