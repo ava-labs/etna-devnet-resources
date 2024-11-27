@@ -62,7 +62,7 @@ Source code: [05_create_chain/chain.go](./05_create_chain/chain.go)
 createChainTx, err := pWallet.IssueCreateChainTx(
     subnetID,               // Transaction id from 2 steps ago
     genesisBytes,           // L1 genesis
-    constants.SubnetEVMID,  // Really could be any cb58 string, but for EVM you should use 
+    constants.SubnetEVMID,  // Could be any cb58 string, but for EVM you should use this one
     nil,                    // TODO: Document fixture extension usage
     "My L1",                // Just a string
 )
@@ -83,7 +83,27 @@ Launches [06_launch_nodes/docker-compose.yml](./06_launch_nodes/docker-compose.y
 
 Source code: [07_convert_chain/convert.go](./07_convert_chain/convert.go)
 
-TODO: Describe
+This converts your Chain to the new Avalanche L1, introduced at Etna upgrade. 
+
+```golang
+tx, err := wallet.P().IssueConvertSubnetToL1Tx(
+		subnetID, // Transaction hash from the "Create Subnet" step
+		chainID, // Transaction hash from the "Create Subnet" step
+		managerAddress.Bytes(), // The address of your manager contract. We added this in genesis
+		avaGoBootstrapValidators, // The initial list of validators. Keep it, we will need it in initialization 
+		options...,
+	)
+```
+
+`avaGoBootstrapValidators` is formed using HTTP requests to nodes, like this one:
+
+```bash
+curl -X POST --data '{
+    "jsonrpc":"2.0",
+    "id"     :1,
+    "method" :"info.getNodeID"
+}' -H 'content-type:application/json' 127.0.0.1:9650/ext/info
+```
 
 ### 8. 🔃 Restarting nodes
 
@@ -125,3 +145,8 @@ TODO: Implementation pending
 ### 15. Remove a validator
 
 TODO: Implementation pending
+
+
+TODOS: 
+- Get the manager contract out of Genesis to make the process more manual
+- Minimize amount of the allocations in genesis
