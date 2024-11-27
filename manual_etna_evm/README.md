@@ -53,6 +53,9 @@ Here we generate the Genesis for our new L1. We will include it in a P-chain cre
 Note: Don't confuse your L1 genesis with the Avalanche Fuji genesis. Your node will need both.
 
 The most important function calls are `validatormanager.AddPoAValidatorManagerContractToAllocations` and `validatormanager.AddTransparentProxyContractToAllocations` from the `github.com/ava-labs/avalanche-cli/pkg/validatormanager` package.
+ 
+TODO: Get the manager contract out of Genesis into a separate step to make the deployment process more transparent
+TODO: Minimize the amount of allocations in genesis
 
 ### 5. ⛓️  Creating chain
 
@@ -145,8 +148,3 @@ TODO: Implementation pending
 ### 15. Remove a validator
 
 TODO: Implementation pending
-
-
-TODOS: 
-- Get the manager contract out of Genesis to make the process more manual
-- Minimize amount of the allocations in genesis
