@@ -8,10 +8,4 @@ if [ ! -d "/teleporter/contracts" ]; then
     git checkout $TELEPORTER_COMMIT
 fi
 
-if [ ! -f "/root/.foundry/bin/forge" ]; then
-    cd /teleporter && ./scripts/install_foundry.sh
-fi
-
-export PATH="/root/.foundry/bin/:${PATH}"
-
 cd /teleporter/contracts && forge build --extra-output-files=bin

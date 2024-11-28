@@ -20,17 +20,20 @@ go run ./05_create_chain/
 echo -e "\n🚀 Launching nodes\n"
 ./06_launch_nodes/launch.sh
 
-echo -e "\n🔮 Converting chain\n"
-go run ./07_convert_chain/
+echo -e "\n🛠️ Compiling validator manager\n"
+./07_compile_validator_manager/compile.sh
 
-echo -e "\n🔃 Restarting nodes\n"
-./06_launch_nodes/launch.sh
+# echo -e "\n🔮 Converting chain\n"
+# go run ./07_convert_chain/
 
-echo -e "\n🏥 Checking subnet health\n"
-go run ./09_check_subnet_health/
+# echo -e "\n🔃 Restarting nodes\n"
+# ./06_launch_nodes/launch.sh
 
-echo -e "\n💸 Sending some test coins\n"
-go run ./10_evm_transfer/
+# echo -e "\n🏥 Checking subnet health\n"
+# go run ./09_check_subnet_health/
 
-echo -e "\n🎯 Activate ProposerVM fork\n"
-go run ./11_activate_proposer_vm/
+# echo -e "\n💸 Sending some test coins\n"
+# go run ./10_evm_transfer/
+
+# echo -e "\n🎯 Activate ProposerVM fork\n"
+# go run ./11_activate_proposer_vm/

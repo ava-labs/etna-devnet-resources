@@ -83,6 +83,29 @@ Setup Steps:
 
 Launches [06_launch_nodes/docker-compose.yml](./06_launch_nodes/docker-compose.yml). It contains only one node for simplicity. Mounts local `./data/` folder as `/data/`
 
+### 7. 🛠️ Compile contracts
+
+After the Etna upgrade, L1s are managed by Warp messages emitted by L1. Currently, the most functional implementation is the [Validator manager contract](https://github.com/ava-labs/teleporter/tree/790ccce873f9a904910a0f3ffd783436c920ce97/contracts/validator-manager) in the [Teleporter Repo](https://github.com/ava-labs/teleporter).
+
+In this step, we first install the [ava-labs/foundry fork](https://github.com/ava-labs/foundry):
+
+```dockerfile
+RUN curl -o install_foundry.sh https://raw.githubusercontent.com/ava-labs/teleporter/${TELEPORTER_COMMIT}/scripts/install_foundry.sh && \
+    chmod +x install_foundry.sh && \
+    ./install_foundry.sh && \
+    rm install_foundry.sh
+```
+
+Then, download and compile the teleporter repository:
+```bash
+git clone https://github.com/ava-labs/teleporter /teleporter
+# ....
+cd /teleporter/contracts && forge build --extra-output-files=bin
+```
+
+The compiled json would be copied to [07_compile_validator_manager/PoAValidatorManager.sol/PoAValidatorManager.json](./07_compile_validator_manager/PoAValidatorManager.sol/PoAValidatorManager.json).
+
+<!--
 ### 7. 🔮 Converting chain
 
 Source code: [07_convert_chain/convert.go](./07_convert_chain/convert.go)
@@ -119,7 +142,7 @@ Runs step 6 again so nodes can pick up changes after the upgrade
 
 Source code: [09_check_subnet_health/health.go](./09_check_subnet_health/health.go)
 
-Polls `http://127.0.0.1:6550/ext/bc/[CHAIN_ID]/rpc` and requests the EVM chainID until it receives a response. The endpoint becomes available once the node is fully booted and synced, which can take a few minutes. You can monitor progress with `docker logs -f node0`.
+Polls `http://127.0.0.1:9650/ext/bc/[CHAIN_ID]/rpc` and requests the EVM chainID until it receives a response. The endpoint becomes available once the node is fully booted and synced, which can take a few minutes. You can monitor progress with `docker logs -f node0`.
 
 FIXME: [Health API](https://docs.avax.network/api-reference/health-api) is a better option.
 
