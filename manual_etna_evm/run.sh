@@ -29,14 +29,15 @@ go run ./08_depoly_validator_manager/
 echo -e "\n🔮 Converting chain into L1\n"
 go run ./09_convert_chain/
 
-# echo -e "\n🔃 Restarting nodes\n"
-# ./06_launch_nodes/launch.sh
+echo -e "\n🔃 Restarting nodes\n"
+./06_launch_nodes/launch.sh # Reuse the script to restart nodes
 
-# echo -e "\n🏥 Checking subnet health\n"
-# go run ./09_check_subnet_health/
+echo -e "\n🎯 Activate ProposerVM fork\n"
+go run ./11_activate_proposer_vm/
+
 
 # echo -e "\n💸 Sending some test coins\n"
 # go run ./10_evm_transfer/
 
-# echo -e "\n🎯 Activate ProposerVM fork\n"
-# go run ./11_activate_proposer_vm/
+
+
