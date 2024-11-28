@@ -23,8 +23,11 @@ echo -e "\n🚀 Launching nodes\n"
 echo -e "\n🛠️ Compiling validator manager\n"
 ./07_compile_validator_manager/compile.sh
 
-# echo -e "\n🔮 Converting chain\n"
-# go run ./07_convert_chain/
+echo -e "\n📦 Deploy Validator Manager\n"
+go run ./08_depoly_validator_manager/
+
+echo -e "\n🔮 Converting chain into L1\n"
+go run ./09_convert_chain/
 
 # echo -e "\n🔃 Restarting nodes\n"
 # ./06_launch_nodes/launch.sh

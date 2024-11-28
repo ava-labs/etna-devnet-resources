@@ -17,7 +17,6 @@ import (
 	"github.com/ava-labs/avalanche-cli/pkg/constants"
 	"github.com/ava-labs/avalanche-cli/pkg/key"
 	"github.com/ava-labs/avalanche-cli/pkg/models"
-	validatorManagerSDK "github.com/ava-labs/avalanche-cli/sdk/validatormanager"
 	"github.com/ava-labs/avalanchego/api/info"
 	"github.com/ava-labs/avalanchego/ids"
 	avagoconstants "github.com/ava-labs/avalanchego/utils/constants"
@@ -107,7 +106,12 @@ func main() {
 		log.Fatalf("❌ Failed to convert to AvalancheGo subnet validator: %s\n", err)
 	}
 
-	managerAddress := goethereumcommon.HexToAddress(validatorManagerSDK.ValidatorContractAddress)
+	managerAddressHex, err := helpers.LoadText("validator_manager_address")
+	if err != nil {
+		log.Fatalf("❌ Failed to load validator manager address: %s\n", err)
+	}
+
+	managerAddress := goethereumcommon.HexToAddress(managerAddressHex)
 	options := getMultisigTxOptions(subnetAuthKeys, kc)
 
 	convertLog := fmt.Sprintf("Issuing convert subnet tx\n"+
