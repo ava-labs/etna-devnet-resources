@@ -83,9 +83,9 @@ Setup Steps:
 
 Launches [06_launch_nodes/docker-compose.yml](./06_launch_nodes/docker-compose.yml). It contains only one node for simplicity. Mounts local `./data/` folder as `/data/`
 
-### 7. 🛠️ Compile contracts
+### 7. 🛠️ Compile the Validator Manager Contract
 
-After the Etna upgrade, L1s are managed by Warp messages emitted by L1. Currently, the most functional implementation is the [Validator manager contract](https://github.com/ava-labs/teleporter/tree/790ccce873f9a904910a0f3ffd783436c920ce97/contracts/validator-manager) in the [Teleporter Repo](https://github.com/ava-labs/teleporter).
+After the Etna upgrade, L1s are managed by Warp messages emitted by L1. Currently, the most functional implementation is the [Validator Manager Contract](https://github.com/ava-labs/teleporter/tree/790ccce873f9a904910a0f3ffd783436c920ce97/contracts/validator-manager) in the [Teleporter Repo](https://github.com/ava-labs/teleporter).
 
 In this step, we first install the [ava-labs/foundry fork](https://github.com/ava-labs/foundry):
 
@@ -104,6 +104,8 @@ cd /teleporter/contracts && forge build --extra-output-files=bin
 ```
 
 The compiled json would be copied to [07_compile_validator_manager/PoAValidatorManager.sol/PoAValidatorManager.json](./07_compile_validator_manager/PoAValidatorManager.sol/PoAValidatorManager.json).
+
+### 8. Deploy the Validator Manager Contract
 
 <!--
 ### 7. 🔮 Converting chain
