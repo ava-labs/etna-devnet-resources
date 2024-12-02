@@ -35,6 +35,8 @@ echo -e "\n🔃 Restarting nodes\n"
 echo -e "\n🎯 Activate ProposerVM fork\n"
 go run ./11_activate_proposer_vm/
 
+echo -e "\n🔌 Initialize Validator Manager\n"
+go run ./12_validator_manager_initialize/ 
 
 # echo -e "\n💸 Sending some test coins\n"
 # go run ./10_evm_transfer/
