@@ -3,7 +3,7 @@ module mypkg
 go 1.22.8
 
 require (
-	github.com/ava-labs/avalanche-cli v1.7.8-0.20241125211322-b62b006fb371
+	github.com/ava-labs/avalanche-cli v1.7.8-0.20241130135036-c7fd308588f2
 	github.com/ava-labs/avalanchego v1.12.0-initial-poc.9.0.20241125192703-8c538e65af03
 	github.com/ava-labs/coreth v0.13.9-rc.1
 	github.com/ava-labs/subnet-evm v0.6.13-0.20241120134850-5853b9cf5e01
@@ -20,8 +20,8 @@ require (
 	github.com/ProtonMail/go-crypto v1.0.0 // indirect
 	github.com/VictoriaMetrics/fastcache v1.12.1 // indirect
 	github.com/ava-labs/apm v1.0.0 // indirect
-	github.com/ava-labs/avalanche-network-runner v1.8.4-0.20241120013844-71784ad023cc // indirect
-	github.com/ava-labs/awm-relayer v1.4.1-0.20241125193122-fbee7816141f // indirect
+	github.com/ava-labs/avalanche-network-runner v1.8.4-0.20241129194458-e0c13f085d2b // indirect
+	github.com/ava-labs/awm-relayer v1.4.1-0.20241126163322-f9c590e20b65 // indirect
 	github.com/ava-labs/ledger-avalanche/go v0.0.0-20241009183145-e6f90a8a1a60 // indirect
 	github.com/ava-labs/teleporter v1.0.8-0.20241121223552-226937a967e8 // indirect
 	github.com/aws/aws-sdk-go-v2 v1.32.5 // indirect
@@ -115,6 +115,7 @@ require (
 	github.com/kr/fs v0.1.0 // indirect
 	github.com/kr/pretty v0.3.1 // indirect
 	github.com/kr/text v0.2.0 // indirect
+	github.com/liyue201/erc20-go v0.0.0-20210521034206-b2824246def0 // indirect
 	github.com/magiconair/properties v1.8.7 // indirect
 	github.com/manifoldco/promptui v0.9.0 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
@@ -122,6 +123,7 @@ require (
 	github.com/mattn/go-runewidth v0.0.16 // indirect
 	github.com/melbahja/goph v1.4.0 // indirect
 	github.com/mitchellh/colorstring v0.0.0-20190213212951-d06e56a500db // indirect
+	github.com/mitchellh/go-wordwrap v1.0.1 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	github.com/mitchellh/pointerstructure v1.2.0 // indirect
 	github.com/mmcloughlin/addchain v0.4.0 // indirect
