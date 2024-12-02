@@ -3,30 +3,45 @@ package main
 import (
 	"fmt"
 	"log"
+	"math/big"
 	"mypkg/helpers"
+	"strings"
 
 	"github.com/ava-labs/avalanche-cli/cmd/blockchaincmd"
 	"github.com/ava-labs/avalanche-cli/pkg/constants"
+	"github.com/ava-labs/avalanche-cli/pkg/contract"
 	"github.com/ava-labs/avalanche-cli/pkg/models"
 	"github.com/ava-labs/avalanche-cli/sdk/interchain"
+	"github.com/ava-labs/avalanche-cli/sdk/validatormanager"
 	avagoconstants "github.com/ava-labs/avalanchego/utils/constants"
 	"github.com/ava-labs/avalanchego/utils/logging"
 	"github.com/ava-labs/avalanchego/vms/platformvm/warp"
 	"github.com/ava-labs/avalanchego/vms/platformvm/warp/message"
 	"github.com/ava-labs/avalanchego/vms/platformvm/warp/payload"
+	"github.com/ethereum/go-ethereum/common"
 	goethereumcommon "github.com/ethereum/go-ethereum/common"
 )
 
 func main() {
-	if err := retrievePChainSubnetConversionWarpMessage(); err != nil {
-		log.Fatalf("❌ Failed to retrieve P-Chain subnet conversion warp message: %s\n", err)
+	err := initializeValidatorSet()
+	if err != nil {
+		log.Fatalf("❌ Failed to initialize validator set: %s\n", err)
 	}
 }
 
-func retrievePChainSubnetConversionWarpMessage() error {
+func initializeValidatorSet() error {
+	alreadyInitialized, err := helpers.TextFileExists("initialize_validator_set_tx")
+	if err != nil {
+		return fmt.Errorf("failed to check if validator set is already initialized: %w", err)
+	}
+	if alreadyInitialized {
+		fmt.Println("✅ Validator set is already initialized")
+		return nil
+	}
+
 	managerAddressHex, err := helpers.LoadText("validator_manager_address")
 	if err != nil {
-		log.Fatalf("❌ Failed to load validator manager address: %s\n", err)
+		return fmt.Errorf("failed to load validator manager address: %w", err)
 	}
 
 	managerAddress := goethereumcommon.HexToAddress(managerAddressHex)
@@ -50,7 +65,7 @@ func retrievePChainSubnetConversionWarpMessage() error {
 
 	chainID, err := helpers.LoadId("chain")
 	if err != nil {
-		log.Fatalf("❌ Failed to load chain ID: %s\n", err)
+		return fmt.Errorf("failed to load chain ID: %w", err)
 	}
 
 	validators := []message.SubnetToL1ConverstionValidatorData{}
@@ -117,7 +132,55 @@ func retrievePChainSubnetConversionWarpMessage() error {
 		return fmt.Errorf("failed to sign subnet conversion unsigned message: %w", err)
 	}
 
-	fmt.Println("subnetConversionSignedMessage", subnetConversionSignedMessage.String())
+	privateKey, err := helpers.LoadText("validator_manager_owner_key")
+	if err != nil {
+		return fmt.Errorf("failed to load private key: %w", err)
+	}
+
+	type InitialValidatorPayload struct {
+		NodeID       []byte
+		BlsPublicKey []byte
+		Weight       uint64
+	}
+	type SubnetConversionDataPayload struct {
+		SubnetID                     [32]byte
+		ValidatorManagerBlockchainID [32]byte
+		ValidatorManagerAddress      common.Address
+		InitialValidators            []InitialValidatorPayload
+	}
+
+	subnetConversionDataPayload := SubnetConversionDataPayload{
+		SubnetID:                     subnetID,
+		ValidatorManagerBlockchainID: chainID,
+		ValidatorManagerAddress:      managerAddress,
+		InitialValidators: []InitialValidatorPayload{
+			{
+				NodeID:       nodeID[:],
+				BlsPublicKey: proofOfPossession.PublicKey[:],
+				Weight:       constants.BootstrapValidatorWeight,
+			},
+		},
+	}
+
+	tx, _, err := contract.TxToMethodWithWarpMessage(
+		fmt.Sprintf("http://%s:%s/ext/bc/%s/rpc", "127.0.0.1", "9650", chainID),
+		strings.TrimSpace(privateKey),
+		managerAddress,
+		subnetConversionSignedMessage,
+		big.NewInt(0),
+		"initialize validator set",
+		validatormanager.ErrorSignatureToError,
+		"initializeValidatorSet((bytes32,bytes32,address,[(bytes,bytes,uint64)]),uint32)",
+		subnetConversionDataPayload,
+		uint32(0),
+	)
+	if err != nil {
+		return fmt.Errorf("failed to initialize validator set: %w", err)
+	}
+
+	fmt.Printf("✅ Successfully initialized validator set. Transaction hash: %s\n", tx.Hash().String())
+
+	helpers.SaveText("initialize_validator_set_tx", tx.Hash().String())
 
 	return nil
 }
