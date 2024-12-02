@@ -3,8 +3,9 @@ package main
 import (
 	"fmt"
 	"log"
-	"mypkg/07_compile_validator_manager/bindings/povalidatormanager"
 	"mypkg/helpers"
+
+	poavalidatormanager "github.com/ava-labs/teleporter/abi-bindings/go/validator-manager/PoAValidatorManager"
 
 	"github.com/ava-labs/subnet-evm/accounts/abi/bind"
 )
@@ -40,7 +41,7 @@ func main() {
 	opts.GasLimit = 8000000 // Set a reasonable gas limit
 	opts.GasPrice = nil     // Let the network determine the gas price
 
-	addr, _, _, err := povalidatormanager.DeployPoAValidatorManager(opts, ethClient, uint8(0))
+	addr, _, _, err := poavalidatormanager.DeployPoAValidatorManager(opts, ethClient, uint8(0))
 	if err != nil {
 		log.Fatalf("failed to deploy contract: %s\n", err)
 	}
