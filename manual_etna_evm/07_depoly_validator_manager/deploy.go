@@ -1,9 +1,11 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"mypkg/helpers"
+	"time"
 
 	poavalidatormanager "github.com/ava-labs/teleporter/abi-bindings/go/validator-manager/PoAValidatorManager"
 
@@ -11,18 +13,19 @@ import (
 )
 
 func main() {
-	exists, err := helpers.TextFileExists("validator_manager_address")
-	if err != nil {
-		log.Fatalf("failed to check if validator manager address file exists: %s\n", err)
-	}
-	if exists {
-		content, err := helpers.LoadText("validator_manager_address")
-		if err != nil {
-			log.Fatalf("failed to load validator manager address: %s\n", err)
-		}
-		log.Printf("✅ Validator manager already deployed at: %s\n", content)
-		return
-	}
+
+	// exists, err := helpers.TextFileExists("validator_manager_address")
+	// if err != nil {
+	// 	log.Fatalf("failed to check if validator manager address file exists: %s\n", err)
+	// }
+	// if exists {
+	// 	content, err := helpers.LoadText("validator_manager_address")
+	// 	if err != nil {
+	// 		log.Fatalf("failed to load validator manager address: %s\n", err)
+	// 	}
+	// 	log.Printf("✅ Validator manager already deployed at: %s\n", content)
+	// 	return
+	// }
 
 	key, err := helpers.LoadValidatorManagerKeyECDSA()
 	if err != nil {
@@ -41,14 +44,35 @@ func main() {
 	opts.GasLimit = 8000000 // Set a reasonable gas limit
 	opts.GasPrice = nil     // Let the network determine the gas price
 
-	addr, _, _, err := poavalidatormanager.DeployPoAValidatorManager(opts, ethClient, uint8(0))
+	addr, tx, validatorManagerCaller, err := poavalidatormanager.DeployPoAValidatorManager(opts, ethClient, uint8(1))
 	if err != nil {
 		log.Fatalf("failed to deploy contract: %s\n", err)
 	}
 
 	fmt.Printf("✅ Contract deployed at: %s\n", addr.Hex())
 
+	fmt.Printf("✅ Waiting for transaction %s to be mined...\n", tx.Hash().Hex())
+	time.Sleep(5 * time.Second)
+
+	receipt, err := ethClient.TransactionReceipt(context.Background(), tx.Hash())
+	if err != nil {
+		log.Fatalf("failed to get transaction receipt: %s\n", err)
+	}
+	fmt.Printf("✅ Transaction receipt: %+v\n", receipt)
+
 	if err := helpers.SaveText("validator_manager_address", addr.Hex()); err != nil {
 		log.Fatalf("failed to save validator manager address: %s\n", err)
 	}
+
+	nodeID, _, err := helpers.GetNodeInfoRetry("http://127.0.0.1:9650")
+	if err != nil {
+		log.Fatalf("❌ Failed to get node info: %s\n", err)
+	}
+
+	registeredValidators, err := validatorManagerCaller.RegisteredValidators(nil, nodeID[:])
+	if err != nil {
+		log.Fatalf("failed to get registered validators: %s\n", err)
+	}
+
+	log.Printf("registeredValidators: %v\n", registeredValidators)
 }

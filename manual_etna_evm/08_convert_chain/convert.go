@@ -80,7 +80,7 @@ func main() {
 
 	validators := []models.SubnetValidator{}
 
-	nodeID, proofOfPossession, err := helpers.GetNodeInfoRetry(fmt.Sprintf("http://%s:%s", "127.0.0.1", "9650"))
+	nodeID, proofOfPossession, err := helpers.GetNodeInfoRetry("http://127.0.0.1:9650")
 	if err != nil {
 		log.Fatalf("❌ Failed to get node info: %s\n", err)
 	}

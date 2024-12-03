@@ -79,7 +79,7 @@ func main() {
 		log.Printf("C-chain balance sufficient: current %s, required %s\n", getBalanceString(cChainBalance, 9), MIN_BALANCE_STRING)
 	}
 
-	log.Printf("Transferring %s from C-chain to P-chain\n", MIN_BALANCE_STRING)
+	log.Printf("Transferring balance from C-chain to P-chain\n", MIN_BALANCE_STRING)
 
 	// Create keychain and wallet
 	kc := secp256k1fx.NewKeychain(key)
@@ -110,7 +110,7 @@ func main() {
 	exportTx, err := cWallet.IssueExportTx(
 		constants.PlatformChainID,
 		[]*secp256k1fx.TransferOutput{{
-			Amt:          MIN_BALANCE,
+			Amt:          cChainBalance.Uint64() - 100*units.MilliAvax,
 			OutputOwners: owner,
 		}},
 	)
