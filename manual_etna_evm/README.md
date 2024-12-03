@@ -26,6 +26,8 @@ Source code: [02_check_balance/balance.go](./02_check_balance/balance.go)
 
 This provides a good example of checking balances and transferring AVAX between C and P chains.
 
+> There is a bug in counting the amounts somewhere. Running this step 2 times would solve it.
+
 ### 3. 🕸️ Creating subnet
 
 Source code: [03_create_subnet/create.go](./03_create_subnet/create.go)

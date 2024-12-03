@@ -6,6 +6,7 @@ import (
 	"math/big"
 	"mypkg/helpers"
 	"strings"
+	"time"
 
 	"github.com/ava-labs/avalanche-cli/cmd/blockchaincmd"
 	"github.com/ava-labs/avalanche-cli/pkg/constants"
@@ -23,10 +24,25 @@ import (
 )
 
 func main() {
-	err := initializeValidatorSet()
-	if err != nil {
-		log.Fatalf("❌ Failed to initialize validator set: %s\n", err)
+	const maxAttempts = 3
+	const retryDelay = 10 * time.Second
+
+	var lastErr error
+	for i := 0; i < maxAttempts; i++ {
+		if i > 0 {
+			fmt.Printf("Attempt %d/%d (will sleep for %v before retry)\n", i+1, maxAttempts, retryDelay)
+			time.Sleep(retryDelay)
+		}
+
+		err := initializeValidatorSet()
+		if err == nil {
+			return
+		}
+		lastErr = err
+		fmt.Printf("❌ Failed to initialize validator set: %s\n", err)
 	}
+
+	log.Fatalf("❌ Failed to initialize validator set after %d attempts: %s\n", maxAttempts, lastErr)
 }
 
 func initializeValidatorSet() error {
@@ -117,7 +133,7 @@ func initializeValidatorSet() error {
 
 	signatureAggregator, err := interchain.NewSignatureAggregator(
 		network,
-		logging.Level(logging.Debug),
+		logging.Level(logging.Info),
 		subnetID,
 		interchain.DefaultQuorumPercentage,
 		true,

@@ -6,7 +6,7 @@ FROM golang:1.22-bookworm AS avalanchego-builder
 
 WORKDIR /app
 
-RUN git clone https://github.com/ava-labs/avalanchego.git && cd avalanchego && git checkout v1.12.0-fuji && ./scripts/build.sh
+RUN git clone https://github.com/ava-labs/avalanchego.git && cd avalanchego && git checkout v1.12.0 && ./scripts/build.sh
 
 # # # # # # # # # # # # # # 
 # Subnet-EVM builder
