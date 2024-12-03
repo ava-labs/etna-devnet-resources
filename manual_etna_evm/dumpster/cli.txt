@@ -1,0 +1,5 @@
+go run . key create supakey --file ~/supakey.pk --force
+go run . key list --fuji
+go run .  blockchain create mynet --skip-update-check --force --evm  --proof-of-authority --validator-manager-owner 0x73c07D5e006E99323075E6A7B53D94C27dB24C08 --evm-chain-id 77777 --evm-token ABC --production-defaults
+go run .  blockchain describe mynet
+go run .  blockchain deploy mynet --fuji --key supakey --use-local-machine
