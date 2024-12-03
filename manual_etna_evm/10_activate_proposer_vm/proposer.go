@@ -4,11 +4,13 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"math/big"
 	"mypkg/helpers"
 	"time"
 
-	"github.com/ava-labs/avalanche-cli/pkg/evm"
+	"github.com/ava-labs/subnet-evm/core/types"
 	"github.com/ava-labs/subnet-evm/ethclient"
+	"github.com/ethereum/go-ethereum/crypto"
 )
 
 const maxAttempts = 10
@@ -16,6 +18,7 @@ const maxAttempts = 10
 func main() {
 	var lastErr error
 	for i := 0; i < maxAttempts; i++ {
+
 		lastErr = activateProposerVM()
 		if lastErr == nil {
 			fmt.Println("✅ Successfully activated proposer VM fork")
@@ -55,21 +58,46 @@ func activateProposerVM() error {
 	}
 	fmt.Printf("Initial block height: %d\n", blockHeight)
 
-	//FIXME: How to check if the fork is already activated? PRs are welcome!
 	if blockHeight >= 3 {
 		fmt.Printf("Block height is already greater than or equal to 3, skipping activation\n")
 		return nil
 	}
 
-	if err := evm.IssueTxsToActivateProposerVMFork(client, evmChainID, key); err != nil {
-		return fmt.Errorf("failed to activate proposer VM fork: %w", err)
+	address := crypto.PubkeyToAddress(key.PublicKey)
+	nonce, err := client.NonceAt(context.Background(), address, nil)
+	if err != nil {
+		return fmt.Errorf("failed to get nonce: %w", err)
 	}
+
+	for i := 0; i < 2; i++ {
+		tx := types.NewTransaction(
+			nonce+uint64(i)+2,
+			address,
+			big.NewInt(1),
+			21000,
+			big.NewInt(225_000_000_000),
+			nil,
+		)
+
+		signedTx, err := types.SignTx(tx, types.LatestSignerForChainID(evmChainID), key)
+		if err != nil {
+			return fmt.Errorf("failed to sign transaction: %w", err)
+		}
+
+		err = client.SendTransaction(context.Background(), signedTx)
+		if err != nil {
+			return fmt.Errorf("failed to send transaction: %w", err)
+		}
+
+		fmt.Printf("Sent transaction %d: %s\n", i+1, signedTx.Hash().String())
+	}
+
+	time.Sleep(4 * time.Second)
 
 	blockHeight, err = client.BlockNumber(context.Background())
 	if err != nil {
 		return fmt.Errorf("failed to get final block height: %w", err)
 	}
 	fmt.Printf("Final block height: %d\n", blockHeight)
-	fmt.Println("✅ Successfully activated proposer VM fork")
 	return nil
 }

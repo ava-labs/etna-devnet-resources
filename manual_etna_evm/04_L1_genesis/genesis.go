@@ -45,7 +45,7 @@ func main() {
 		BlockGasCostStep:         big.NewInt(200000),
 	}
 
-	// cancunTime := uint64(0)
+	zeroTime := uint64(0)
 
 	genesis := core.Genesis{
 		Config: &params.ChainConfig{
