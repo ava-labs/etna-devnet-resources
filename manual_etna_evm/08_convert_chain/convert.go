@@ -11,19 +11,15 @@ import (
 	"mypkg/config"
 	"mypkg/helpers"
 	"os"
-	"time"
 
 	"github.com/ava-labs/avalanche-cli/cmd/blockchaincmd"
 	"github.com/ava-labs/avalanche-cli/pkg/constants"
 	"github.com/ava-labs/avalanche-cli/pkg/key"
 	"github.com/ava-labs/avalanche-cli/pkg/models"
-	validatorManagerSDK "github.com/ava-labs/avalanche-cli/sdk/validatormanager"
-	"github.com/ava-labs/avalanchego/api/info"
 	"github.com/ava-labs/avalanchego/ids"
 	avagoconstants "github.com/ava-labs/avalanchego/utils/constants"
 	"github.com/ava-labs/avalanchego/utils/formatting/address"
 	"github.com/ava-labs/avalanchego/utils/set"
-	"github.com/ava-labs/avalanchego/vms/platformvm/signer"
 	"github.com/ava-labs/avalanchego/vms/secp256k1fx"
 	"github.com/ava-labs/avalanchego/wallet/subnet/primary"
 	"github.com/ava-labs/avalanchego/wallet/subnet/primary/common"
@@ -83,9 +79,8 @@ func main() {
 	}
 
 	validators := []models.SubnetValidator{}
-	endpoint := fmt.Sprintf("http://%s:%s", "127.0.0.1", "9650")
 
-	nodeID, proofOfPossession, err := getNodeInfoRetry(endpoint)
+	nodeID, proofOfPossession, err := helpers.GetNodeInfoRetry(fmt.Sprintf("http://%s:%s", "127.0.0.1", "9650"))
 	if err != nil {
 		log.Fatalf("❌ Failed to get node info: %s\n", err)
 	}
@@ -107,7 +102,12 @@ func main() {
 		log.Fatalf("❌ Failed to convert to AvalancheGo subnet validator: %s\n", err)
 	}
 
-	managerAddress := goethereumcommon.HexToAddress(validatorManagerSDK.ValidatorContractAddress)
+	managerAddressHex, err := helpers.LoadText("validator_manager_address")
+	if err != nil {
+		log.Fatalf("❌ Failed to load validator manager address: %s\n", err)
+	}
+
+	managerAddress := goethereumcommon.HexToAddress(managerAddressHex)
 	options := getMultisigTxOptions(subnetAuthKeys, kc)
 
 	convertLog := fmt.Sprintf("Issuing convert subnet tx\n"+
@@ -155,24 +155,6 @@ func main() {
 	}
 
 	fmt.Printf("✅ Convert subnet tx ID: %s\n", tx.ID().String())
-}
-
-// Naively retries getting node info from the node until it succeeds
-func getNodeInfoRetry(endpoint string) (nodeID ids.NodeID, proofOfPossession *signer.ProofOfPossession, err error) {
-	infoClient := info.NewClient(endpoint)
-	fmt.Printf("Getting node info from %s\n", endpoint)
-
-	for i := 0; i < 10; i++ {
-		ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
-		defer cancel()
-
-		nodeID, proofOfPossession, err = infoClient.GetNodeID(ctx)
-		if err == nil {
-			return
-		}
-		time.Sleep(time.Duration(i) * time.Second)
-	}
-	return ids.NodeID{}, nil, fmt.Errorf("failed to get node info after 10 retries")
 }
 
 func getMultisigTxOptions(subnetAuthKeys []ids.ShortID, kc *secp256k1fx.Keychain) []common.Option {

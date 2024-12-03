@@ -7,5 +7,5 @@ services:
     volumes:
       - ../data/:/data/
     network_mode: host
-    command: /usr/local/bin/avalanchego --chain-config-dir=/data/chains --network-id=fuji --data-dir=/data/node0 --plugin-dir=/plugins/ --http-port=9650 --staking-port=9651 --track-subnets=${TRACK_SUBNETS}
+    command: /usr/local/bin/avalanchego --chain-config-dir=/data/chains --network-id=fuji --data-dir=/data/node0 --plugin-dir=/plugins/ --http-port=9650 --staking-port=9651 --track-subnets=${TRACK_SUBNETS} --http-allowed-hosts=*
     user: "${CURRENT_UID}:${CURRENT_GID}"

@@ -52,7 +52,9 @@ Here we generate the Genesis for our new L1. We will include it in a P-chain cre
 
 Note: Don't confuse your L1 genesis with the Avalanche Fuji genesis. Your node will need both.
 
-The most important function calls are `validatormanager.AddPoAValidatorManagerContractToAllocations` and `validatormanager.AddTransparentProxyContractToAllocations` from the `github.com/ava-labs/avalanche-cli/pkg/validatormanager` package.
+Read more about genesis here: [https://docs.avax.network/avalanche-l1s/upgrade/customize-avalanche-l1](https://docs.avax.network/avalanche-l1s/upgrade/customize-avalanche-l1).
+
+> Normally, you would want to include the Transparent Proxy and Validator manager contracts in genesis, but in this tutorial, for the purpose of a more granular workflow, we are going to deploy them manually in the later steps.
 
 ### 5. ⛓️  Creating chain
 
@@ -62,8 +64,8 @@ Source code: [05_create_chain/chain.go](./05_create_chain/chain.go)
 createChainTx, err := pWallet.IssueCreateChainTx(
     subnetID,               // Transaction id from 2 steps ago
     genesisBytes,           // L1 genesis
-    constants.SubnetEVMID,  // Really could be any cb58 string, but for EVM you should use 
-    nil,                    // TODO: Document fixture extension usage
+    constants.SubnetEVMID,  // Could be any cb58 string, but for EVM you should use this one
+    nil,                    // FIXME: Document fixture extension usage
     "My L1",                // Just a string
 )
 ```
@@ -78,45 +80,103 @@ Setup Steps:
 - `TRACK_SUBNETS` loads the current subnet ID so the node can track the subnet and all chains belonging to it.
 
 Launches [06_launch_nodes/docker-compose.yml](./06_launch_nodes/docker-compose.yml). It contains only one node for simplicity. Mounts local `./data/` folder as `/data/`
+<!-- 
+### 7. 🛠️ Compile the Validator Manager Contract
 
-### 7. 🔮 Converting chain
+After the Etna upgrade, L1s are managed by Warp messages emitted by L1. Currently, the most functional implementation is the [Validator Manager Contract](https://github.com/ava-labs/teleporter/tree/790ccce873f9a904910a0f3ffd783436c920ce97/contracts/validator-manager) in the [Teleporter Repo](https://github.com/ava-labs/teleporter).
 
-Source code: [07_convert_chain/convert.go](./07_convert_chain/convert.go)
+In this step, we first install the [ava-labs/foundry fork](https://github.com/ava-labs/foundry):
 
-TODO: Describe
+```dockerfile
+RUN curl -o install_foundry.sh https://raw.githubusercontent.com/ava-labs/teleporter/${TELEPORTER_COMMIT}/scripts/install_foundry.sh && \
+    chmod +x install_foundry.sh && \
+    ./install_foundry.sh && \
+    rm install_foundry.sh
+```
 
-### 8. 🔃 Restarting nodes
+Then, download and compile the teleporter repository:
+```bash
+git clone https://github.com/ava-labs/teleporter /teleporter
+# ....
+cd /teleporter/contracts && forge build --extra-output-files=bin
+```
+
+The compiled json would be copied to [07_compile_validator_manager/PoAValidatorManager.sol/PoAValidatorManager.json](./07_compile_validator_manager/PoAValidatorManager.sol/PoAValidatorManager.json). -->
+
+### 7. 📦 Deploy the Validator Manager Contract
+
+Source code: [07_depoly_validator_manager/deploy.go](./07_depoly_validator_manager/deploy.go)
+
+Using the pre-compiled PoA Validator Manager from [abi-bindings/go/validator-manager/PoAValidatorManager/PoAValidatorManager.go](https://github.com/ava-labs/teleporter/blob/main/abi-bindings/go/validator-manager/PoAValidatorManager/PoAValidatorManager.go) in the ava-labs/teleporter repo, deploy it using standard EVM Go bindings.
+
+> In production, you should put PoAValidatorManager behind a transparent proxy and preferably include it in genesis.
+
+### 8. 🔮 Converting chain
+
+Source code: [08_convert_chain/convert.go](./08_convert_chain/convert.go)
+
+This converts your Chain to the new Avalanche L1, introduced at Etna upgrade. 
+
+```golang
+tx, err := wallet.P().IssueConvertSubnetToL1Tx(
+		subnetID, // Transaction hash from the "Create Subnet" step
+		chainID, // Transaction hash from the "Create Subnet" step
+		managerAddress.Bytes(), // The address of your manager contract. We added this in genesis
+		avaGoBootstrapValidators, // The initial list of validators. Keep it, we will need it in initialization 
+		options...,
+	)
+```
+
+`avaGoBootstrapValidators` is formed using HTTP requests to nodes, like this one:
+
+```bash
+curl -X POST --data '{
+    "jsonrpc":"2.0",
+    "id"     :1,
+    "method" :"info.getNodeID"
+}' -H 'content-type:application/json' 127.0.0.1:9650/ext/info
+```
+
+### 9. 🔃 Restarting nodes
 
 Source code: none
 
 Runs step 6 again so nodes can pick up changes after the upgrade
-
+<!-- 
 ### 9. 🏥 Checking subnet health
 
 Source code: [09_check_subnet_health/health.go](./09_check_subnet_health/health.go)
 
-Polls `http://127.0.0.1:6550/ext/bc/[CHAIN_ID]/rpc` and requests the EVM chainID until it receives a response. The endpoint becomes available once the node is fully booted and synced, which can take a few minutes. You can monitor progress with `docker logs -f node0`.
+Polls `http://127.0.0.1:9650/ext/bc/[CHAIN_ID]/rpc` and requests the EVM chainID until it receives a response. The endpoint becomes available once the node is fully booted and synced, which can take a few minutes. You can monitor progress with `docker logs -f node0`.
+
+FIXME: [Health API](https://docs.avax.network/api-reference/health-api) is a better option.
 
 ### 10. 💸 Sending some test coins
 
 Source code: [10_evm_transfer/transfer.go](./10_evm_transfer/transfer.go)
 
-Sends a test transfer using the generic EVM API. This double checks that the chain is operational.
+Sends a test transfer using the generic EVM API. This double checks that the chain is operational. -->
 
-### 11. 🎯 Activate ProposerVM fork
+### 10. 🎯 Activate ProposerVM fork
+
+Source code: [10_activate_proposer_vm/proposer.go](./10_activate_proposer_vm/proposer.go)
 
 Sends test transactions to activate the ProposerVM fork.
 
-- TODO: Add more details about ProposerVM
-- TODO: Investigate if this can be combined with EVM transfers to eliminate this step
+- FIXME: Add more details about ProposerVM fork
+- FIXME: Investigate if this can be combined with EVM transfers to eliminate this step
 
-### 12. Initialize PoA validator manager contract
+### 11. Initialize PoA validator manager contract
 
-TODO: Implementation pending
+Source code: [11_validator_manager_initialize/initialize.go](./11_validator_manager_initialize/initialize.go)
+
+TODO: Describe this step
 
 ### 13. Initialize validator set
 
-TODO: Implementation pending
+Source code: [12_initialize_validator_set/initialize_validator_set.go](./12_initialize_validator_set/initialize_validator_set.go)
+
+TODO: Describe this step
 
 ### 14. Add 2 more validators
 

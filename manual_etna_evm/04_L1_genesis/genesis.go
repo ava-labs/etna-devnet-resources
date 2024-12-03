@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bytes"
 	_ "embed"
 	"encoding/json"
 	"log"
@@ -13,16 +12,12 @@ import (
 
 	_ "embed"
 
-	"github.com/ava-labs/avalanche-cli/pkg/validatormanager"
 	"github.com/ava-labs/avalanche-cli/pkg/vm"
-	blockchainSDK "github.com/ava-labs/avalanche-cli/sdk/blockchain"
-	"github.com/ava-labs/coreth/plugin/evm"
-	"github.com/ava-labs/coreth/utils"
+	pluginEVM "github.com/ava-labs/coreth/plugin/evm"
 	"github.com/ava-labs/subnet-evm/commontype"
 	"github.com/ava-labs/subnet-evm/core"
+	"github.com/ava-labs/subnet-evm/core/types"
 	"github.com/ava-labs/subnet-evm/params"
-	"github.com/ava-labs/subnet-evm/precompile/contracts/warp"
-	"github.com/ava-labs/subnet-evm/precompile/precompileconfig"
 )
 
 var (
@@ -35,7 +30,9 @@ func main() {
 		log.Fatalf("failed to load key from file: %s\n", err)
 	}
 
-	ethAddr := evm.PublicKeyToEthAddress(ownerKey.PublicKey())
+	ethAddr := pluginEVM.PublicKeyToEthAddress(ownerKey.PublicKey())
+
+	now := time.Now().Unix()
 
 	feeConfig := commontype.FeeConfig{
 		GasLimit:                 big.NewInt(12000000),
@@ -48,48 +45,56 @@ func main() {
 		BlockGasCostStep:         big.NewInt(200000),
 	}
 
-	allocation := core.GenesisAlloc{
-		// FIXME: This looks like a bug in the CLI, CLI allocates funds to a zero address here
-		// It is filled in here: https://github.com/ava-labs/avalanche-cli/blob/6debe4169dce2c64352d8c9d0d0acac49e573661/pkg/vm/evm_prompts.go#L178
-		ethAddr: core.GenesisAccount{Balance: defaultPoAOwnerBalance},
-	}
-
-	validatormanager.AddPoAValidatorManagerContractToAllocations(allocation)
-	validatormanager.AddTransparentProxyContractToAllocations(allocation, ethAddr.String()) //TODO: might need to be zero address
-
-	genesisTimestamp := utils.TimeToNewUint64(time.Now())
-
-	precompiles := params.Precompiles{}
-	precompiles[warp.ConfigKey] = &warp.Config{
-		QuorumNumerator:              warp.WarpDefaultQuorumNumerator,
-		RequirePrimaryNetworkSigners: true,
-		Upgrade: precompileconfig.Upgrade{
-			BlockTimestamp: genesisTimestamp,
+	genesis := core.Genesis{
+		Config: &params.ChainConfig{
+			BerlinBlock:         big.NewInt(0),
+			ByzantiumBlock:      big.NewInt(0),
+			ConstantinopleBlock: big.NewInt(0),
+			EIP150Block:         big.NewInt(0),
+			EIP155Block:         big.NewInt(0),
+			EIP158Block:         big.NewInt(0),
+			HomesteadBlock:      big.NewInt(0),
+			IstanbulBlock:       big.NewInt(0),
+			LondonBlock:         big.NewInt(0),
+			MuirGlacierBlock:    big.NewInt(0),
+			PetersburgBlock:     big.NewInt(0),
+			FeeConfig:           feeConfig,
+			ChainID:             big.NewInt(config.L1_CHAIN_ID),
 		},
-	}
-
-	subnetConfig, err := blockchainSDK.New(
-		&blockchainSDK.SubnetParams{
-			SubnetEVM: &blockchainSDK.SubnetEVMParams{
-				ChainID:     new(big.Int).SetUint64(config.L1_CHAIN_ID),
-				FeeConfig:   feeConfig,
-				Allocation:  allocation,
-				Precompiles: precompiles,
-				Timestamp:   genesisTimestamp,
+		Alloc: types.GenesisAlloc{
+			ethAddr: {
+				Balance: defaultPoAOwnerBalance,
 			},
-			Name: "TestSubnet",
-		})
-	if err != nil {
-		log.Fatalf("❌ Failed to create subnet: %s\n", err)
+		},
+		Difficulty: big.NewInt(0),
+		GasLimit:   uint64(12000000),
+		Timestamp:  uint64(now),
 	}
 
-	var prettyJSON bytes.Buffer
-	err = json.Indent(&prettyJSON, subnetConfig.Genesis, "", "    ")
+	// Convert genesis to map to add warpConfig
+	genesisMap := make(map[string]interface{})
+	genesisBytes, err := json.Marshal(genesis)
 	if err != nil {
-		log.Fatalf("❌ Failed to indent genesis: %s\n", err)
+		log.Fatalf("❌ Failed to marshal genesis to map: %s\n", err)
+	}
+	if err := json.Unmarshal(genesisBytes, &genesisMap); err != nil {
+		log.Fatalf("❌ Failed to unmarshal genesis to map: %s\n", err)
 	}
 
-	if err := os.WriteFile("data/L1-genesis.json", prettyJSON.Bytes(), 0644); err != nil {
+	// Add warpConfig to config
+	configMap := genesisMap["config"].(map[string]interface{})
+	configMap["warpConfig"] = map[string]interface{}{
+		"blockTimestamp":               now,
+		"quorumNumerator":              67,
+		"requirePrimaryNetworkSigners": true,
+	}
+
+	prettyJSON, err := json.MarshalIndent(genesisMap, "", "  ")
+	if err != nil {
+		log.Fatalf("❌ Failed to marshal genesis: %s\n", err)
+	}
+
+	if err := os.WriteFile("data/L1-genesis.json", prettyJSON, 0644); err != nil {
 		log.Fatalf("❌ Failed to write genesis: %s\n", err)
 	}
 

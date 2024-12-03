@@ -3,8 +3,6 @@ package helpers
 import (
 	"crypto/ecdsa"
 	"encoding/hex"
-	"errors"
-	"os"
 	"strings"
 
 	"github.com/ava-labs/avalanchego/utils/crypto/secp256k1"
@@ -12,17 +10,8 @@ import (
 	goethereumcrypto "github.com/ethereum/go-ethereum/crypto"
 )
 
-const VALIDATOR_MANAGER_KEY_PATH = "data/validator_manager_owner_key.txt"
-
 func ValidatorManagerKeyExists() (bool, error) {
-	_, err := os.Stat(VALIDATOR_MANAGER_KEY_PATH)
-	if errors.Is(err, os.ErrNotExist) {
-		return false, nil
-	}
-	if err != nil {
-		return false, err
-	}
-	return true, nil
+	return TextFileExists("validator_manager_owner_key")
 }
 
 func GenerateValidatorManagerKeyAndSave() error {
@@ -31,18 +20,16 @@ func GenerateValidatorManagerKeyAndSave() error {
 		return err
 	}
 	hexStr := hex.EncodeToString(key.Bytes())
-	return os.WriteFile(VALIDATOR_MANAGER_KEY_PATH, []byte(hexStr), 0644)
+	return SaveText("validator_manager_owner_key", hexStr)
 }
 
 func LoadValidatorManagerKey() (*secp256k1.PrivateKey, error) {
-	hexStr, err := os.ReadFile(VALIDATOR_MANAGER_KEY_PATH)
+	hexStr, err := LoadText("validator_manager_owner_key")
 	if err != nil {
 		return nil, err
 	}
 
-	hexStr = []byte(strings.TrimSpace(string(hexStr)))
-
-	keyBytes, err := hex.DecodeString(string(hexStr))
+	keyBytes, err := hex.DecodeString(strings.TrimSpace(hexStr))
 	if err != nil {
 		return nil, err
 	}
@@ -51,18 +38,15 @@ func LoadValidatorManagerKey() (*secp256k1.PrivateKey, error) {
 }
 
 func LoadValidatorManagerKeyECDSA() (*ecdsa.PrivateKey, error) {
-	keyHex, err := os.ReadFile(VALIDATOR_MANAGER_KEY_PATH)
-	if err != nil {
-		return nil, err
-	}
-	keyBytes, err := hex.DecodeString(strings.TrimSpace(string(keyHex)))
+	hexStr, err := LoadText("validator_manager_owner_key")
 	if err != nil {
 		return nil, err
 	}
 
-	key, err := goethereumcrypto.ToECDSA(keyBytes)
+	keyBytes, err := hex.DecodeString(strings.TrimSpace(hexStr))
 	if err != nil {
 		return nil, err
 	}
-	return key, nil
+
+	return goethereumcrypto.ToECDSA(keyBytes)
 }
