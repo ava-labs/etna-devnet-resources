@@ -30,8 +30,8 @@ while [ $attempt -le $max_attempts ]; do
         chain_id_hex=$(echo $response | grep -o '"result":"[^"]*"' | cut -d'"' -f4)
         if [ ! -z "$chain_id_hex" ]; then
             echo "✅ Subnet is healthy and responding"
-            echo "Chain ID (hex): $chain_id_hex"
             echo "Chain ID (decimal): $((chain_id_hex))"
+            echo "To see logs, run: docker logs -f node0"
             exit 0
         fi
     fi
