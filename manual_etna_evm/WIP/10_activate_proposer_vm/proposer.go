@@ -21,7 +21,7 @@ func main() {
 
 		lastErr = activateProposerVM()
 		if lastErr == nil {
-			fmt.Println("✅ Successfully activated proposer VM fork")
+			log.Println("✅ Successfully activated proposer VM fork")
 			return
 		}
 		fmt.Printf("Attempt %d/%d of activating proposerVM failed: %s\n", i+1, maxAttempts, lastErr)

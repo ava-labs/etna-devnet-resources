@@ -8,8 +8,9 @@ if [ ! -d "/teleporter_src/contracts" ]; then
     git checkout $TELEPORTER_COMMIT
 fi
 
-cd /teleporter_src/contracts && forge build --extra-output-files=bin
+cd /teleporter_src/contracts
 
+forge build --via-ir
 
 # Extract ABI from the compiled JSON file
 jq .abi /teleporter_src/out/PoAValidatorManager.sol/PoAValidatorManager.json > /teleporter_src/out/PoAValidatorManager.sol/PoAValidatorManager.abi

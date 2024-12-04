@@ -51,7 +51,7 @@ func initializeValidatorSet() error {
 		return fmt.Errorf("failed to check if validator set is already initialized: %w", err)
 	}
 	if alreadyInitialized {
-		fmt.Println("✅ Validator set is already initialized")
+		log.Println("✅ Validator set is already initialized")
 		return nil
 	}
 

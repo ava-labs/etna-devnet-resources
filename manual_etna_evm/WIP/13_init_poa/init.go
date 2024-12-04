@@ -26,7 +26,7 @@ import (
 func main() {
 	poaInitializedFilepath := "data/poa_initialized.txt"
 	if _, err := os.Stat(poaInitializedFilepath); err == nil {
-		fmt.Println("✅ PoA already initialized")
+		log.Println("✅ PoA already initialized")
 		return
 	}
 
@@ -138,7 +138,7 @@ func main() {
 		log.Fatalf("❌ Failed to initialize Proof of Authority: %s\n", err)
 	}
 
-	fmt.Println("✅ Successfully initialized Proof of Authority")
+	log.Println("✅ Successfully initialized Proof of Authority")
 
 	// Create file to indicate that PoA is initialized
 	if err := os.WriteFile(poaInitializedFilepath, []byte("true"), 0644); err != nil {

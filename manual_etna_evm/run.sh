@@ -2,20 +2,24 @@
 
 # set -euo pipefail
 
-# echo -e "\n🔑 Generating keys\n"
-# go run ./01_generate_keys/
+echo -e "\n🔑 Generating keys\n"
+go run ./01_generate_keys/
 
-# echo -e "\n💰 Checking balance\n" 
-# go run ./02_check_balance/
+echo -e "\n💰 Checking balance\n" 
+go run ./02_check_balance/
 
-# echo -e "\n🕸️  Creating subnet\n"
-# go run ./03_create_subnet/
+echo -e "\n🕸️  Creating subnet\n"
+go run ./03_create_subnet/
+echo -e "\n🛠️ Using hardcoded smart contracts code\n"
 
-# echo -e "\n🧱 Generating genesis\n"
-# go run ./04_L1_genesis/
+echo -e "\n🧱 Generating genesis\n"
+go run ./05_L1_genesis/
 
-# echo -e "\n⛓️  Creating chain\n"
-# go run ./05_create_chain/
+echo -e "\n⛓️  Creating chain\n"
+go run ./06_create_chain/
+
+echo -e "\n🚀 Launching nodes\n"
+./07_launch_nodes/launch.sh 
 
 # echo -e "\n🚀 Launching nodes\n"
 # ./06_launch_nodes/launch.sh
