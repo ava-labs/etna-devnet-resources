@@ -14,7 +14,8 @@ mkdir -p "${SCRIPT_DIR}/../data/chains/${CHAIN_ID}"
 cp "${SCRIPT_DIR}/evm_debug_config.json" "${SCRIPT_DIR}/../data/chains/${CHAIN_ID}/config.json"
 
 docker compose -f "${SCRIPT_DIR}/docker-compose.yml" down || true
-docker compose -f "${SCRIPT_DIR}/docker-compose.yml" up -d --build
+docker compose -f "${SCRIPT_DIR}/docker-compose.yml" up -d --build $1
+
 
 # Add health check loop
 echo "Waiting for subnet to become available..."

@@ -19,13 +19,13 @@ echo -e "\n⛓️  Creating chain\n"
 go run ./06_create_chain/
 
 echo -e "\n🚀 Launching nodes\n"
-./07_launch_nodes/launch.sh 
+./07_launch_nodes/launch.sh "node0"
 
 echo -e "\n🔮 Converting chain into L1\n"
 go run ./08_convert_chain/
 
 echo -e "\n🚀 Restarting nodes\n"
-./09_restart_nodes/restart.sh 
+./07_launch_nodes/launch.sh "node0"
 
 echo -e "\n🎯 Activate ProposerVM fork\n"
 go run ./10_activate_proposer_vm/
@@ -36,5 +36,8 @@ go run ./11_validator_manager_initialize/
 echo -e "\n👥 Initialize validator set\n"
 go run ./12_initialize_validator_set
 
+echo -e "\n📄 Reading contract logs\n"
+go run ./13_read_contract_logs
 
-
+echo -e "\n🚀 Starting 2 more nodes\n"
+./07_launch_nodes/launch.sh "node0 node1 node2"
