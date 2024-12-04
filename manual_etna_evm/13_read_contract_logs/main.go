@@ -91,7 +91,7 @@ func printPChainState() error {
 
 	// Make HTTP requests
 	client := &http.Client{}
-	fujiPChainURL := "https://rpc.ankr.com/avalanche_fuji-p"
+	fujiPChainURL := "https://api.avax-test.network/ext/P"
 
 	// Get validators
 	validatorsResp, err := makeJSONRPCRequest(client, fujiPChainURL, validatorsPayload)
