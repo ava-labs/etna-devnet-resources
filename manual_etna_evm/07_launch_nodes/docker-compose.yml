@@ -10,3 +10,4 @@ services:
     user: "${CURRENT_UID}:${CURRENT_GID}"
     environment:
       - TRACK_SUBNETS=${TRACK_SUBNETS}
+      - NODE_NAME=node0

@@ -36,12 +36,5 @@ go run ./11_validator_manager_initialize/
 echo -e "\n👥 Initialize validator set\n"
 go run ./12_initialize_validator_set
 
-# echo -e "\n📦 Deploy Validator Manager\n"
-# go run ./07_depoly_validator_manager/
-
-# echo -e "\n🔃 Restarting nodes\n"
-# ./06_launch_nodes/launch.sh # Reuse the script to restart nodes
-
-
 
 

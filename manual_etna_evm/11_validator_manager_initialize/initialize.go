@@ -11,11 +11,17 @@ import (
 
 	poavalidatormanager "github.com/ava-labs/teleporter/abi-bindings/go/validator-manager/PoAValidatorManager"
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/crypto"
 
 	"github.com/ava-labs/subnet-evm/accounts/abi/bind"
 )
 
 func main() {
+	ecdsaKey, err := helpers.LoadValidatorManagerKeyECDSA()
+	if err != nil {
+		log.Fatalf("failed to load validator manager key: %w", err)
+	}
+
 	isInitialized, err := helpers.TextFileExists("validator_manager_initialized")
 	if err != nil {
 		log.Fatalf("failed to check if validator manager initialized file exists: %s\n", err)
@@ -58,7 +64,7 @@ func main() {
 		SubnetID:               subnetID,
 		ChurnPeriodSeconds:     0,
 		MaximumChurnPercentage: 20,
-	}, managerAddress)
+	}, crypto.PubkeyToAddress(ecdsaKey.PublicKey))
 	if err != nil {
 		log.Fatalf("failed to initialize validator manager: %s\n", err)
 	}
