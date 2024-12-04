@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"math/big"
+	"mypkg/config"
 	"mypkg/helpers"
 	"strings"
 	"time"
@@ -55,12 +56,7 @@ func initializeValidatorSet() error {
 		return nil
 	}
 
-	managerAddressHex, err := helpers.LoadText("validator_manager_address")
-	if err != nil {
-		return fmt.Errorf("failed to load validator manager address: %w", err)
-	}
-
-	managerAddress := goethereumcommon.HexToAddress(managerAddressHex)
+	managerAddress := goethereumcommon.HexToAddress(config.ProxyContractAddress)
 
 	subnetID, err := helpers.LoadId("subnet")
 	if err != nil {

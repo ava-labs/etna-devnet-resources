@@ -47,15 +47,6 @@ func checkValidators() error {
 	// Print receiving contract address (To address from transaction)
 	log.Printf("Receiving Contract Address: %s\n", tx.To().Hex())
 
-	// Add code existence check
-	code, err := ethClient.CodeAt(context.Background(), *tx.To(), nil)
-	if err != nil {
-		return fmt.Errorf("failed to get contract code: %w", err)
-	}
-	if len(code) == 0 {
-		return fmt.Errorf("no contract code found at address %s - contract might not be deployed yet", tx.To().Hex())
-	}
-
 	validatorManagerCaller, err := poavalidatormanager.NewPoAValidatorManagerCaller(*tx.To(), ethClient)
 	if err != nil {
 		return fmt.Errorf("failed to create validator manager caller: %w", err)

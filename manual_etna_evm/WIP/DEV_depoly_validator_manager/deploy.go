@@ -13,19 +13,18 @@ import (
 )
 
 func main() {
-
-	// exists, err := helpers.TextFileExists("validator_manager_address")
-	// if err != nil {
-	// 	log.Fatalf("failed to check if validator manager address file exists: %s\n", err)
-	// }
-	// if exists {
-	// 	content, err := helpers.LoadText("validator_manager_address")
-	// 	if err != nil {
-	// 		log.Fatalf("failed to load validator manager address: %s\n", err)
-	// 	}
-	// 	log.Printf("✅ Validator manager already deployed at: %s\n", content)
-	// 	return
-	// }
+	exists, err := helpers.TextFileExists("validator_manager_address")
+	if err != nil {
+		log.Fatalf("failed to check if validator manager address file exists: %s\n", err)
+	}
+	if exists {
+		content, err := helpers.LoadText("validator_manager_address")
+		if err != nil {
+			log.Fatalf("failed to load validator manager address: %s\n", err)
+		}
+		log.Printf("✅ Validator manager already deployed at: %s\n", content)
+		return
+	}
 
 	key, err := helpers.LoadValidatorManagerKeyECDSA()
 	if err != nil {
@@ -75,4 +74,12 @@ func main() {
 	}
 
 	log.Printf("registeredValidators: %v\n", registeredValidators)
+
+	// Get deployed bytecode from chain
+	deployedCode, err := ethClient.CodeAt(context.Background(), addr, nil)
+	if err != nil {
+		log.Fatalf("failed to get deployed code: %s\n", err)
+	}
+
+	fmt.Printf("\n✅ Deployed contract bytecode:\n0x%x\n", deployedCode)
 }

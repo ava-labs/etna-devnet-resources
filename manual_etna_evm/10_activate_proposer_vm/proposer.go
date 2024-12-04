@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"crypto/ecdsa"
 	"fmt"
 	"log"
 	"math/big"
@@ -10,6 +11,7 @@ import (
 
 	"github.com/ava-labs/subnet-evm/core/types"
 	"github.com/ava-labs/subnet-evm/ethclient"
+	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
 )
 
@@ -63,41 +65,109 @@ func activateProposerVM() error {
 		return nil
 	}
 
-	address := crypto.PubkeyToAddress(key.PublicKey)
-	nonce, err := client.NonceAt(context.Background(), address, nil)
+	err = IssueTxsToActivateProposerVMFork(client, evmChainID, key)
 	if err != nil {
-		return fmt.Errorf("failed to get nonce: %w", err)
+		return fmt.Errorf("failed to issue transactions to activate proposer VM fork: %w", err)
 	}
-
-	for i := 0; i < 2; i++ {
-		tx := types.NewTransaction(
-			nonce+uint64(i)+2,
-			address,
-			big.NewInt(1),
-			21000,
-			big.NewInt(225_000_000_000),
-			nil,
-		)
-
-		signedTx, err := types.SignTx(tx, types.LatestSignerForChainID(evmChainID), key)
-		if err != nil {
-			return fmt.Errorf("failed to sign transaction: %w", err)
-		}
-
-		err = client.SendTransaction(context.Background(), signedTx)
-		if err != nil {
-			return fmt.Errorf("failed to send transaction: %w", err)
-		}
-
-		fmt.Printf("Sent transaction %d: %s\n", i+1, signedTx.Hash().String())
-	}
-
-	time.Sleep(4 * time.Second)
 
 	blockHeight, err = client.BlockNumber(context.Background())
 	if err != nil {
-		return fmt.Errorf("failed to get final block height: %w", err)
+		return fmt.Errorf("failed to get initial block height: %w", err)
 	}
-	fmt.Printf("Final block height: %d\n", blockHeight)
+	fmt.Printf("Block height after activation: %d\n", blockHeight)
+
 	return nil
+
+}
+
+func IssueTxsToActivateProposerVMFork(
+	client ethclient.Client,
+	chainID *big.Int,
+	privKey *ecdsa.PrivateKey,
+) error {
+	const (
+		repeatsOnFailure    = 3
+		sleepBetweenRepeats = 1 * time.Second
+	)
+
+	var errorList []error
+	var err error
+	for i := 0; i < repeatsOnFailure; i++ {
+		ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+		defer cancel()
+		err = issueTxsToActivateProposerVMFork(client, ctx, chainID, privKey)
+		if err == nil {
+			break
+		}
+		err = fmt.Errorf(
+			"failure issuing txs to activate proposer VM fork for client %#v: %w",
+			client,
+			err,
+		)
+		errorList = append(errorList, err)
+		time.Sleep(sleepBetweenRepeats)
+	}
+	if err != nil {
+		for _, indivError := range errorList {
+			log.Printf("Error: %s", indivError)
+		}
+	}
+	return err
+}
+
+func issueTxsToActivateProposerVMFork(
+	client ethclient.Client,
+	ctx context.Context,
+	chainID *big.Int,
+	fundedKey *ecdsa.PrivateKey,
+) error {
+	const numTriggerTxs = 2 // Number of txs needed to activate the proposer VM fork
+	addr := crypto.PubkeyToAddress(fundedKey.PublicKey)
+	gasPrice := big.NewInt(225_000_000_000) // 225 Gwei
+
+	txSigner := types.LatestSignerForChainID(chainID)
+	for i := 0; i < numTriggerTxs; i++ {
+		prevBlockNumber, err := client.BlockNumber(ctx)
+		if err != nil {
+			return err
+		}
+		nonce, err := client.NonceAt(ctx, addr, nil)
+		if err != nil {
+			return err
+		}
+		tx := types.NewTransaction(
+			nonce, addr, common.Big1, 21000, gasPrice, nil)
+		triggerTx, err := types.SignTx(tx, txSigner, fundedKey)
+		if err != nil {
+			return err
+		}
+		if err := client.SendTransaction(ctx, triggerTx); err != nil {
+			return err
+		}
+		if err := WaitForNewBlock(client, ctx, prevBlockNumber, 10*time.Second, time.Second); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func WaitForNewBlock(
+	client ethclient.Client,
+	ctx context.Context,
+	prevBlockNumber uint64,
+	totalDuration time.Duration,
+	stepDuration time.Duration,
+) error {
+	steps := totalDuration / stepDuration
+	for seconds := 0; seconds < int(steps); seconds++ {
+		blockNumber, err := client.BlockNumber(ctx)
+		if err != nil {
+			return err
+		}
+		if blockNumber > prevBlockNumber {
+			return nil
+		}
+		time.Sleep(stepDuration)
+	}
+	return fmt.Errorf("new block not produced in %f seconds", totalDuration.Seconds())
 }

@@ -27,8 +27,14 @@ go run ./08_convert_chain/
 echo -e "\n🚀 Restarting nodes\n"
 ./09_restart_nodes/restart.sh 
 
-# echo -e "\n🎯 Activate ProposerVM fork\n"
-# go run ./10_activate_proposer_vm/
+echo -e "\n🎯 Activate ProposerVM fork\n"
+go run ./10_activate_proposer_vm/
+
+echo -e "\n🔌 Initialize Validator Manager\n"
+go run ./11_validator_manager_initialize/ 
+
+echo -e "\n👥 Initialize validator set\n"
+go run ./12_initialize_validator_set
 
 # echo -e "\n📦 Deploy Validator Manager\n"
 # go run ./07_depoly_validator_manager/
@@ -36,10 +42,6 @@ echo -e "\n🚀 Restarting nodes\n"
 # echo -e "\n🔃 Restarting nodes\n"
 # ./06_launch_nodes/launch.sh # Reuse the script to restart nodes
 
-# echo -e "\n🔌 Initialize Validator Manager\n"
-# go run ./11_validator_manager_initialize/ 
 
-# echo -e "\n👥 Initialize validator set\n"
-# go run ./12_initialize_validator_set
 
 

@@ -5,13 +5,14 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"mypkg/config"
 	"mypkg/helpers"
 	"time"
 
 	poavalidatormanager "github.com/ava-labs/teleporter/abi-bindings/go/validator-manager/PoAValidatorManager"
+	"github.com/ethereum/go-ethereum/common"
 
 	"github.com/ava-labs/subnet-evm/accounts/abi/bind"
-	"github.com/ethereum/go-ethereum/common"
 )
 
 func main() {
@@ -29,11 +30,7 @@ func main() {
 		log.Fatalf("failed to load subnet ID: %s\n", err)
 	}
 
-	validatorManagerAddresshex, err := helpers.LoadText("validator_manager_address")
-	if err != nil {
-		log.Fatalf("failed to load validator manager address: %s\n", err)
-	}
-	validatorManagerAddress := common.HexToAddress(validatorManagerAddresshex)
+	managerAddress := common.HexToAddress(config.ProxyContractAddress)
 
 	key, err := helpers.LoadValidatorManagerKeyECDSA()
 	if err != nil {
@@ -52,7 +49,7 @@ func main() {
 	opts.GasLimit = 8000000 // Set a reasonable gas limit
 	opts.GasPrice = nil     // Let the network determine the gas price
 
-	contract, err := poavalidatormanager.NewPoAValidatorManager(validatorManagerAddress, ethClient)
+	contract, err := poavalidatormanager.NewPoAValidatorManager(managerAddress, ethClient)
 	if err != nil {
 		log.Fatalf("failed to deploy contract: %s\n", err)
 	}
@@ -61,7 +58,7 @@ func main() {
 		SubnetID:               subnetID,
 		ChurnPeriodSeconds:     0,
 		MaximumChurnPercentage: 20,
-	}, validatorManagerAddress)
+	}, managerAddress)
 	if err != nil {
 		log.Fatalf("failed to initialize validator manager: %s\n", err)
 	}
