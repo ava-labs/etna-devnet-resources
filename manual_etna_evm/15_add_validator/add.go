@@ -28,14 +28,10 @@ import (
 )
 
 func main() {
-	ports := []string{"9654", "9652"}
-	for _, port := range ports {
-		log.Printf("--------------------------------")
-		log.Printf("Adding validator on port %s\n", port)
-		if err := AddValidator(fmt.Sprintf("http://127.0.0.1:%s", port)); err != nil {
-			log.Fatalf("❌ Failed to add validator on port %s: %s\n", port, err)
-		}
-
+	port := "9652"
+	log.Printf("Adding validator on port %s\n", port)
+	if err := AddValidator(fmt.Sprintf("http://127.0.0.1:%s", port)); err != nil {
+		log.Fatalf("❌ Failed to add validator on port %s: %s\n", port, err)
 	}
 }
 
