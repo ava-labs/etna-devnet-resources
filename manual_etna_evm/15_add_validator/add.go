@@ -23,11 +23,9 @@ import (
 func main() {
 	ports := []string{"9654", "9652"}
 	for _, port := range ports {
+		log.Printf("--------------------------------")
+		log.Printf("Adding validator on port %s\n", port)
 		if err := AddValidator(fmt.Sprintf("http://127.0.0.1:%s", port)); err != nil {
-			if strings.Contains(err.Error(), "node already registered") {
-				log.Printf("✅ Node on port %s was already registered as validator\n", port)
-				continue
-			}
 			log.Fatalf("❌ Failed to add validator on port %s: %s\n", port, err)
 		}
 	}
@@ -80,6 +78,11 @@ func AddValidator(rpcURL string) error {
 		constants.NonBootstrapValidatorWeight,
 	)
 	if err != nil {
+		if strings.Contains(err.Error(), "node already registered") {
+			log.Printf("reverted with an expected error: %s", err)
+			log.Printf("✅ Node %s was already registered as validator previously\n", rpcURL)
+			return nil
+		}
 		return fmt.Errorf("failed to initialize validator registration: %s", err)
 	}
 
@@ -100,32 +103,32 @@ func PoAValidatorManagerInitializeValidatorRegistration(
 	disableOwners warpMessage.PChainOwner,
 	weight uint64,
 ) (*types.Transaction, *types.Receipt, error) {
-	log.Printf("Initializing validator registration with:\n"+
-		"rpcURL: %s\n"+
-		"managerAddress: %s\n"+
-		"managerOwnerPrivateKey: %s\n"+
-		"nodeID: %s\n"+
-		"blsPublicKey: %x\n"+
-		"expiry: %d\n"+
-		"balanceOwners:\n"+
-		"\tThreshold: %d\n"+
-		"\tAddresses: %v\n"+
-		"disableOwners:\n"+
-		"\tThreshold: %d\n"+
-		"\tAddresses: %v\n"+
-		"weight: %d\n",
-		rpcURL,
-		managerAddress.String(),
-		managerOwnerPrivateKey,
-		nodeID.String(),
-		blsPublicKey,
-		expiry,
-		balanceOwners.Threshold,
-		balanceOwners.Addresses,
-		disableOwners.Threshold,
-		disableOwners.Addresses,
-		weight,
-	)
+	// log.Printf("Initializing validator registration with:\n"+
+	// 	"rpcURL: %s\n"+
+	// 	"managerAddress: %s\n"+
+	// 	"managerOwnerPrivateKey: %s\n"+
+	// 	"nodeID: %s\n"+
+	// 	"blsPublicKey: %x\n"+
+	// 	"expiry: %d\n"+
+	// 	"balanceOwners:\n"+
+	// 	"\tThreshold: %d\n"+
+	// 	"\tAddresses: %v\n"+
+	// 	"disableOwners:\n"+
+	// 	"\tThreshold: %d\n"+
+	// 	"\tAddresses: %v\n"+
+	// 	"weight: %d\n",
+	// 	rpcURL,
+	// 	managerAddress.String(),
+	// 	managerOwnerPrivateKey,
+	// 	nodeID.String(),
+	// 	blsPublicKey,
+	// 	expiry,
+	// 	balanceOwners.Threshold,
+	// 	balanceOwners.Addresses,
+	// 	disableOwners.Threshold,
+	// 	disableOwners.Addresses,
+	// 	weight,
+	// )
 
 	type PChainOwner struct {
 		Threshold uint32
