@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"encoding/hex"
 	"fmt"
 	"log"
@@ -19,10 +20,15 @@ import (
 	validatorManagerSDK "github.com/ava-labs/avalanche-cli/sdk/validatormanager"
 	"github.com/ava-labs/avalanchego/api/info"
 	"github.com/ava-labs/avalanchego/ids"
+	"github.com/ava-labs/avalanchego/utils/crypto/secp256k1"
 	"github.com/ava-labs/avalanchego/utils/logging"
+	"github.com/ava-labs/avalanchego/utils/units"
+	"github.com/ava-labs/avalanchego/vms/platformvm/txs"
 	"github.com/ava-labs/avalanchego/vms/platformvm/warp"
 	warpMessage "github.com/ava-labs/avalanchego/vms/platformvm/warp/message"
 	warpPayload "github.com/ava-labs/avalanchego/vms/platformvm/warp/payload"
+	"github.com/ava-labs/avalanchego/vms/secp256k1fx"
+	"github.com/ava-labs/avalanchego/wallet/subnet/primary"
 	"github.com/ava-labs/subnet-evm/core/types"
 	"github.com/ethereum/go-ethereum/common"
 )
@@ -139,13 +145,15 @@ func AddValidator(rpcURL string) error {
 	fmt.Printf("signedMessage: %s\n", signedMessage)
 	fmt.Printf("validationID: %s\n", validationID)
 
-	//TODO:
-	//txID, _, err := deployer.RegisterL1Validator(balance, blsInfo, signedMessage)
+	balance := 1 * units.Avax
+	var proofOfPossession [96]byte
+	copy(proofOfPossession[:], blsInfo.ProofOfPossession[:])
+	if err := RegisterL1ValidatorOnPChain(key, balance, proofOfPossession, signedMessage); err != nil {
+		return fmt.Errorf("failed to register L1 validator on P-chain: %s", err)
+	}
 
-	//TODO:
-	// if err := UpdatePChainHeight(
-
-	//TODO:
+	log.Printf("Waiting for P-chain to update validator information ...")
+	time.Sleep(30 * time.Second)
 
 	// if err := validatormanager.FinishValidatorRegistration(
 	// 	app,
@@ -159,6 +167,39 @@ func AddValidator(rpcURL string) error {
 	// ); err != nil {
 	// 	return err
 	// }
+
+	return nil
+}
+
+func RegisterL1ValidatorOnPChain(key *secp256k1.PrivateKey, balance uint64, proofOfPossession [96]byte, message *warp.Message) error {
+	kc := secp256k1fx.NewKeychain(key)
+	wallet, err := primary.MakeWallet(context.Background(), &primary.WalletConfig{
+		URI:          config.RPC_URL,
+		AVAXKeychain: kc,
+		EthKeychain:  kc,
+	})
+	if err != nil {
+		log.Fatalf("failed to initialize wallet: %s\n", err)
+	}
+
+	unsignedTx, err := wallet.P().Builder().NewRegisterL1ValidatorTx(
+		balance,
+		proofOfPossession,
+		message.Bytes(),
+	)
+	if err != nil {
+		return fmt.Errorf("error building tx: %w", err)
+	}
+
+	tx := txs.Tx{Unsigned: unsignedTx}
+	if err := wallet.P().Signer().Sign(context.Background(), &tx); err != nil {
+		return fmt.Errorf("error signing tx: %w", err)
+	}
+
+	err = wallet.P().IssueTx(&tx)
+	if err != nil {
+		return fmt.Errorf("error issuing tx: %w", err)
+	}
 
 	return nil
 }

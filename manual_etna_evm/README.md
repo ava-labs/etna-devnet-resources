@@ -8,6 +8,8 @@ This repository provides a detailed, code-first guide for integrating L1 subnet 
 
 Run everything at once: `./run.sh` to start a new L1 on Devnet, `./cleanup.sh` to clean up (preserves your keys)
 
+> Note: This guide uses simplified, linear code with hardcoded values to demonstrate concepts clearly. Not intended as a library.
+
 For up to date steps, check the [./run.sh](./run.sh) file.
 
 <!--
