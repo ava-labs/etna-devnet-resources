@@ -1,0 +1,44 @@
+services:
+  node0:
+    container_name: node0
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ../data/:/data/
+    network_mode: host
+    user: "${CURRENT_UID}:${CURRENT_GID}"
+    environment:
+      - TRACK_SUBNETS=${TRACK_SUBNETS}
+      - NODE_NAME=node0
+      - HTTP_PORT=9650
+      - STAKING_PORT=9651
+  node1:
+    container_name: node1
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ../data/:/data/
+    network_mode: host
+    user: "${CURRENT_UID}:${CURRENT_GID}"
+    environment:
+      - TRACK_SUBNETS=${TRACK_SUBNETS}
+      - NODE_NAME=node1
+      - HTTP_PORT=9652
+      - STAKING_PORT=9653
+  node2:
+    container_name: node2
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ../data/:/data/
+    network_mode: host
+    user: "${CURRENT_UID}:${CURRENT_GID}"
+    environment:
+      - TRACK_SUBNETS=${TRACK_SUBNETS}
+      - NODE_NAME=node2
+      - HTTP_PORT=9654
+      - STAKING_PORT=9655
+

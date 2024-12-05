@@ -80,7 +80,7 @@ func main() {
 
 	validators := []models.SubnetValidator{}
 
-	nodeID, proofOfPossession, err := helpers.GetNodeInfoRetry(fmt.Sprintf("http://%s:%s", "127.0.0.1", "9650"))
+	nodeID, proofOfPossession, err := helpers.GetNodeInfoRetry("http://127.0.0.1:9650")
 	if err != nil {
 		log.Fatalf("❌ Failed to get node info: %s\n", err)
 	}
@@ -102,12 +102,7 @@ func main() {
 		log.Fatalf("❌ Failed to convert to AvalancheGo subnet validator: %s\n", err)
 	}
 
-	managerAddressHex, err := helpers.LoadText("validator_manager_address")
-	if err != nil {
-		log.Fatalf("❌ Failed to load validator manager address: %s\n", err)
-	}
-
-	managerAddress := goethereumcommon.HexToAddress(managerAddressHex)
+	managerAddress := goethereumcommon.HexToAddress(config.ProxyContractAddress)
 	options := getMultisigTxOptions(subnetAuthKeys, kc)
 
 	convertLog := fmt.Sprintf("Issuing convert subnet tx\n"+
@@ -128,7 +123,7 @@ func main() {
 		int(avaGoBootstrapValidators[0].Balance),
 	)
 
-	fmt.Println(convertLog)
+	log.Println(convertLog)
 	err = os.WriteFile("./data/convert_log.txt", []byte(convertLog), 0644)
 	if err != nil {
 		log.Fatalf("❌ Failed to write convert log: %s\n", err)

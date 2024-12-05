@@ -1,6 +1,6 @@
-#!/bin/bash
+# #!/bin/bash
 
-set -euo pipefail
+# set -euo pipefail
 
 echo -e "\n🔑 Generating keys\n"
 go run ./01_generate_keys/
@@ -10,24 +10,22 @@ go run ./02_check_balance/
 
 echo -e "\n🕸️  Creating subnet\n"
 go run ./03_create_subnet/
+echo -e "\n🛠️ Using hardcoded smart contracts code\n"
 
 echo -e "\n🧱 Generating genesis\n"
-go run ./04_L1_genesis/
+go run ./05_L1_genesis/
 
 echo -e "\n⛓️  Creating chain\n"
-go run ./05_create_chain/
+go run ./06_create_chain/
 
 echo -e "\n🚀 Launching nodes\n"
-./06_launch_nodes/launch.sh
-
-echo -e "\n📦 Deploy Validator Manager\n"
-go run ./07_depoly_validator_manager/
+./07_launch_nodes/launch.sh "node0"
 
 echo -e "\n🔮 Converting chain into L1\n"
 go run ./08_convert_chain/
 
-echo -e "\n🔃 Restarting nodes\n"
-./06_launch_nodes/launch.sh # Reuse the script to restart nodes
+echo -e "\n🚀 Restarting nodes\n"
+./07_launch_nodes/launch.sh "node0"
 
 echo -e "\n🎯 Activate ProposerVM fork\n"
 go run ./10_activate_proposer_vm/
@@ -38,4 +36,20 @@ go run ./11_validator_manager_initialize/
 echo -e "\n👥 Initialize validator set\n"
 go run ./12_initialize_validator_set
 
+echo -e "\n📄 Reading contract logs\n"
+go run ./13_read_contract_logs
 
+echo -e "\n🚀 Starting 2 more nodes\n"
+./07_launch_nodes/launch.sh "node0 node1"
+
+echo -e "\n👥 Add validator - initialize registration (Work in progress)\n"
+echo "Note: This step is not implemented yet."
+# go run ./15_add_validator_init_registration/
+
+echo -e "\n👥 Add validator - finish registration (Work in progress)\n"
+echo "Note: This step is not implemented yet."
+# go run ./16_add_validator_finish_registration/
+
+echo -e "\n👥 Add validator - update weight (Work in progress)\n"
+echo "Note: This step is not implemented yet."
+# go run ./17_add_validator_update_weight/

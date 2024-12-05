@@ -18,10 +18,15 @@ import (
 	"github.com/ava-labs/subnet-evm/core"
 	"github.com/ava-labs/subnet-evm/core/types"
 	"github.com/ava-labs/subnet-evm/params"
+	"github.com/ethereum/go-ethereum/common"
 )
 
 var (
 	defaultPoAOwnerBalance = new(big.Int).Mul(vm.OneAvax, big.NewInt(10)) // 10 Native Tokens
+
+	ValidatorContractAddress  = "0xC0DEBA5E0000000000000000000000000000000"
+	ProxyAdminContractAddress = "0xC0FFEE1234567890aBcDEF1234567890AbCdEf34"
+	RewardCalculatorAddress   = "0xDEADC0DE0000000000000000000000000000000"
 )
 
 func main() {
@@ -44,6 +49,8 @@ func main() {
 		MaxBlockGasCost:          big.NewInt(1000000),
 		BlockGasCostStep:         big.NewInt(200000),
 	}
+
+	// zeroTime := uint64(0)
 
 	genesis := core.Genesis{
 		Config: &params.ChainConfig{
@@ -69,6 +76,46 @@ func main() {
 		Difficulty: big.NewInt(0),
 		GasLimit:   uint64(12000000),
 		Timestamp:  uint64(now),
+	}
+
+	poaDeployedBytecode, err := loadHexFile("04_hardcoded_validator_manager/deployed_poa_validator_manager_bytecode.txt")
+	if err != nil {
+		log.Fatalf("❌ Failed to get PoA deployed bytecode: %s\n", err)
+	}
+
+	proxyAdminBytecode, err := loadHexFile("04_hardcoded_validator_manager/deployed_proxy_admin_bytecode.txt")
+	if err != nil {
+		log.Fatalf("❌ Failed to get proxy admin deployed bytecode: %s\n", err)
+	}
+
+	transparentProxyBytecode, err := loadHexFile("04_hardcoded_validator_manager/deployed_transparent_proxy_bytecode.txt")
+	if err != nil {
+		log.Fatalf("❌ Failed to get transparent proxy deployed bytecode: %s\n", err)
+	}
+
+	genesis.Alloc[common.HexToAddress(ValidatorContractAddress)] = types.Account{
+		Code:    poaDeployedBytecode,
+		Balance: big.NewInt(0),
+		Nonce:   1,
+	}
+
+	genesis.Alloc[common.HexToAddress(ProxyAdminContractAddress)] = types.Account{
+		Balance: big.NewInt(0),
+		Code:    proxyAdminBytecode,
+		Nonce:   1,
+		Storage: map[common.Hash]common.Hash{
+			common.HexToHash("0x0"): common.HexToHash(ethAddr.String()),
+		},
+	}
+
+	genesis.Alloc[common.HexToAddress(config.ProxyContractAddress)] = types.Account{
+		Balance: big.NewInt(0),
+		Code:    transparentProxyBytecode,
+		Nonce:   1,
+		Storage: map[common.Hash]common.Hash{
+			common.HexToHash("0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc"): common.HexToHash(ValidatorContractAddress),
+			common.HexToHash("0xb53127684a568b3173ae13b9f8a6016e243e63b6e8ee1178d6a717850b5d6103"): common.HexToHash(ProxyAdminContractAddress),
+		},
 	}
 
 	// Convert genesis to map to add warpConfig
