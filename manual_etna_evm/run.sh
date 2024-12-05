@@ -41,3 +41,6 @@ go run ./13_read_contract_logs
 
 echo -e "\n🚀 Starting 2 more nodes\n"
 ./07_launch_nodes/launch.sh "node0 node1 node2"
+
+echo -e "\n👥 Adding validator\n"
+go run ./15_add_validator/

@@ -8,6 +8,9 @@ This repository provides a detailed, code-first guide for integrating L1 subnet 
 
 Run everything at once: `./run.sh` to start a new L1 on Devnet, `./cleanup.sh` to clean up (preserves your keys)
 
+For up to date steps, check the [./run.sh](./run.sh) file.
+
+<!--
 ### 1. 🔑 Generating Keys
 
 Source code: [01_generate_keys/generate.go](./01_generate_keys/generate.go)
@@ -103,7 +106,7 @@ git clone https://github.com/ava-labs/teleporter /teleporter
 cd /teleporter/contracts && forge build --extra-output-files=bin
 ```
 
-The compiled json would be copied to [07_compile_validator_manager/PoAValidatorManager.sol/PoAValidatorManager.json](./07_compile_validator_manager/PoAValidatorManager.sol/PoAValidatorManager.json). -->
+The compiled json would be copied to [07_compile_validator_manager/PoAValidatorManager.sol/PoAValidatorManager.json](./07_compile_validator_manager/PoAValidatorManager.sol/PoAValidatorManager.json). 
 
 ### 7. 📦 Deploy the Validator Manager Contract
 
@@ -157,7 +160,7 @@ FIXME: [Health API](https://docs.avax.network/api-reference/health-api) is a bet
 
 Source code: [10_evm_transfer/transfer.go](./10_evm_transfer/transfer.go)
 
-Sends a test transfer using the generic EVM API. This double checks that the chain is operational. -->
+Sends a test transfer using the generic EVM API. This double checks that the chain is operational. 
 
 ### 10. 🎯 Activate ProposerVM fork
 
