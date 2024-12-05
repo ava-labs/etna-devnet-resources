@@ -1,6 +1,6 @@
 # #!/bin/bash
 
-# set -euo pipefail
+set -euo pipefail
 
 echo -e "\n🔑 Generating keys\n"
 go run ./01_generate_keys/
@@ -39,17 +39,15 @@ go run ./12_initialize_validator_set
 echo -e "\n📄 Reading contract logs\n"
 go run ./13_read_contract_logs
 
-echo -e "\n🚀 Starting 2 more nodes\n"
+echo -e "\n🚀 Starting 1 more node\n"
 ./07_launch_nodes/launch.sh "node0 node1"
 
-echo -e "\n👥 Add validator - initialize registration (Work in progress)\n"
-echo "Note: This step is not implemented yet."
-# go run ./15_add_validator_init_registration/
+echo -e "\n👥 Add validator - initialize registration\n"
+go run ./15_add_validator_init_registration/
 
-echo -e "\n👥 Add validator - finish registration (Work in progress)\n"
-echo "Note: This step is not implemented yet."
-# go run ./16_add_validator_finish_registration/
+echo -e "\n👥 Add validator - register on P-chain\n"
+go run ./16_add_validator_register_on_p_chain/
 
-echo -e "\n👥 Add validator - update weight (Work in progress)\n"
-echo "Note: This step is not implemented yet."
-# go run ./17_add_validator_update_weight/
+echo -e "\n👥 Add validator - complete validator registration\n"
+go run ./17_add_validator_complete_validator_registration/
+
