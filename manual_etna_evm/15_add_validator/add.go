@@ -10,12 +10,19 @@ import (
 	"strings"
 	"time"
 
+	"github.com/ava-labs/avalanche-cli/cmd/blockchaincmd"
 	"github.com/ava-labs/avalanche-cli/pkg/constants"
 	"github.com/ava-labs/avalanche-cli/pkg/contract"
+	"github.com/ava-labs/avalanche-cli/pkg/models"
 	"github.com/ava-labs/avalanche-cli/pkg/utils"
+	"github.com/ava-labs/avalanche-cli/sdk/interchain"
 	validatorManagerSDK "github.com/ava-labs/avalanche-cli/sdk/validatormanager"
+	"github.com/ava-labs/avalanchego/api/info"
 	"github.com/ava-labs/avalanchego/ids"
+	"github.com/ava-labs/avalanchego/utils/logging"
+	"github.com/ava-labs/avalanchego/vms/platformvm/warp"
 	warpMessage "github.com/ava-labs/avalanchego/vms/platformvm/warp/message"
+	warpPayload "github.com/ava-labs/avalanchego/vms/platformvm/warp/payload"
 	"github.com/ava-labs/subnet-evm/core/types"
 	"github.com/ethereum/go-ethereum/common"
 )
@@ -28,6 +35,7 @@ func main() {
 		if err := AddValidator(fmt.Sprintf("http://127.0.0.1:%s", port)); err != nil {
 			log.Fatalf("❌ Failed to add validator on port %s: %s\n", port, err)
 		}
+
 	}
 }
 
@@ -44,7 +52,10 @@ func AddValidator(rpcURL string) error {
 		return fmt.Errorf("failed to get node info: %s", err)
 	}
 
-	expiry := uint64(time.Now().Add(constants.DefaultValidationIDExpiryDuration).Unix())
+	expiry, err := loadOrGenerateExpiry()
+	if err != nil {
+		return fmt.Errorf("failed to load or generate expiry: %s", err)
+	}
 
 	key, err := helpers.LoadValidatorManagerKey()
 	if err != nil {
@@ -81,14 +92,138 @@ func AddValidator(rpcURL string) error {
 		if strings.Contains(err.Error(), "node already registered") {
 			log.Printf("reverted with an expected error: %s", err)
 			log.Printf("✅ Node %s was already registered as validator previously\n", rpcURL)
-			return nil
+		} else {
+			return fmt.Errorf("failed to initialize validator registration: %s", err)
 		}
-		return fmt.Errorf("failed to initialize validator registration: %s", err)
+	} else {
+		log.Printf("✅ Validator registration initialized: %s\n", receipt.TxHash)
 	}
 
-	log.Printf("✅ Validator registration initialized: %s\n", receipt.TxHash)
+	network := models.NewFujiNetwork()
+	aggregatorLogLevel := logging.Level(logging.Info)
+	aggregatorQuorumPercentage := uint64(0)
+	aggregatorAllowPrivateIPs := true
+
+	aggregatorExtraPeerEndpoints, err := blockchaincmd.ConvertURIToPeers([]string{"http://127.0.0.1:9650"})
+	if err != nil {
+		return fmt.Errorf("failed to get extra peers: %w", err)
+	}
+
+	subnetID, err := helpers.LoadId("subnet")
+	if err != nil {
+		return fmt.Errorf("failed to load subnet ID: %w", err)
+	}
+
+	blsPublicKey := [48]byte(blsInfo.PublicKey[:])
+	weight := constants.NonBootstrapValidatorWeight
+
+	signedMessage, validationID, err := ValidatorManagerGetSubnetValidatorRegistrationMessage(
+		network,
+		aggregatorLogLevel,
+		aggregatorQuorumPercentage,
+		aggregatorAllowPrivateIPs,
+		aggregatorExtraPeerEndpoints,
+		subnetID,
+		chainID,
+		managerAddress,
+		nodeID,
+		blsPublicKey,
+		expiry,
+		remainingBalanceOwners,
+		disableOwners,
+		uint64(weight),
+	)
+	if err != nil {
+		return fmt.Errorf("failed to get subnet validator registration message: %s", err)
+	}
+
+	_ = signedMessage
+	_ = validationID
+
+	fmt.Printf("signedMessage: %s\n", signedMessage)
+	fmt.Printf("validationID: %s\n", validationID)
+
+	//TODO:
+	//txID, _, err := deployer.RegisterL1Validator(balance, blsInfo, signedMessage)
+
+	//TODO:
+	// if err := UpdatePChainHeight(
+
+	//TODO:
+
+	// if err := validatormanager.FinishValidatorRegistration(
+	// 	app,
+	// 	network,
+	// 	rpcURL,
+	// 	chainSpec,
+	// 	ownerPrivateKey,
+	// 	validationID,
+	// 	extraAggregatorPeers,
+	// 	aggregatorLogLevel,
+	// ); err != nil {
+	// 	return err
+	// }
 
 	return nil
+}
+
+func ValidatorManagerGetSubnetValidatorRegistrationMessage(
+	network models.Network,
+	aggregatorLogLevel logging.Level,
+	aggregatorQuorumPercentage uint64,
+	aggregatorAllowPrivateIPs bool,
+	aggregatorExtraPeerEndpoints []info.Peer,
+	subnetID ids.ID,
+	blockchainID ids.ID,
+	managerAddress common.Address,
+	nodeID ids.NodeID,
+	blsPublicKey [48]byte,
+	expiry uint64,
+	balanceOwners warpMessage.PChainOwner,
+	disableOwners warpMessage.PChainOwner,
+	weight uint64,
+) (*warp.Message, ids.ID, error) {
+	addressedCallPayload, err := warpMessage.NewRegisterL1Validator(
+		subnetID,
+		nodeID,
+		blsPublicKey,
+		expiry,
+		balanceOwners,
+		disableOwners,
+		weight,
+	)
+	if err != nil {
+		return nil, ids.Empty, err
+	}
+	validationID := addressedCallPayload.ValidationID()
+	registerSubnetValidatorAddressedCall, err := warpPayload.NewAddressedCall(
+		managerAddress.Bytes(),
+		addressedCallPayload.Bytes(),
+	)
+	if err != nil {
+		return nil, ids.Empty, err
+	}
+	registerSubnetValidatorUnsignedMessage, err := warp.NewUnsignedMessage(
+		network.ID,
+		blockchainID,
+		registerSubnetValidatorAddressedCall.Bytes(),
+	)
+	if err != nil {
+		return nil, ids.Empty, err
+	}
+	signatureAggregator, err := interchain.NewSignatureAggregator(
+		network,
+		aggregatorLogLevel,
+		subnetID,
+		aggregatorQuorumPercentage,
+		aggregatorAllowPrivateIPs,
+		aggregatorExtraPeerEndpoints,
+	)
+	if err != nil {
+		return nil, ids.Empty, err
+	}
+	signedMessage, err := signatureAggregator.Sign(registerSubnetValidatorUnsignedMessage, nil)
+	return signedMessage, validationID, err
 }
 
 // step 1 of flow for adding a new validator
@@ -173,44 +308,6 @@ func PoAValidatorManagerInitializeValidatorRegistration(
 		weight,
 	)
 
-	//TODO:
-	// return ValidatorManagerGetSubnetValidatorRegistrationMessage(
-	// 	network,
-	// 	aggregatorLogLevel,
-	// 	0,
-	// 	network.Kind == models.Local,
-	// 	aggregatorExtraPeerEndpoints,
-	// 	subnetID,
-	// 	blockchainID,
-	// 	managerAddress,
-	// 	nodeID,
-	// 	[48]byte(blsPublicKey),
-	// 	expiry,
-	// 	balanceOwners,
-	// 	disableOwners,
-	// 	weight,
-	// )
-
-	//TODO:
-	//txID, _, err := deployer.RegisterL1Validator(balance, blsInfo, signedMessage)
-
-	//TODO:
-	// if err := UpdatePChainHeight(
-
-	//TODO:
-
-	// if err := validatormanager.FinishValidatorRegistration(
-	// 	app,
-	// 	network,
-	// 	rpcURL,
-	// 	chainSpec,
-	// 	ownerPrivateKey,
-	// 	validationID,
-	// 	extraAggregatorPeers,
-	// 	aggregatorLogLevel,
-	// ); err != nil {
-	// 	return err
-	// }
 }
 
 // func AddValidator() error {
@@ -376,33 +473,54 @@ func PoAValidatorManagerInitializeValidatorRegistration(
 // 		return nil, ids.Empty, err
 // 	}
 
-// 	validationID := addressedCallPayload.ValidationID()
-// 	registerSubnetValidatorAddressedCall, err := warpPayload.NewAddressedCall(
-// 		managerAddress.Bytes(),
-// 		addressedCallPayload.Bytes(),
-// 	)
-// 	if err != nil {
-// 		return nil, ids.Empty, err
-// 	}
-// 	registerSubnetValidatorUnsignedMessage, err := warp.NewUnsignedMessage(
-// 		network.ID,
-// 		blockchainID,
-// 		registerSubnetValidatorAddressedCall.Bytes(),
-// 	)
-// 	if err != nil {
-// 		return nil, ids.Empty, err
-// 	}
-// 	signatureAggregator, err := interchain.NewSignatureAggregator(
-// 		network,
-// 		aggregatorLogLevel,
-// 		subnetID,
-// 		aggregatorQuorumPercentage,
-// 		aggregatorAllowPrivateIPs,
-// 		aggregatorExtraPeerEndpoints,
-// 	)
-// 	if err != nil {
-// 		return nil, ids.Empty, err
-// 	}
-// 	signedMessage, err := signatureAggregator.Sign(registerSubnetValidatorUnsignedMessage, nil)
-// 	return signedMessage, validationID, err
-// }
+//		validationID := addressedCallPayload.ValidationID()
+//		registerSubnetValidatorAddressedCall, err := warpPayload.NewAddressedCall(
+//			managerAddress.Bytes(),
+//			addressedCallPayload.Bytes(),
+//		)
+//		if err != nil {
+//			return nil, ids.Empty, err
+//		}
+//		registerSubnetValidatorUnsignedMessage, err := warp.NewUnsignedMessage(
+//			network.ID,
+//			blockchainID,
+//			registerSubnetValidatorAddressedCall.Bytes(),
+//		)
+//		if err != nil {
+//			return nil, ids.Empty, err
+//		}
+//		signatureAggregator, err := interchain.NewSignatureAggregator(
+//			network,
+//			aggregatorLogLevel,
+//			subnetID,
+//			aggregatorQuorumPercentage,
+//			aggregatorAllowPrivateIPs,
+//			aggregatorExtraPeerEndpoints,
+//		)
+//		if err != nil {
+//			return nil, ids.Empty, err
+//		}
+//		signedMessage, err := signatureAggregator.Sign(registerSubnetValidatorUnsignedMessage, nil)
+//		return signedMessage, validationID, err
+//	}
+func loadOrGenerateExpiry() (uint64, error) {
+	expiryFile := "validator_expiry"
+	exists, err := helpers.TextFileExists(expiryFile)
+	if err != nil {
+		return 0, fmt.Errorf("failed to check if expiry file exists: %w", err)
+	}
+
+	if !exists {
+		expiry := uint64(time.Now().Add(constants.DefaultValidationIDExpiryDuration).Unix())
+		if err := helpers.SaveUint64(expiryFile, expiry); err != nil {
+			return 0, fmt.Errorf("failed to save expiry: %w", err)
+		}
+		return expiry, nil
+	}
+
+	expiry, err := helpers.LoadUint64(expiryFile)
+	if err != nil {
+		return 0, fmt.Errorf("failed to load expiry: %w", err)
+	}
+	return expiry, nil
+}

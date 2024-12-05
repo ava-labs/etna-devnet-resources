@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"strconv"
 
 	"github.com/ava-labs/avalanchego/ids"
 )
@@ -57,4 +58,16 @@ func LoadText(textType string) (string, error) {
 		return "", err
 	}
 	return string(textBytes), nil
+}
+
+func SaveUint64(textType string, value uint64) error {
+	return SaveText(textType, fmt.Sprintf("%d", value))
+}
+
+func LoadUint64(textType string) (uint64, error) {
+	text, err := LoadText(textType)
+	if err != nil {
+		return 0, err
+	}
+	return strconv.ParseUint(text, 10, 64)
 }
