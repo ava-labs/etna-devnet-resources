@@ -43,10 +43,13 @@ echo -e "\n🚀 Starting 2 more nodes\n"
 ./07_launch_nodes/launch.sh "node0 node1"
 
 echo -e "\n👥 Add validator - initialize registration (Work in progress)\n"
+echo "Note: This step is not implemented yet."
 # go run ./15_add_validator_init_registration/
 
 echo -e "\n👥 Add validator - finish registration (Work in progress)\n"
+echo "Note: This step is not implemented yet."
 # go run ./16_add_validator_finish_registration/
 
 echo -e "\n👥 Add validator - update weight (Work in progress)\n"
+echo "Note: This step is not implemented yet."
 # go run ./17_add_validator_update_weight/
