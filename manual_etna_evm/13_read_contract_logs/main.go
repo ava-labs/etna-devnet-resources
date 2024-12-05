@@ -69,13 +69,18 @@ func main() {
 }
 
 func printPChainState() error {
+	subnetID, err := helpers.LoadId("subnet")
+	if err != nil {
+		return fmt.Errorf("failed to load subnet ID: %w", err)
+	}
+
 	// Create JSON-RPC request payloads
 	validatorsPayload := map[string]interface{}{
 		"jsonrpc": "2.0",
 		"method":  "platform.getValidatorsAt",
 		"params": map[string]string{
 			"height":   "proposed",
-			"subnetID": "mNGzCz4iiZgRDFBWcdGyDHpETVR24inQwcyDHGZUQPtmLdynk",
+			"subnetID": subnetID.String(),
 		},
 		"id": 1,
 	}
@@ -84,7 +89,7 @@ func printPChainState() error {
 		"jsonrpc": "2.0",
 		"method":  "platform.getSubnet",
 		"params": map[string]string{
-			"subnetID": "mNGzCz4iiZgRDFBWcdGyDHpETVR24inQwcyDHGZUQPtmLdynk",
+			"subnetID": subnetID.String(),
 		},
 		"id": 1,
 	}

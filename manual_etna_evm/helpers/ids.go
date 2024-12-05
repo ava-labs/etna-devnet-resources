@@ -1,6 +1,7 @@
 package helpers
 
 import (
+	"encoding/hex"
 	"errors"
 	"fmt"
 	"os"
@@ -70,4 +71,16 @@ func LoadUint64(textType string) (uint64, error) {
 		return 0, err
 	}
 	return strconv.ParseUint(text, 10, 64)
+}
+
+func SaveHex(textType string, value []byte) error {
+	return SaveText(textType, hex.EncodeToString(value))
+}
+
+func LoadHex(textType string) ([]byte, error) {
+	text, err := LoadText(textType)
+	if err != nil {
+		return nil, err
+	}
+	return hex.DecodeString(text)
 }
