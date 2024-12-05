@@ -1,19 +1,19 @@
-FROM golang:1.22.9-bookworm
+FROM ubuntu:24.04
 
 # Install git and other necessary dependencies
 RUN apt-get update
-RUN apt-get install -y git jq
+RUN apt-get install -y git jq software-properties-common golang
 
-# Download and run the install_foundry.sh script
-ARG TELEPORTER_COMMIT
-RUN curl -o install_foundry.sh https://raw.githubusercontent.com/ava-labs/teleporter/${TELEPORTER_COMMIT}/scripts/install_foundry.sh && \
-    chmod +x install_foundry.sh && \
-    ./install_foundry.sh && \
-    rm install_foundry.sh
+# Set GOPATH and add Go binaries to PATH
+ENV GOPATH /root/go
+ENV PATH $GOPATH/bin:$PATH
 
 RUN go install github.com/ava-labs/subnet-evm/cmd/abigen@v0.6.12
 
-ENV PATH="/root/.foundry/bin/:${PATH}"
+RUN apt-get install -y wget curl
+
+RUN wget https://github.com/ethereum/solidity/releases/download/v0.8.25/solc-static-linux -O /usr/local/bin/solc
+RUN chmod +x /usr/local/bin/solc
 
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh

@@ -1,4 +1,5 @@
 #!/bin/bash
+set -exu -o pipefail
 
 SCRIPT_DIR=$(dirname "$0")
 TELEPORTER_COMMIT=790ccce873f9a904910a0f3ffd783436c920ce97
