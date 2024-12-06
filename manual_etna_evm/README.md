@@ -33,7 +33,7 @@ This provides a good example of checking balances and transferring AVAX between 
 
 > There is a bug in counting the amounts somewhere. Running this step 2 times would solve it.
 
-<!--
+
 ### 3. 🕸️ Creating subnet
 
 Source code: [03_create_subnet/create.go](./03_create_subnet/create.go)
@@ -52,7 +52,7 @@ createSubnetTx, err := wallet.P().IssueCreateSubnetTx(owner)
 
 A subnet is a group of validators that agree to validate the same chains. A chain can only belong to one subnet, but a subnet can have multiple chains. Each validator must validate all chains within their subnet. Validators can participate in multiple subnets simultaneously.
 
-
+<!--
 ### 4. 🧱 Generating genesis
 
 Source code: [04_L1_genesis/genesis.go](./04_L1_genesis/genesis.go)
