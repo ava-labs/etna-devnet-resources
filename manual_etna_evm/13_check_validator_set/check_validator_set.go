@@ -6,9 +6,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
-	"mypkg/config"
-	"mypkg/helpers"
 	"net/http"
+
+	"github.com/ava-labs/etna-devnet-resources/manual_etna_evm/config"
+	"github.com/ava-labs/etna-devnet-resources/manual_etna_evm/helpers"
 
 	poavalidatormanager "github.com/ava-labs/icm-contracts/abi-bindings/go/validator-manager/PoAValidatorManager"
 	"github.com/ava-labs/subnet-evm/interfaces"

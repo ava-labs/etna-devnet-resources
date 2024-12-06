@@ -8,9 +8,10 @@ import (
 	"encoding/hex"
 	"fmt"
 	"log"
-	"mypkg/config"
-	"mypkg/helpers"
 	"os"
+
+	"github.com/ava-labs/etna-devnet-resources/manual_etna_evm/config"
+	"github.com/ava-labs/etna-devnet-resources/manual_etna_evm/helpers"
 
 	"github.com/ava-labs/avalanche-cli/cmd/blockchaincmd"
 	"github.com/ava-labs/avalanche-cli/pkg/constants"

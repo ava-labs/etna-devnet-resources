@@ -5,9 +5,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
-	"mypkg/config"
-	"mypkg/helpers"
 	"time"
+
+	"github.com/ava-labs/etna-devnet-resources/manual_etna_evm/config"
+	"github.com/ava-labs/etna-devnet-resources/manual_etna_evm/helpers"
 
 	poavalidatormanager "github.com/ava-labs/icm-contracts/abi-bindings/go/validator-manager/PoAValidatorManager"
 	"github.com/ethereum/go-ethereum/common"
@@ -52,8 +53,8 @@ func main() {
 	if err != nil {
 		log.Fatalf("failed to create transactor: %s\n", err)
 	}
-	opts.GasLimit = 8000000 // Set a reasonable gas limit
-	opts.GasPrice = nil     // Let the network determine the gas price
+	opts.GasLimit = 8000000
+	opts.GasPrice = nil
 
 	contract, err := poavalidatormanager.NewPoAValidatorManager(managerAddress, ethClient)
 	if err != nil {

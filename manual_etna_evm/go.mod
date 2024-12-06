@@ -1,4 +1,4 @@
-module mypkg
+module github.com/ava-labs/etna-devnet-resources/manual_etna_evm
 
 go 1.22.10
 

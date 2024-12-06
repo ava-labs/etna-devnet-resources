@@ -5,8 +5,8 @@ set -euo pipefail
 echo -e "\n🔑 Generating keys\n"
 go run ./01_generate_keys/
 
-echo -e "\n💰 Checking balance\n" 
-go run ./02_check_balance/
+echo -e "\n💰 Transferring AVAX between C and P chains\n" 
+go run ./02_transfer_balance/
 
 echo -e "\n🕸️  Creating subnet\n"
 go run ./03_create_subnet/
@@ -39,7 +39,7 @@ echo -e "\n👥 Initialize validator set\n"
 go run ./12_initialize_validator_set
 
 echo -e "\n📄 Reading contract logs\n"
-go run ./13_read_contract_logs
+go run ./13_check_validator_set
 
 echo -e "\n🚀 Starting 1 more node\n"
 ./07_launch_nodes/launch.sh "node0 node1"
@@ -57,4 +57,4 @@ echo -e "\n🎉 Everything is done! Waiting for 1 minute before reading contract
 sleep 60
 
 echo -e "\n📄 Reading contract logs again\n"
-go run ./13_read_contract_logs
+go run ./13_check_validator_set

@@ -4,10 +4,11 @@ import (
 	"fmt"
 	"log"
 	"math/big"
-	"mypkg/config"
-	"mypkg/helpers"
 	"strings"
 	"time"
+
+	"github.com/ava-labs/etna-devnet-resources/manual_etna_evm/config"
+	"github.com/ava-labs/etna-devnet-resources/manual_etna_evm/helpers"
 
 	"github.com/ava-labs/avalanche-cli/cmd/blockchaincmd"
 	"github.com/ava-labs/avalanche-cli/pkg/constants"
@@ -175,7 +176,7 @@ func initializeValidatorSet() error {
 	}
 
 	tx, _, err := contract.TxToMethodWithWarpMessage(
-		fmt.Sprintf("http://%s:%s/ext/bc/%s/rpc", "127.0.0.1", "9650", chainID),
+		fmt.Sprintf("http://127.0.0.1:9650/ext/bc/%s/rpc", chainID),
 		strings.TrimSpace(privateKey),
 		managerAddress,
 		subnetConversionSignedMessage,

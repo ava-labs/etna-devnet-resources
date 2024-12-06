@@ -2,8 +2,9 @@ package main
 
 import (
 	"log"
-	"mypkg/helpers"
 	"os"
+
+	"github.com/ava-labs/etna-devnet-resources/manual_etna_evm/helpers"
 )
 
 func main() {

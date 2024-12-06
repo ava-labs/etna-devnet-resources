@@ -5,10 +5,11 @@ import (
 	"fmt"
 	"log"
 	"math/big"
-	"mypkg/config"
-	"mypkg/helpers"
 	"os"
 	"time"
+
+	"github.com/ava-labs/etna-devnet-resources/manual_etna_evm/config"
+	"github.com/ava-labs/etna-devnet-resources/manual_etna_evm/helpers"
 
 	"github.com/ava-labs/avalanchego/ids"
 	"github.com/ava-labs/avalanchego/utils/constants"
