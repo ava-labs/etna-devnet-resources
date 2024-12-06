@@ -22,15 +22,7 @@ cd /teleporter_src/contracts && forge build --extra-output-files bin
 # Extract ABI from the compiled JSON file
 jq .abi /teleporter_src/out/PoAValidatorManager.sol/PoAValidatorManager.json > /teleporter_src/out/PoAValidatorManager.sol/PoAValidatorManager.abi
 
-mkdir -p "/bindings/povalidatormanager"
-abigen \
-    --abi "/teleporter_src/out/PoAValidatorManager.sol/PoAValidatorManager.abi" \
-    --pkg povalidatormanager \
-    --type PoAValidatorManager \
-    --out "/bindings/povalidatormanager/PoAValidatorManager.go" \
-    --bin "/teleporter_src/out/PoAValidatorManager.sol/PoAValidatorManager.bin"
-
 cp -r /teleporter_src/out/PoAValidatorManager.sol/*.json /compiled/
 cp -r /teleporter_src/out/ValidatorMessages.sol/*.json /compiled/
 
-chown -R $HOST_UID:$HOST_GID /bindings /compiled
+chown -R $HOST_UID:$HOST_GID /compiled

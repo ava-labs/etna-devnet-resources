@@ -15,7 +15,6 @@ CURRENT_GID=$(id -g)
 
 docker build -t validator-manager-compiler --build-arg SUBNET_EVM_VERSION=$SUBNET_EVM_VERSION --build-arg ICM_COMMIT=$ICM_COMMIT "$SCRIPT_DIR"
 docker run -it --rm \
-    -v "$SCRIPT_DIR/bindings":/bindings \
     -v "$SCRIPT_DIR/compiled":/compiled \
     -v "$SCRIPT_DIR/teleporter_src":/teleporter_src \
     -e ICM_COMMIT=$ICM_COMMIT \
