@@ -97,7 +97,7 @@ createChainTx, err := pWallet.IssueCreateChainTx(
     subnetID,               // Transaction id from 2 steps ago
     genesisBytes,           // L1 genesis
     constants.SubnetEVMID,  // Could be any cb58 string, but for EVM you should use this one
-    nil,                    // FIXME: Document fixture extension usage
+    nil,                    //
     "My L1",                // Just a string
 )
 ```
@@ -181,13 +181,52 @@ tx, err := contract.Initialize(opts, poavalidatormanager.ValidatorManagerSetting
 
 Source code: [12_initialize_validator_set/initialize_validator_set.go](./12_initialize_validator_set/initialize_validator_set.go)
 
-TODO: Describe this step
+Here we call `initializeValidatorSet` method with the same data we used in the "Converting chain". That is very important - if one byte differs, the hash would be different.
 
+```golang
+tx, _, err := contract.TxToMethodWithWarpMessage(
+		fmt.Sprintf("http://127.0.0.1:9650/ext/bc/%s/rpc", chainID),
+		strings.TrimSpace(privateKey),
+		managerAddress,
+		subnetConversionSignedMessage,
+		big.NewInt(0),
+		"initialize validator set",
+		validatormanager.ErrorSignatureToError,
+		"initializeValidatorSet((bytes32,bytes32,address,[(bytes,bytes,uint64)]),uint32)",
+		subnetConversionDataPayload,
+		uint32(0),
+	)
+```
 ### 13. 📄 Check validator set
 
 Source code: [13_check_validator_set/check_validator_set.go](./13_check_validator_set/check_validator_set.go)
 
-TODO: Describe this step
+Just checks the state of the validator set on the P-chain and the logs in the smart contract:
+```golang
+validatorsPayload := map[string]interface{}{
+		"jsonrpc": "2.0",
+		"method":  "platform.getValidatorsAt",
+		"params": map[string]string{
+			"height":   "proposed",
+			"subnetID": subnetID.String(),
+		},
+		"id": 1,
+	}
+// Get validators
+validatorsResp, err := makeJSONRPCRequest(client, fujiPChainURL, validatorsPayload)
+if err != nil {
+  return fmt.Errorf("failed to get validators: %w", err)
+}
+//...
+query := ethereum.FilterQuery{
+  Addresses: []common.Address{managerAddress},
+}
+
+logs, err := ethClient.FilterLogs(context.Background(), (interfaces.FilterQuery)(query))
+if err != nil {
+  log.Fatal(err)
+}
+```
 
 ### 14. 🚀 Start another node
 
@@ -197,22 +236,55 @@ Source code: none
 ./07_launch_nodes/launch.sh "node0 node1"
 ```
 
-TODO: Describe this step
+Starts another node to test adding a validator.
 
-### 15. 👾 Add validator
+### 15. 👾 Add validator - initialize registration
 
 Source code: [15_add_validator_init_registration/add.go](./15_add_validator_init_registration/add.go)
 
-TODO: Describe this step
+Initializes the validator registration process by:
 
-### 16. 📝 Register validator on P-chain
+1. Getting the node ID and BLS key info from the node
+2. Generating an expiry timestamp for the registration
+3. Loading the validator manager key and contract address
+4. Calling `initializeValidatorRegistration` on the validator manager contract with:
+   - Node ID
+   - BLS public key
+   - Registration expiry
+   - Balance owners (who can claim remaining balance)
+   - Disable owners (who can disable the validator)
+   - Validator weight
+5. Generating and signing a Warp message containing the validator registration data
+6. Saving the signed Warp message, BLS info, and validation ID to files
+
+
+### 16. 📝 Add validator - register on P-chain
 
 Source code: [16_add_validator_register_on_p_chain/register.go](./16_add_validator_register_on_p_chain/register.go)
 
-TODO: Describe this step
+Registers the validator on the P-chain by:
 
-### 17. 🏰 Complete validator registration
+1. Loading the BLS info and signed Warp message from files
+2. Creating a wallet using the validator manager key
+3. Building and signing a P-chain transaction to register the L1 validator with:
+   - 1 AVAX staking amount
+   - BLS proof of possession
+   - Signed Warp message containing validator details
+4. Issuing the transaction to register the validator
+5. Retrying up to 3 times if registration fails
+
+### 17. 🏰 Add validator - complete registration
 
 Source code: [17_add_validator_complete_validator_registration/finish.go](./17_add_validator_complete_validator_registration/finish.go)
 
-TODO: Describe this step
+Completes the validator registration process by:
+
+1. Loading the validation ID from file
+2. Generating a signed Warp message proving the validator was registered on the P-chain
+3. Loading the validator manager contract address and private key
+4. Calling `completeValidatorRegistration` on the validator manager contract with:
+   - The signed Warp message proving P-chain registration
+   - A registration index of 0
+5. Waiting for the transaction to be confirmed
+
+This final step links the P-chain registration with the validator manager contract, allowing the validator to participate in consensus.

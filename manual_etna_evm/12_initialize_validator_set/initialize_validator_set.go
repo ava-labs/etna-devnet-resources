@@ -176,7 +176,7 @@ func initializeValidatorSet() error {
 	}
 
 	tx, _, err := contract.TxToMethodWithWarpMessage(
-		fmt.Sprintf("http://%s:%s/ext/bc/%s/rpc", "127.0.0.1", "9650", chainID),
+		fmt.Sprintf("http://127.0.0.1:9650/ext/bc/%s/rpc", chainID),
 		strings.TrimSpace(privateKey),
 		managerAddress,
 		subnetConversionSignedMessage,
