@@ -95,7 +95,7 @@ After the Etna upgrade, L1s are managed by Warp messages emitted by L1. Currentl
 In this step, we first install the [ava-labs/foundry fork](https://github.com/ava-labs/foundry):
 
 ```dockerfile
-RUN curl -o install_foundry.sh https://raw.githubusercontent.com/ava-labs/teleporter/${TELEPORTER_COMMIT}/scripts/install_foundry.sh && \
+RUN curl -o install_foundry.sh https://raw.githubusercontent.com/ava-labs/teleporter/${ICM_COMMIT}/scripts/install_foundry.sh && \
     chmod +x install_foundry.sh && \
     ./install_foundry.sh && \
     rm install_foundry.sh

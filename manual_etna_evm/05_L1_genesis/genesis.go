@@ -24,9 +24,10 @@ import (
 var (
 	defaultPoAOwnerBalance = new(big.Int).Mul(vm.OneAvax, big.NewInt(10)) // 10 Native Tokens
 
-	ValidatorContractAddress  = "0xC0DEBA5E0000000000000000000000000000000"
+	ValidatorContractAddress  = "0xC0DEBA5E00000000000000000000000000000000"
 	ProxyAdminContractAddress = "0xC0FFEE1234567890aBcDEF1234567890AbCdEf34"
-	RewardCalculatorAddress   = "0xDEADC0DE0000000000000000000000000000000"
+	RewardCalculatorAddress   = "0xDEADC0DE00000000000000000000000000000000"
+	ValidatorMessagesAddress  = "0xca11ab1e00000000000000000000000000000000"
 )
 
 func main() {
@@ -91,6 +92,21 @@ func main() {
 	transparentProxyBytecode, err := loadHexFile("04_hardcoded_validator_manager/deployed_transparent_proxy_bytecode.txt")
 	if err != nil {
 		log.Fatalf("❌ Failed to get transparent proxy deployed bytecode: %s\n", err)
+	}
+
+	validatorMessagesBytecode, validatorMessagesLinkReferences, err := laodDeployedContractBytecodeFromJSON("04_compile_validator_manager/compiled/ValidatorMessages.json")
+	if err != nil {
+		log.Fatalf("❌ Failed to get validator messages deployed bytecode: %s\n", err)
+	}
+
+	if len(validatorMessagesLinkReferences) != 0 {
+		log.Fatalf("❌ Validator messages link references are not supported yet\n")
+	}
+
+	genesis.Alloc[common.HexToAddress(ValidatorMessagesAddress)] = types.Account{
+		Code:    validatorMessagesBytecode,
+		Balance: big.NewInt(0),
+		Nonce:   1,
 	}
 
 	genesis.Alloc[common.HexToAddress(ValidatorContractAddress)] = types.Account{
