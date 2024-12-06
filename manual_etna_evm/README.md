@@ -21,12 +21,12 @@ Generates a validator manager private key if you don't have one yet.
 The key method you'll need is `secp256k1.NewPrivateKey()` from package `github.com/ava-labs/avalanchego/utils/crypto/secp256k1`.
 
 
-### 2. 💰 Checking balance
+### 2. 💰 Transfer AVAX between C and P chains
 
-Source code: [02_check_balance/balance.go](./02_check_balance/balance.go)
+Source code: [02_transfer_balance/balance.go](./02_transfer_balance/balance.go)
 
-- Checks your P-chain balance
-- Attempts to export funds from C-chain to P-chain if balance is less than 1.1 AVAX (required for subnet creation)
+- Checks your C-chain and P-chain balance
+- Attempts to export all C-Chain funds to P-chain
 - If insufficient funds, directs you to the [Fuji faucet](https://test.core.app/tools/testnet-faucet/?subnet=c&token=c)
 
 This provides a good example of checking balances and transferring AVAX between C and P chains.

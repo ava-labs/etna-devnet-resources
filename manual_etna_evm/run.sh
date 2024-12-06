@@ -5,8 +5,8 @@ set -euo pipefail
 echo -e "\n🔑 Generating keys\n"
 go run ./01_generate_keys/
 
-echo -e "\n💰 Checking balance\n" 
-go run ./02_check_balance/
+echo -e "\n💰 Transferring AVAX between C and P chains\n" 
+go run ./02_transfer_balance/
 
 echo -e "\n🕸️  Creating subnet\n"
 go run ./03_create_subnet/
