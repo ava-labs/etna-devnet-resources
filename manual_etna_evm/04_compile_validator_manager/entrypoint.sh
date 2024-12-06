@@ -31,5 +31,6 @@ abigen \
     --bin "/teleporter_src/out/PoAValidatorManager.sol/PoAValidatorManager.bin"
 
 cp -r /teleporter_src/out/PoAValidatorManager.sol/*.json /compiled/
+cp -r /teleporter_src/out/ValidatorMessages.sol/*.json /compiled/
 
 chown -R $HOST_UID:$HOST_GID /bindings /compiled

@@ -10,8 +10,8 @@ import (
 	"mypkg/helpers"
 	"net/http"
 
+	poavalidatormanager "github.com/ava-labs/icm-contracts/abi-bindings/go/validator-manager/PoAValidatorManager"
 	"github.com/ava-labs/subnet-evm/interfaces"
-	poavalidatormanager "github.com/ava-labs/teleporter/abi-bindings/go/validator-manager/PoAValidatorManager"
 	"github.com/ethereum/go-ethereum"
 	"github.com/ethereum/go-ethereum/common"
 )
@@ -159,14 +159,14 @@ func printEVMContractLogs() error {
 	// Print all logs
 	for _, vLog := range logs {
 		fmt.Println("------------------------")
-
 		fmt.Printf("Log TxHash: %s\n", vLog.TxHash.Hex())
 
+		// Try parsing each event type
 		if event, err := contract.PoAValidatorManagerFilterer.ParseInitialValidatorCreated(vLog); err == nil {
 			fmt.Printf("InitialValidatorCreated:\n")
 			fmt.Printf("  ValidationID: %x\n", event.ValidationID)
 			fmt.Printf("  NodeID: %x\n", event.NodeID)
-			fmt.Printf("  Weight: %s\n", event.Weight.String())
+			fmt.Printf("  Weight: %d\n", event.Weight)
 			continue
 		}
 
@@ -175,8 +175,26 @@ func printEVMContractLogs() error {
 			fmt.Printf("  ValidationID: %x\n", event.ValidationID)
 			fmt.Printf("  NodeID: %x\n", event.NodeID)
 			fmt.Printf("  RegisterValidationMessageID: %x\n", event.RegisterValidationMessageID)
-			fmt.Printf("  Weight: %s\n", event.Weight.String())
+			fmt.Printf("  Weight: %d\n", event.Weight)
 			fmt.Printf("  RegistrationExpiry: %d\n", event.RegistrationExpiry)
+			continue
+		}
+
+		// Add these new event parsers
+		if event, err := contract.PoAValidatorManagerFilterer.ParseValidatorWeightUpdate(vLog); err == nil {
+			fmt.Printf("ValidatorWeightUpdate:\n")
+			fmt.Printf("  ValidationID: %x\n", event.ValidationID)
+			fmt.Printf("  Nonce: %d\n", event.Nonce)
+			fmt.Printf("  Weight: %d\n", event.Weight)
+			fmt.Printf("  SetWeightMessageID: %x\n", event.SetWeightMessageID)
+			continue
+		}
+
+		if event, err := contract.PoAValidatorManagerFilterer.ParseValidationPeriodRegistered(vLog); err == nil {
+			fmt.Printf("ValidationPeriodRegistered:\n")
+			fmt.Printf("  ValidationID: %x\n", event.ValidationID)
+			fmt.Printf("  Weight: %d\n", event.Weight)
+			fmt.Printf("  Timestamp: %d\n", event.Timestamp)
 			continue
 		}
 
@@ -187,29 +205,12 @@ func printEVMContractLogs() error {
 			continue
 		}
 
-		if event, err := contract.PoAValidatorManagerFilterer.ParseValidationPeriodRegistered(vLog); err == nil {
-			fmt.Printf("ValidationPeriodRegistered:\n")
-			fmt.Printf("  ValidationID: %x\n", event.ValidationID)
-			fmt.Printf("  Weight: %s\n", event.Weight.String())
-			fmt.Printf("  Timestamp: %s\n", event.Timestamp.String())
-			continue
-		}
-
 		if event, err := contract.PoAValidatorManagerFilterer.ParseValidatorRemovalInitialized(vLog); err == nil {
 			fmt.Printf("ValidatorRemovalInitialized:\n")
 			fmt.Printf("  ValidationID: %x\n", event.ValidationID)
 			fmt.Printf("  SetWeightMessageID: %x\n", event.SetWeightMessageID)
-			fmt.Printf("  Weight: %s\n", event.Weight.String())
-			fmt.Printf("  EndTime: %s\n", event.EndTime.String())
-			continue
-		}
-
-		if event, err := contract.PoAValidatorManagerFilterer.ParseValidatorWeightUpdate(vLog); err == nil {
-			fmt.Printf("ValidatorWeightUpdate:\n")
-			fmt.Printf("  ValidationID: %x\n", event.ValidationID)
-			fmt.Printf("  Nonce: %d\n", event.Nonce)
-			fmt.Printf("  ValidatorWeight: %d\n", event.ValidatorWeight)
-			fmt.Printf("  SetWeightMessageID: %x\n", event.SetWeightMessageID)
+			fmt.Printf("  Weight: %d\n", event.Weight)
+			fmt.Printf("  EndTime: %d\n", event.EndTime)
 			continue
 		}
 
@@ -226,7 +227,10 @@ func printEVMContractLogs() error {
 			continue
 		}
 
-		log.Printf("Failed to parse log: unknown event type\n")
+		log.Printf("❗ Failed to parse log: unknown event type\n")
+		fmt.Printf("  Address: %s\n", vLog.Address.Hex())
+		fmt.Printf("  Topics: %v\n", vLog.Topics)
+		fmt.Printf("  Data: %x\n", vLog.Data)
 	}
 	return nil
 }

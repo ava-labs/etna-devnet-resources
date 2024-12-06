@@ -24,9 +24,10 @@ import (
 var (
 	defaultPoAOwnerBalance = new(big.Int).Mul(vm.OneAvax, big.NewInt(10)) // 10 Native Tokens
 
-	ValidatorContractAddress  = "0xC0DEBA5E0000000000000000000000000000000"
+	ValidatorContractAddress  = "0xC0DEBA5E00000000000000000000000000000000"
 	ProxyAdminContractAddress = "0xC0FFEE1234567890aBcDEF1234567890AbCdEf34"
-	RewardCalculatorAddress   = "0xDEADC0DE0000000000000000000000000000000"
+	RewardCalculatorAddress   = "0xDEADC0DE00000000000000000000000000000000"
+	ValidatorMessagesAddress  = "0xca11ab1e00000000000000000000000000000000"
 )
 
 func main() {
@@ -78,23 +79,37 @@ func main() {
 		Timestamp:  uint64(now),
 	}
 
-	poaDeployedBytecode, err := loadHexFile("04_hardcoded_validator_manager/deployed_poa_validator_manager_bytecode.txt")
-	if err != nil {
-		log.Fatalf("❌ Failed to get PoA deployed bytecode: %s\n", err)
-	}
-
-	proxyAdminBytecode, err := loadHexFile("04_hardcoded_validator_manager/deployed_proxy_admin_bytecode.txt")
+	proxyAdminBytecode, err := loadHexFile("04_compile_validator_manager/proxy_compiled/deployed_proxy_admin_bytecode.txt")
 	if err != nil {
 		log.Fatalf("❌ Failed to get proxy admin deployed bytecode: %s\n", err)
 	}
 
-	transparentProxyBytecode, err := loadHexFile("04_hardcoded_validator_manager/deployed_transparent_proxy_bytecode.txt")
+	transparentProxyBytecode, err := loadHexFile("04_compile_validator_manager/proxy_compiled/deployed_transparent_proxy_bytecode.txt")
 	if err != nil {
 		log.Fatalf("❌ Failed to get transparent proxy deployed bytecode: %s\n", err)
 	}
 
+	validatorMessagesBytecode, err := loadDeployedHexFromJSON("04_compile_validator_manager/compiled/ValidatorMessages.json", nil)
+	if err != nil {
+		log.Fatalf("❌ Failed to get validator messages deployed bytecode: %s\n", err)
+	}
+
+	poaValidatorManagerLinkRefs := map[string]string{
+		"contracts/validator-manager/ValidatorMessages.sol:ValidatorMessages": ValidatorMessagesAddress[2:],
+	}
+	poaValidatorManagerDeployedBytecode, err := loadDeployedHexFromJSON("04_compile_validator_manager/compiled/PoAValidatorManager.json", poaValidatorManagerLinkRefs)
+	if err != nil {
+		log.Fatalf("❌ Failed to get PoA deployed bytecode: %s\n", err)
+	}
+
+	genesis.Alloc[common.HexToAddress(ValidatorMessagesAddress)] = types.Account{
+		Code:    validatorMessagesBytecode,
+		Balance: big.NewInt(0),
+		Nonce:   1,
+	}
+
 	genesis.Alloc[common.HexToAddress(ValidatorContractAddress)] = types.Account{
-		Code:    poaDeployedBytecode,
+		Code:    poaValidatorManagerDeployedBytecode,
 		Balance: big.NewInt(0),
 		Nonce:   1,
 	}

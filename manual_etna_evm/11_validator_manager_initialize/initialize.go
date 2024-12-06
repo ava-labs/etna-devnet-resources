@@ -9,7 +9,7 @@ import (
 	"mypkg/helpers"
 	"time"
 
-	poavalidatormanager "github.com/ava-labs/teleporter/abi-bindings/go/validator-manager/PoAValidatorManager"
+	poavalidatormanager "github.com/ava-labs/icm-contracts/abi-bindings/go/validator-manager/PoAValidatorManager"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
 
@@ -61,7 +61,7 @@ func main() {
 	}
 
 	tx, err := contract.Initialize(opts, poavalidatormanager.ValidatorManagerSettings{
-		SubnetID:               subnetID,
+		L1ID:                   subnetID,
 		ChurnPeriodSeconds:     0,
 		MaximumChurnPercentage: 20,
 	}, crypto.PubkeyToAddress(ecdsaKey.PublicKey))
