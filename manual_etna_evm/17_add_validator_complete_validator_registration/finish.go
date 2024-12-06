@@ -68,7 +68,7 @@ func main() {
 		log.Fatalf("failed to get P-chain subnet validator registration warp message: %s", err)
 	}
 
-	fmt.Printf("signedMessage: %s\n", signedMessage.Bytes())
+	log.Printf("signedMessage: %x\n", signedMessage.Bytes())
 
 	managerAddress := goethereumcommon.HexToAddress(config.ProxyContractAddress)
 

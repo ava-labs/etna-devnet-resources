@@ -10,7 +10,9 @@ go run ./02_check_balance/
 
 echo -e "\n🕸️  Creating subnet\n"
 go run ./03_create_subnet/
-echo -e "\n🛠️ Using hardcoded smart contracts code\n"
+
+echo -e "\n🛠️ Compiling smart contracts code\n"
+./04_compile_validator_manager/compile.sh
 
 echo -e "\n🧱 Generating genesis\n"
 go run ./05_L1_genesis/
@@ -51,7 +53,7 @@ go run ./16_add_validator_register_on_p_chain/
 echo -e "\n👥 Add validator - complete validator registration\n"
 go run ./17_add_validator_complete_validator_registration/
 
-echo -e "\nEverything is done! Waiting for 1 minute before reading contract logs again\n"
+echo -e "\n🎉 Everything is done! Waiting for 1 minute before reading contract logs again\n"
 sleep 60
 
 echo -e "\n📄 Reading contract logs again\n"

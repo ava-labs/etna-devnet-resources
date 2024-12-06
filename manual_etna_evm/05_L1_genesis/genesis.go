@@ -79,12 +79,12 @@ func main() {
 		Timestamp:  uint64(now),
 	}
 
-	proxyAdminBytecode, err := loadHexFile("04_hardcoded_validator_manager/deployed_proxy_admin_bytecode.txt")
+	proxyAdminBytecode, err := loadHexFile("04_compile_validator_manager/proxy_compiled/deployed_proxy_admin_bytecode.txt")
 	if err != nil {
 		log.Fatalf("❌ Failed to get proxy admin deployed bytecode: %s\n", err)
 	}
 
-	transparentProxyBytecode, err := loadHexFile("04_hardcoded_validator_manager/deployed_transparent_proxy_bytecode.txt")
+	transparentProxyBytecode, err := loadHexFile("04_compile_validator_manager/proxy_compiled/deployed_transparent_proxy_bytecode.txt")
 	if err != nil {
 		log.Fatalf("❌ Failed to get transparent proxy deployed bytecode: %s\n", err)
 	}
