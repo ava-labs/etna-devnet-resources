@@ -240,6 +240,8 @@ Starts another node to test adding a validator.
 
 ### 15. 👾 Add validator - initialize registration
 
+//FIXME: Readme for the last 3 steps needs improvement
+
 Source code: [15_add_validator_init_registration/add.go](./15_add_validator_init_registration/add.go)
 
 Initializes the validator registration process by:
