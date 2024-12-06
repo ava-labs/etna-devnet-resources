@@ -139,11 +139,15 @@ curl -X POST --data '{
 }' -H 'content-type:application/json' 127.0.0.1:9650/ext/info
 ```
 
-### 9. 🔃 Restarting nodes
+### 9. 🔃 Restarting the node
 
 Source code: none
 
-Runs step 7 again so nodes can pick up changes after the upgrade
+Runs step 7 again so nodes can pick up changes after the conversion:
+
+```bash
+./07_launch_nodes/launch.sh "node0"
+```
 
 
 ### 10. 🎯 Activate ProposerVM fork
@@ -153,13 +157,25 @@ Source code: [10_activate_proposer_vm/proposer.go](./10_activate_proposer_vm/pro
 Sends test transactions to activate the ProposerVM fork.
 
 - FIXME: Add more details about ProposerVM fork
-- FIXME: Investigate if this can be combined with EVM transfers to eliminate this step
 
 ### 11. 🔌 Initialize PoA validator manager contract
 
 Source code: [11_validator_manager_initialize/initialize.go](./11_validator_manager_initialize/initialize.go)
 
-TODO: Describe this step
+Here using [bindings for PoAValidatorManager](https://github.com/ava-labs/icm-contracts/blob/main/abi-bindings/go/validator-manager/PoAValidatorManager/PoAValidatorManager.go) to initialize the contract.
+
+```go
+contract, err := poavalidatormanager.NewPoAValidatorManager(managerAddress, ethClient)
+if err != nil {
+    log.Fatalf("failed to deploy contract: %s\n", err)
+}
+
+tx, err := contract.Initialize(opts, poavalidatormanager.ValidatorManagerSettings{
+    L1ID:                   subnetID,
+    ChurnPeriodSeconds:     0,
+    MaximumChurnPercentage: 20,
+}, crypto.PubkeyToAddress(ecdsaKey.PublicKey))
+```
 
 ### 12. 👥 Initialize validator set
 

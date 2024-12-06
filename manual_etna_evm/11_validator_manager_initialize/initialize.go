@@ -53,8 +53,8 @@ func main() {
 	if err != nil {
 		log.Fatalf("failed to create transactor: %s\n", err)
 	}
-	opts.GasLimit = 8000000 // Set a reasonable gas limit
-	opts.GasPrice = nil     // Let the network determine the gas price
+	opts.GasLimit = 8000000
+	opts.GasPrice = nil
 
 	contract, err := poavalidatormanager.NewPoAValidatorManager(managerAddress, ethClient)
 	if err != nil {
