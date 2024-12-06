@@ -11,7 +11,7 @@ Run everything at once: `./run.sh` to start a new L1 on Devnet, `./cleanup.sh` t
 > Note: This guide uses simplified, linear code with hardcoded values to demonstrate concepts clearly. Not intended as a library.
 
 For up to date steps, check the [./run.sh](./run.sh) file.
-<!--
+
 ### 1. 🔑 Generating Keys
 
 Source code: [01_generate_keys/generate.go](./01_generate_keys/generate.go)
@@ -19,6 +19,7 @@ Source code: [01_generate_keys/generate.go](./01_generate_keys/generate.go)
 Generates a validator manager private key if you don't have one yet.
 
 The key method you'll need is `secp256k1.NewPrivateKey()` from package `github.com/ava-labs/avalanchego/utils/crypto/secp256k1`.
+
 
 ### 2. 💰 Checking balance
 
@@ -32,6 +33,7 @@ This provides a good example of checking balances and transferring AVAX between 
 
 > There is a bug in counting the amounts somewhere. Running this step 2 times would solve it.
 
+<!--
 ### 3. 🕸️ Creating subnet
 
 Source code: [03_create_subnet/create.go](./03_create_subnet/create.go)
