@@ -52,6 +52,19 @@ createSubnetTx, err := wallet.P().IssueCreateSubnetTx(owner)
 
 A subnet is a group of validators that agree to validate the same chains. A chain can only belong to one subnet, but a subnet can have multiple chains. Each validator must validate all chains within their subnet. Validators can participate in multiple subnets simultaneously.
 
+### 4. 📝 Compiling smart contracts code
+
+Source code: [04_compile_validator_manager/compile.sh](./04_compile_validator_manager/compile.sh), [04_compile_validator_manager/entrypoint.sh](./04_compile_validator_manager/entrypoint.sh)
+
+
+Simplified workflow:
+```bash
+git clone https://github.com/ava-labs/icm-contracts /teleporter_src 
+cd /teleporter_src
+git submodule update --init --recursive
+./scripts/install_foundry.sh
+cd /teleporter_src/contracts && forge build --extra-output-files bin
+```
 <!--
 ### 4. 🧱 Generating genesis
 
