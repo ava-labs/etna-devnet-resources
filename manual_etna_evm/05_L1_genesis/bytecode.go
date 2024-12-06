@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"os"
 	"strings"
+
+	"github.com/ethereum/go-ethereum/crypto"
 )
 
 func loadHexFile(path string) ([]byte, error) {
@@ -22,77 +24,52 @@ func loadHexFile(path string) ([]byte, error) {
 	return hex.DecodeString(string(cleanData))
 }
 
-type linkReference struct {
-	Start  int `json:"start"`
-	Length int `json:"length"`
-}
-
 type compiledJSON struct {
 	DeployedBytecode struct {
 		Object string `json:"object"`
 	} `json:"deployedBytecode"`
-	LinkReferences map[string]map[string][]linkReference `json:"linkReferences"`
 }
 
-func laodDeployedContractBytecodeFromJSON(path string) ([]byte, map[string]map[string][]linkReference, error) {
+func loadDeployedHexFromJSON(path string, linkReferences map[string]string) ([]byte, error) {
 	compiled := compiledJSON{}
 	data, err := os.ReadFile(path)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 	err = json.Unmarshal(data, &compiled)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
-	deployedBytecodeHex := compiled.DeployedBytecode.Object
-	if strings.HasPrefix(deployedBytecodeHex, "0x") {
-		deployedBytecodeHex = deployedBytecodeHex[2:]
-	}
+	resultHex := compiled.DeployedBytecode.Object
 
-	bytecode, err := hex.DecodeString(deployedBytecodeHex)
-	if err != nil {
-		return nil, nil, err
-	}
-	return bytecode, compiled.LinkReferences, nil
-}
-
-func insertLinkReferences(bytecode []byte, linkReferences map[string]map[string][]linkReference, addressMap map[string]map[string]string) ([]byte, error) {
-	// Make a copy of the bytecode to modify
-	result := make([]byte, len(bytecode))
-	copy(result, bytecode)
-
-	// Iterate through all link references
-	for file, contracts := range linkReferences {
-		for contract, refs := range contracts {
-			// Get the address from the address map
-			addresses, ok := addressMap[file]
-			if !ok {
-				return nil, fmt.Errorf("missing address map entry for file: %s", file)
+	if linkReferences != nil {
+		for refName, address := range linkReferences {
+			if len(address) != 40 {
+				return nil, fmt.Errorf("invalid placeholder length %d, expected 40: %s", len(address), address)
 			}
-			address, ok := addresses[contract]
-			if !ok {
-				return nil, fmt.Errorf("missing address for contract: %s in file: %s", contract, file)
+			if _, err := hex.DecodeString(address); err != nil {
+				return nil, fmt.Errorf("invalid hex in placeholder address: %s", address)
 			}
 
-			// Convert address to bytes
-			addressBytes, err := hex.DecodeString(strings.TrimPrefix(address, "0x"))
-			if err != nil {
-				return nil, fmt.Errorf("invalid address hex: %s", address)
-			}
-			if len(addressBytes) != 20 {
-				return nil, fmt.Errorf("address must be 20 bytes long, got %d bytes", len(addressBytes))
-			}
+			linkRefHash := crypto.Keccak256Hash([]byte(refName))
+			linkRefHashStr := linkRefHash.Hex()
+			placeholderStr := fmt.Sprintf("__$%s$__", linkRefHashStr[2:36])
 
-			// Insert address at each reference location
-			for _, ref := range refs {
-				if ref.Length != 20 {
-					return nil, fmt.Errorf("link reference length must be 20, got %d", ref.Length)
-				}
-				copy(result[ref.Start:ref.Start+ref.Length], addressBytes)
-			}
+			fmt.Printf("Replacing %s with %s\n", placeholderStr, address)
+
+			resultHex = strings.Replace(resultHex, placeholderStr, address, -1)
 		}
 	}
 
-	return result, nil
+	if strings.Contains(resultHex, "$__") {
+		return nil, fmt.Errorf("unresolved link reference found in bytecode: %s", resultHex)
+	}
+
+	// Handle 0x prefix if present
+	if len(resultHex) > 1 && resultHex[0] == '0' && resultHex[1] == 'x' {
+		resultHex = resultHex[2:]
+	}
+
+	return hex.DecodeString(resultHex)
 }

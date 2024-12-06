@@ -79,11 +79,6 @@ func main() {
 		Timestamp:  uint64(now),
 	}
 
-	poaDeployedBytecode, err := loadHexFile("04_hardcoded_validator_manager/deployed_poa_validator_manager_bytecode.txt")
-	if err != nil {
-		log.Fatalf("❌ Failed to get PoA deployed bytecode: %s\n", err)
-	}
-
 	proxyAdminBytecode, err := loadHexFile("04_hardcoded_validator_manager/deployed_proxy_admin_bytecode.txt")
 	if err != nil {
 		log.Fatalf("❌ Failed to get proxy admin deployed bytecode: %s\n", err)
@@ -94,13 +89,17 @@ func main() {
 		log.Fatalf("❌ Failed to get transparent proxy deployed bytecode: %s\n", err)
 	}
 
-	validatorMessagesBytecode, validatorMessagesLinkReferences, err := laodDeployedContractBytecodeFromJSON("04_compile_validator_manager/compiled/ValidatorMessages.json")
+	validatorMessagesBytecode, err := loadDeployedHexFromJSON("04_compile_validator_manager/compiled/ValidatorMessages.json", nil)
 	if err != nil {
 		log.Fatalf("❌ Failed to get validator messages deployed bytecode: %s\n", err)
 	}
 
-	if len(validatorMessagesLinkReferences) != 0 {
-		log.Fatalf("❌ Validator messages link references are not supported yet\n")
+	poaValidatorManagerLinkRefs := map[string]string{
+		"contracts/validator-manager/ValidatorMessages.sol:ValidatorMessages": ValidatorMessagesAddress[2:],
+	}
+	poaValidatorManagerDeployedBytecode, err := loadDeployedHexFromJSON("04_compile_validator_manager/compiled/PoAValidatorManager.json", poaValidatorManagerLinkRefs)
+	if err != nil {
+		log.Fatalf("❌ Failed to get PoA deployed bytecode: %s\n", err)
 	}
 
 	genesis.Alloc[common.HexToAddress(ValidatorMessagesAddress)] = types.Account{
@@ -110,7 +109,7 @@ func main() {
 	}
 
 	genesis.Alloc[common.HexToAddress(ValidatorContractAddress)] = types.Account{
-		Code:    poaDeployedBytecode,
+		Code:    poaValidatorManagerDeployedBytecode,
 		Balance: big.NewInt(0),
 		Nonce:   1,
 	}
