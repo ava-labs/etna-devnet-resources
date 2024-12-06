@@ -63,7 +63,7 @@ git clone https://github.com/ava-labs/icm-contracts /teleporter_src
 cd /teleporter_src
 git submodule update --init --recursive
 ./scripts/install_foundry.sh
-cd /teleporter_src/contracts && forge build --extra-output-files bin
+cd /teleporter_src/contracts && forge build
 ```
 ### 5. 🧱 Generating Genesis
 
@@ -155,40 +155,48 @@ Sends test transactions to activate the ProposerVM fork.
 - FIXME: Add more details about ProposerVM fork
 - FIXME: Investigate if this can be combined with EVM transfers to eliminate this step
 
-### 11. Initialize PoA validator manager contract
+### 11. 🔌 Initialize PoA validator manager contract
 
 Source code: [11_validator_manager_initialize/initialize.go](./11_validator_manager_initialize/initialize.go)
 
 TODO: Describe this step
 
-### 12. Initialize validator set
+### 12. 👥 Initialize validator set
 
 Source code: [12_initialize_validator_set/initialize_validator_set.go](./12_initialize_validator_set/initialize_validator_set.go)
 
 TODO: Describe this step
 
-### 13. Check validator set
+### 13. 📄 Check validator set
 
 Source code: [13_check_validator_set/check_validator_set.go](./13_check_validator_set/check_validator_set.go)
 
 TODO: Describe this step
 
-### 14. Start another node
+### 14. 🚀 Start another node
 
 Source code: none
 
+```bash
+./07_launch_nodes/launch.sh "node0 node1"
+```
+
 TODO: Describe this step
 
-### 15. Add validator
+### 15. 👾 Add validator
 
 Source code: [15_add_validator_init_registration/add.go](./15_add_validator_init_registration/add.go)
 
 TODO: Describe this step
 
-### 16. Register validator on P-chain
+### 16. 📝 Register validator on P-chain
 
 Source code: [16_add_validator_register_on_p_chain/register.go](./16_add_validator_register_on_p_chain/register.go)
 
-### 17. Complete validator registration
+TODO: Describe this step
+
+### 17. 🏰 Complete validator registration
 
 Source code: [17_add_validator_complete_validator_registration/finish.go](./17_add_validator_complete_validator_registration/finish.go)
+
+TODO: Describe this step
