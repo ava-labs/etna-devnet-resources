@@ -5,9 +5,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
-	"mypkg/config"
-	"mypkg/helpers"
 	"time"
+
+	"github.com/ava-labs/etna-devnet-resources/manual_etna_evm/config"
+	"github.com/ava-labs/etna-devnet-resources/manual_etna_evm/helpers"
 
 	poavalidatormanager "github.com/ava-labs/icm-contracts/abi-bindings/go/validator-manager/PoAValidatorManager"
 	"github.com/ethereum/go-ethereum/common"

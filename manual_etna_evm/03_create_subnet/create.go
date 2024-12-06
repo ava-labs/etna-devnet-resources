@@ -6,9 +6,10 @@ package main
 import (
 	"context"
 	"log"
-	"mypkg/config"
-	"mypkg/helpers"
 	"time"
+
+	"github.com/ava-labs/etna-devnet-resources/manual_etna_evm/config"
+	"github.com/ava-labs/etna-devnet-resources/manual_etna_evm/helpers"
 
 	"github.com/ava-labs/avalanchego/ids"
 	"github.com/ava-labs/avalanchego/vms/secp256k1fx"

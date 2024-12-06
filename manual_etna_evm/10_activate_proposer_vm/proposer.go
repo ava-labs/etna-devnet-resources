@@ -6,8 +6,9 @@ import (
 	"fmt"
 	"log"
 	"math/big"
-	"mypkg/helpers"
 	"time"
+
+	"github.com/ava-labs/etna-devnet-resources/manual_etna_evm/helpers"
 
 	"github.com/ava-labs/subnet-evm/core/types"
 	"github.com/ava-labs/subnet-evm/ethclient"

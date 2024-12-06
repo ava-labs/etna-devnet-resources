@@ -5,10 +5,11 @@ import (
 	"fmt"
 	"log"
 	"math/big"
-	"mypkg/config"
-	"mypkg/helpers"
 	"strings"
 	"time"
+
+	"github.com/ava-labs/etna-devnet-resources/manual_etna_evm/config"
+	"github.com/ava-labs/etna-devnet-resources/manual_etna_evm/helpers"
 
 	"github.com/ava-labs/avalanche-cli/cmd/blockchaincmd"
 	"github.com/ava-labs/avalanche-cli/pkg/constants"
