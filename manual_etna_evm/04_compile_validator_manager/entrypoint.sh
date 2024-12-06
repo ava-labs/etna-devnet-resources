@@ -17,7 +17,7 @@ if ! command -v forge &> /dev/null; then
 fi
 
 # Build contracts
-cd /teleporter_src/contracts && forge build --extra-output-files bin
+cd /teleporter_src/contracts && forge build
 
 # Extract ABI from the compiled JSON file
 jq .abi /teleporter_src/out/PoAValidatorManager.sol/PoAValidatorManager.json > /teleporter_src/out/PoAValidatorManager.sol/PoAValidatorManager.abi
