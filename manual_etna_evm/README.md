@@ -65,19 +65,31 @@ git submodule update --init --recursive
 ./scripts/install_foundry.sh
 cd /teleporter_src/contracts && forge build --extra-output-files bin
 ```
-<!--
-### 4. 🧱 Generating genesis
 
-Source code: [04_L1_genesis/genesis.go](./04_L1_genesis/genesis.go)
+### 5. 🧱 Generating genesis
+
+Source code: [05_L1_genesis/genesis.go](./05_L1_genesis/genesis.go)
 
 Here we generate the Genesis for our new L1. We will include it in a P-chain create chain transaction in the next step.
 
-Note: Don't confuse your L1 genesis with the Avalanche Fuji genesis. Your node will need both.
+Note: Don't confuse your L1 genesis with the Avalanche Fuji genesis.
 
 Read more about genesis here: [https://docs.avax.network/avalanche-l1s/upgrade/customize-avalanche-l1](https://docs.avax.network/avalanche-l1s/upgrade/customize-avalanche-l1).
 
-> Normally, you would want to include the Transparent Proxy and Validator manager contracts in genesis, but in this tutorial, for the purpose of a more granular workflow, we are going to deploy them manually in the later steps.
 
+The most important part is `alloc` field. That's where we define the initially deployed smart contracts:
+
+| Name                | Address                                      | Purpose                                                                  |
+|---------------------|----------------------------------------------|------------------------------------------------------------------------|
+| ValidatorMessages   | `0xca11ab1e00000000000000000000000000000000` | Library contract used by PoAValidatorManager                           |
+| PoAValidatorManager | `0xC0DEBA5E00000000000000000000000000000000` | Main validator management contract. References ValidatorMessages       |
+| ProxyAdmin          | `0xC0FFEE1234567890aBcDEF1234567890AbCdEf34` | Admin contract for managing the transparent proxy                      |
+| TransparentProxy    | `0xFEEDC0DE00000000000000000000000000000000` | Proxy contract that delegates calls to the PoAValidatorManager         |
+
+
+You probably would like to take a look into the manual linking process in `loadDeployedHexFromJSON` function.
+
+<!--
 ### 5. ⛓️  Creating chain
 
 Source code: [05_create_chain/chain.go](./05_create_chain/chain.go)

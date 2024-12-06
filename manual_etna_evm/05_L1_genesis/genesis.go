@@ -23,11 +23,6 @@ import (
 
 var (
 	defaultPoAOwnerBalance = new(big.Int).Mul(vm.OneAvax, big.NewInt(10)) // 10 Native Tokens
-
-	ValidatorContractAddress  = "0xC0DEBA5E00000000000000000000000000000000"
-	ProxyAdminContractAddress = "0xC0FFEE1234567890aBcDEF1234567890AbCdEf34"
-	RewardCalculatorAddress   = "0xDEADC0DE00000000000000000000000000000000"
-	ValidatorMessagesAddress  = "0xca11ab1e00000000000000000000000000000000"
 )
 
 func main() {
@@ -95,26 +90,26 @@ func main() {
 	}
 
 	poaValidatorManagerLinkRefs := map[string]string{
-		"contracts/validator-manager/ValidatorMessages.sol:ValidatorMessages": ValidatorMessagesAddress[2:],
+		"contracts/validator-manager/ValidatorMessages.sol:ValidatorMessages": config.ValidatorMessagesAddress[2:],
 	}
 	poaValidatorManagerDeployedBytecode, err := loadDeployedHexFromJSON("04_compile_validator_manager/compiled/PoAValidatorManager.json", poaValidatorManagerLinkRefs)
 	if err != nil {
 		log.Fatalf("❌ Failed to get PoA deployed bytecode: %s\n", err)
 	}
 
-	genesis.Alloc[common.HexToAddress(ValidatorMessagesAddress)] = types.Account{
+	genesis.Alloc[common.HexToAddress(config.ValidatorMessagesAddress)] = types.Account{
 		Code:    validatorMessagesBytecode,
 		Balance: big.NewInt(0),
 		Nonce:   1,
 	}
 
-	genesis.Alloc[common.HexToAddress(ValidatorContractAddress)] = types.Account{
+	genesis.Alloc[common.HexToAddress(config.ValidatorContractAddress)] = types.Account{
 		Code:    poaValidatorManagerDeployedBytecode,
 		Balance: big.NewInt(0),
 		Nonce:   1,
 	}
 
-	genesis.Alloc[common.HexToAddress(ProxyAdminContractAddress)] = types.Account{
+	genesis.Alloc[common.HexToAddress(config.ProxyAdminContractAddress)] = types.Account{
 		Balance: big.NewInt(0),
 		Code:    proxyAdminBytecode,
 		Nonce:   1,
@@ -128,8 +123,8 @@ func main() {
 		Code:    transparentProxyBytecode,
 		Nonce:   1,
 		Storage: map[common.Hash]common.Hash{
-			common.HexToHash("0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc"): common.HexToHash(ValidatorContractAddress),
-			common.HexToHash("0xb53127684a568b3173ae13b9f8a6016e243e63b6e8ee1178d6a717850b5d6103"): common.HexToHash(ProxyAdminContractAddress),
+			common.HexToHash("0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc"): common.HexToHash(config.ValidatorContractAddress),
+			common.HexToHash("0xb53127684a568b3173ae13b9f8a6016e243e63b6e8ee1178d6a717850b5d6103"): common.HexToHash(config.ProxyAdminContractAddress),
 		},
 	}
 
