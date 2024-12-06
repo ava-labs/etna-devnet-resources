@@ -90,7 +90,7 @@ Launches [06_launch_nodes/docker-compose.yml](./06_launch_nodes/docker-compose.y
 <!-- 
 ### 7. 🛠️ Compile the Validator Manager Contract
 
-After the Etna upgrade, L1s are managed by Warp messages emitted by L1. Currently, the most functional implementation is the [Validator Manager Contract](https://github.com/ava-labs/teleporter/tree/790ccce873f9a904910a0f3ffd783436c920ce97/contracts/validator-manager) in the [Teleporter Repo](https://github.com/ava-labs/teleporter).
+After the Etna upgrade, L1s are managed by Warp messages emitted by L1. Currently, the most functional implementation is the [Validator Manager Contract](https://github.com/ava-labs/icm-contracts/tree/790ccce873f9a904910a0f3ffd783436c920ce97/contracts/validator-manager) in the [Teleporter Repo](https://github.com/ava-labs/icm-contracts).
 
 In this step, we first install the [ava-labs/foundry fork](https://github.com/ava-labs/foundry):
 
@@ -103,7 +103,7 @@ RUN curl -o install_foundry.sh https://raw.githubusercontent.com/ava-labs/telepo
 
 Then, download and compile the teleporter repository:
 ```bash
-git clone https://github.com/ava-labs/teleporter /teleporter
+git clone https://github.com/ava-labs/icm-contracts /teleporter
 # ....
 cd /teleporter/contracts && forge build --extra-output-files=bin
 ```
@@ -114,7 +114,7 @@ The compiled json would be copied to [07_compile_validator_manager/PoAValidatorM
 
 Source code: [07_depoly_validator_manager/deploy.go](./07_depoly_validator_manager/deploy.go)
 
-Using the pre-compiled PoA Validator Manager from [abi-bindings/go/validator-manager/PoAValidatorManager/PoAValidatorManager.go](https://github.com/ava-labs/teleporter/blob/main/abi-bindings/go/validator-manager/PoAValidatorManager/PoAValidatorManager.go) in the ava-labs/teleporter repo, deploy it using standard EVM Go bindings.
+Using the pre-compiled PoA Validator Manager from [abi-bindings/go/validator-manager/PoAValidatorManager/PoAValidatorManager.go](https://github.com/ava-labs/icm-contracts/blob/main/abi-bindings/go/validator-manager/PoAValidatorManager/PoAValidatorManager.go) in the ava-labs/teleporter repo, deploy it using standard EVM Go bindings.
 
 > In production, you should put PoAValidatorManager behind a transparent proxy and preferably include it in genesis.
 
