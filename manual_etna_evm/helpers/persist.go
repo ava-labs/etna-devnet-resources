@@ -7,10 +7,12 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
 
 	"github.com/ava-labs/avalanchego/ids"
+	"github.com/ava-labs/avalanchego/utils/crypto/bls"
 	"github.com/ava-labs/avalanchego/utils/crypto/secp256k1"
 	"github.com/ethereum/go-ethereum/crypto"
 )
@@ -51,7 +53,7 @@ func LoadId(path string) (ids.ID, error) {
 
 func SaveText(path string, text string) error {
 	checkInDataFolderTempREMOVEME(path)
-	return os.WriteFile(path, []byte(text), 0644)
+	return SaveBytes(path, []byte(text))
 }
 
 func LoadText(path string) (string, error) {
@@ -61,6 +63,22 @@ func LoadText(path string) (string, error) {
 		return "", err
 	}
 	return string(textBytes), nil
+}
+
+func SaveBytes(path string, value []byte) error {
+	checkInDataFolderTempREMOVEME(path)
+
+	dir := filepath.Dir(path)
+	if err := os.MkdirAll(dir, 0755); err != nil {
+		return fmt.Errorf("failed to create directory %s: %w", dir, err)
+	}
+
+	return os.WriteFile(path, value, 0644)
+}
+
+func LoadBytes(path string) ([]byte, error) {
+	checkInDataFolderTempREMOVEME(path)
+	return os.ReadFile(path)
 }
 
 func SaveUint64(path string, value uint64) error {
@@ -79,11 +97,12 @@ func LoadUint64(path string) (uint64, error) {
 
 func SaveHex(path string, value []byte) error {
 	checkInDataFolderTempREMOVEME(path)
-	return os.WriteFile(path, []byte(hex.EncodeToString(value)), 0644)
+	return SaveText(path, hex.EncodeToString(value))
 }
+
 func LoadHex(path string) ([]byte, error) {
 	checkInDataFolderTempREMOVEME(path)
-	text, err := os.ReadFile(path)
+	text, err := LoadText(path)
 	if err != nil {
 		return nil, err
 	}
@@ -125,4 +144,18 @@ func LoadSecp256k1PrivateKeyECDSA(path string) (*ecdsa.PrivateKey, error) {
 		return nil, err
 	}
 	return crypto.ToECDSA(keyBytes)
+}
+
+func SaveBLSKey(path string, key *bls.SecretKey) error {
+	checkInDataFolderTempREMOVEME(path)
+	return SaveBytes(path, bls.SecretKeyToBytes(key))
+}
+
+func LoadBLSKey(path string) (*bls.SecretKey, error) {
+	checkInDataFolderTempREMOVEME(path)
+	keyBytes, err := LoadBytes(path)
+	if err != nil {
+		return nil, err
+	}
+	return bls.SecretKeyFromBytes(keyBytes)
 }

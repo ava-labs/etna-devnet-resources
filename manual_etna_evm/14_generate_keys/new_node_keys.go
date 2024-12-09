@@ -11,7 +11,6 @@ import (
 	"github.com/ava-labs/avalanchego/staking"
 	"github.com/ava-labs/avalanchego/utils/crypto/bls"
 	"github.com/ava-labs/avalanchego/vms/platformvm/signer"
-	"github.com/ava-labs/etna-devnet-resources/manual_etna_evm/helpers"
 )
 
 func main() {
@@ -70,6 +69,7 @@ func main() {
 	nodeID := ids.NodeIDFromCert(cert)
 
 	// Write Node ID to file
+	panic("FIXME:")
 	err = helpers.SaveNodeID("new_validator/nodeId", nodeID)
 	if err != nil {
 		log.Fatalf("Failed to save node ID: %s", err)
