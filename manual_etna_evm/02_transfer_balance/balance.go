@@ -80,7 +80,7 @@ func main() {
 		log.Printf("C-chain balance sufficient: current %s, required %s\n", getBalanceString(cChainBalance, 9), MIN_BALANCE_STRING)
 	}
 
-	log.Printf("Transferring balance from C-chain to P-chain\n", MIN_BALANCE_STRING)
+	log.Printf("Transferring balance from C-chain to P-chain\n")
 
 	// Create keychain and wallet
 	kc := secp256k1fx.NewKeychain(key)
