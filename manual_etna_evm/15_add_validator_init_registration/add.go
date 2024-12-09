@@ -30,13 +30,13 @@ import (
 
 func main() {
 	log.Printf("Adding validator on port 9652\n")
-	err := AddValidator("http://127.0.0.1:9652")
+	err := addValidator()
 	if err != nil {
-		log.Fatalf("❌ Failed to add validator on port 9652: %s\n", err)
+		log.Fatalf("❌ Failed to add validator: %s\n", err)
 	}
 }
 
-func AddValidator(rpcURL string) error {
+func addValidator() error {
 	warpMessageExists, err := helpers.TextFileExists("add_validator_warp_message")
 	if err != nil {
 		return fmt.Errorf("failed to check if warp message exists: %w", err)
@@ -52,24 +52,29 @@ func AddValidator(rpcURL string) error {
 		return fmt.Errorf("failed to load chain ID: %w", err)
 	}
 
-	evmChainURL := fmt.Sprintf("http://127.0.0.1:9650/ext/bc/%s/rpc", chainID)
-
-	nodeID, blsInfo, err := helpers.GetNodeInfoRetry(rpcURL)
+	nodeID, err := helpers.LoadNodeID("new_validator/nodeId")
 	if err != nil {
-		return fmt.Errorf("failed to get node info: %s", err)
+		return fmt.Errorf("failed to load node ID: %w", err)
 	}
+
+	pop, err := helpers.LoadProofOfPossession("data/new_validator/pop.json")
+	if err != nil {
+		return fmt.Errorf("failed to load proof of possession: %w", err)
+	}
+
+	evmChainURL := fmt.Sprintf("http://127.0.0.1:9650/ext/bc/%s/rpc", chainID)
 
 	expiry, err := loadOrGenerateExpiry()
 	if err != nil {
 		return fmt.Errorf("failed to load or generate expiry: %s", err)
 	}
 
-	key, err := helpers.LoadValidatorManagerKey()
+	key, err := helpers.LoadSecp256k1PrivateKey(helpers.ValidatorManagerOwnerKeyPath)
 	if err != nil {
 		return fmt.Errorf("failed to load key from file: %s", err)
 	}
 
-	managerKey, err := helpers.LoadValidatorManagerKey()
+	managerKey, err := helpers.LoadSecp256k1PrivateKey(helpers.ValidatorManagerOwnerKeyPath)
 	if err != nil {
 		return fmt.Errorf("failed to load key from file: %s", err)
 	}
@@ -89,7 +94,7 @@ func AddValidator(rpcURL string) error {
 		managerAddress,
 		hex.EncodeToString(managerKey.Bytes()),
 		nodeID,
-		blsInfo.PublicKey[:],
+		pop.PublicKey[:],
 		expiry,
 		remainingBalanceOwners,
 		disableOwners,
@@ -98,7 +103,7 @@ func AddValidator(rpcURL string) error {
 	if err != nil {
 		if strings.Contains(err.Error(), "node already registered") {
 			log.Printf("reverted with an expected error: %s", err)
-			log.Printf("✅ Node %s was already registered as validator previously\n", rpcURL)
+			log.Printf("✅ Node %s was already registered as validator previously\n", nodeID)
 		} else {
 			return fmt.Errorf("failed to initialize validator registration: %s", err)
 		}
@@ -121,7 +126,7 @@ func AddValidator(rpcURL string) error {
 		return fmt.Errorf("failed to load subnet ID: %w", err)
 	}
 
-	blsPublicKey := [48]byte(blsInfo.PublicKey[:])
+	blsPublicKey := [48]byte(pop.PublicKey[:])
 	weight := constants.NonBootstrapValidatorWeight
 
 	signedMessage, validationID, err := ValidatorManagerGetSubnetValidatorRegistrationMessage(
@@ -147,16 +152,6 @@ func AddValidator(rpcURL string) error {
 	err = helpers.SaveHex("add_validator_warp_message", signedMessage.Bytes())
 	if err != nil {
 		return fmt.Errorf("saving validator warp message: %w", err)
-	}
-
-	BLSInfoJSON, err := blsInfo.MarshalJSON()
-	if err != nil {
-		return fmt.Errorf("marshaling BLS: %w", err)
-	}
-
-	err = helpers.SaveText("add_validator_bls_json", string(BLSInfoJSON))
-	if err != nil {
-		return fmt.Errorf("saving BLS JSON: %w", err)
 	}
 
 	fmt.Printf("validationID: %s\n", validationID)

@@ -28,7 +28,7 @@ import (
 )
 
 func main() {
-	exists, err := helpers.IdFileExists("conversion_id")
+	exists, err := helpers.FileExists(helpers.ConversionIdPath)
 	if err != nil {
 		log.Fatalf("❌ Failed to check if conversion_id.txt exists: %s\n", err)
 	}
@@ -38,18 +38,18 @@ func main() {
 		os.Exit(0)
 	}
 
-	chainID, err := helpers.LoadId("chain")
+	chainID, err := helpers.LoadId(helpers.ChainIdPath)
 	if err != nil {
 		log.Fatalf("❌ Failed to load chain ID: %s\n", err)
 	}
 
-	privKey, err := helpers.LoadValidatorManagerKey()
+	privKey, err := helpers.LoadSecp256k1PrivateKey(helpers.ValidatorManagerOwnerKeyPath)
 	if err != nil {
 		log.Fatalf("❌ Failed to load key from file: %s\n", err)
 	}
 	kc := secp256k1fx.NewKeychain(privKey)
 
-	subnetID, err := helpers.LoadId("subnet")
+	subnetID, err := helpers.LoadId(helpers.SubnetIdPath)
 	if err != nil {
 		log.Fatalf("❌ Failed to load subnet ID: %s\n", err)
 	}
@@ -145,7 +145,7 @@ func main() {
 		log.Fatalf("❌ Failed to create convert subnet tx: %s\n", err)
 	}
 
-	err = helpers.SaveId("conversion_id", tx.ID())
+	err = helpers.SaveId(helpers.ConversionIdPath, tx.ID())
 	if err != nil {
 		log.Fatalf("❌ Failed to save convert subnet tx ID: %s\n", err)
 	}

@@ -34,12 +34,12 @@ func main() {
 }
 
 func activateProposerVM() error {
-	key, err := helpers.LoadValidatorManagerKeyECDSA()
+	key, err := helpers.LoadSecp256k1PrivateKeyECDSA(helpers.ValidatorManagerOwnerKeyPath)
 	if err != nil {
 		return fmt.Errorf("failed to load validator manager key: %w", err)
 	}
 
-	chainID, err := helpers.LoadId("chain")
+	chainID, err := helpers.LoadId(helpers.ChainIdPath)
 	if err != nil {
 		return fmt.Errorf("failed to load chain ID: %w", err)
 	}

@@ -52,7 +52,7 @@ func RegisterL1ValidatorOnPChain() error {
 
 	balance := 1 * units.Avax
 
-	key, err := helpers.LoadValidatorManagerKey()
+	key, err := helpers.LoadSecp256k1PrivateKey(helpers.ValidatorManagerOwnerKeyPath)
 	if err != nil {
 		return fmt.Errorf("failed to load key from file: %s", err)
 	}

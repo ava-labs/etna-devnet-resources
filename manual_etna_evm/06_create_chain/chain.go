@@ -6,7 +6,6 @@ package main
 import (
 	"context"
 	"log"
-	"os"
 	"time"
 
 	"github.com/ava-labs/etna-devnet-resources/manual_etna_evm/config"
@@ -19,7 +18,7 @@ import (
 )
 
 func main() {
-	exists, err := helpers.IdFileExists("chain")
+	exists, err := helpers.FileExists(helpers.ChainIdPath)
 	if err != nil {
 		log.Fatalf("❌ Failed to check if chain ID exists: %s\n", err)
 	}
@@ -28,21 +27,20 @@ func main() {
 		return
 	}
 
-	key, err := helpers.LoadValidatorManagerKey()
+	key, err := helpers.LoadSecp256k1PrivateKey(helpers.ValidatorManagerOwnerKeyPath)
 	if err != nil {
 		log.Fatalf("❌ Failed to load key from file: %s\n", err)
 	}
 	kc := secp256k1fx.NewKeychain(key)
 
-	subnetIDBytes, err := os.ReadFile("data/subnet.txt")
+	subnetID, err := helpers.LoadId(helpers.SubnetIdPath)
 	if err != nil {
 		log.Fatalf("❌ Failed to read subnet ID file: %s\n", err)
 	}
-	subnetID := ids.FromStringOrPanic(string(subnetIDBytes))
 
 	log.Printf("Using vmID: %s\n", constants.SubnetEVMID)
 
-	genesisBytes, err := os.ReadFile("data/L1-genesis.json")
+	genesisString, err := helpers.LoadText(helpers.L1GenesisPath)
 	if err != nil {
 		log.Fatalf("❌ Failed to read genesis: %s\n", err)
 	}
@@ -69,7 +67,7 @@ func main() {
 	createChainStartTime := time.Now()
 	createChainTx, err := pWallet.IssueCreateChainTx(
 		subnetID,
-		genesisBytes,
+		[]byte(genesisString),
 		constants.SubnetEVMID,
 		nil,
 		"My L1",
@@ -80,7 +78,7 @@ func main() {
 	log.Printf("✅ Created new chain %s in %s\n", createChainTx.ID(), time.Since(createChainStartTime))
 
 	// Save the chain ID to file
-	err = helpers.SaveId("chain", createChainTx.ID())
+	err = helpers.SaveId(helpers.ChainIdPath, createChainTx.ID())
 	if err != nil {
 		log.Printf("❌ Failed to save chain ID to file: %s\n", err)
 	}

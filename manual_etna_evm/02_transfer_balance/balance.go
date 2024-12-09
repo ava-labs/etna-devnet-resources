@@ -35,7 +35,7 @@ func getBalanceString(balance *big.Int, decimals int) string {
 }
 
 func main() {
-	key, err := helpers.LoadValidatorManagerKey()
+	key, err := helpers.LoadSecp256k1PrivateKey(helpers.ValidatorManagerOwnerKeyPath)
 	if err != nil {
 		log.Fatalf("failed to load key from file: %s\n", err)
 	}

@@ -11,7 +11,7 @@ import (
 
 func GetLocalEthClient() (ethclient.Client, *big.Int, error) {
 	const maxAttempts = 100
-	L1ChainId, err := LoadId("chain")
+	L1ChainId, err := LoadId(ChainIdPath)
 	if err != nil {
 		return nil, nil, fmt.Errorf("failed to load chain ID: %s", err)
 	}

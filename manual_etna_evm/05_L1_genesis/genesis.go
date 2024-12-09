@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"log"
 	"math/big"
-	"os"
 	"time"
 
 	"github.com/ava-labs/etna-devnet-resources/manual_etna_evm/config"
@@ -27,7 +26,7 @@ var (
 )
 
 func main() {
-	ownerKey, err := helpers.LoadValidatorManagerKey()
+	ownerKey, err := helpers.LoadSecp256k1PrivateKey(helpers.ValidatorManagerOwnerKeyPath)
 	if err != nil {
 		log.Fatalf("failed to load key from file: %s\n", err)
 	}
@@ -152,7 +151,7 @@ func main() {
 		log.Fatalf("❌ Failed to marshal genesis: %s\n", err)
 	}
 
-	if err := os.WriteFile("data/L1-genesis.json", prettyJSON, 0644); err != nil {
+	if err := helpers.SaveText(helpers.L1GenesisPath, string(prettyJSON)); err != nil {
 		log.Fatalf("❌ Failed to write genesis: %s\n", err)
 	}
 

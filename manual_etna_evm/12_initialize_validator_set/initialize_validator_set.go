@@ -48,7 +48,7 @@ func main() {
 }
 
 func initializeValidatorSet() error {
-	alreadyInitialized, err := helpers.TextFileExists("initialize_validator_set_tx")
+	alreadyInitialized, err := helpers.FileExists(helpers.InitializeValidatorSetTxPath)
 	if err != nil {
 		return fmt.Errorf("failed to check if validator set is already initialized: %w", err)
 	}
@@ -59,12 +59,12 @@ func initializeValidatorSet() error {
 
 	managerAddress := goethereumcommon.HexToAddress(config.ProxyContractAddress)
 
-	subnetID, err := helpers.LoadId("subnet")
+	subnetID, err := helpers.LoadId(helpers.SubnetIdPath)
 	if err != nil {
 		return fmt.Errorf("failed to load subnet ID: %w", err)
 	}
 
-	subnetConversionIDFromFile, err := helpers.LoadId("conversion_id")
+	subnetConversionIDFromFile, err := helpers.LoadId(helpers.ConversionIdPath)
 	if err != nil {
 		return fmt.Errorf("failed to load subnet conversion ID: %w", err)
 	}
@@ -76,7 +76,7 @@ func initializeValidatorSet() error {
 		return fmt.Errorf("failed to get node info: %w", err)
 	}
 
-	chainID, err := helpers.LoadId("chain")
+	chainID, err := helpers.LoadId(helpers.ChainIdPath)
 	if err != nil {
 		return fmt.Errorf("failed to load chain ID: %w", err)
 	}
@@ -145,7 +145,8 @@ func initializeValidatorSet() error {
 		return fmt.Errorf("failed to sign subnet conversion unsigned message: %w", err)
 	}
 
-	privateKey, err := helpers.LoadText("validator_manager_owner_key")
+	//as plain text
+	privateKey, err := helpers.LoadText(helpers.ValidatorManagerOwnerKeyPath)
 	if err != nil {
 		return fmt.Errorf("failed to load private key: %w", err)
 	}
@@ -193,7 +194,7 @@ func initializeValidatorSet() error {
 
 	fmt.Printf("✅ Successfully initialized validator set. Transaction hash: %s\n", tx.Hash().String())
 
-	helpers.SaveText("initialize_validator_set_tx", tx.Hash().String())
+	helpers.SaveText(helpers.InitializeValidatorSetTxPath, tx.Hash().String())
 
 	return nil
 }

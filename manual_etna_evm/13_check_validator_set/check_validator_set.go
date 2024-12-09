@@ -70,7 +70,7 @@ func main() {
 }
 
 func printPChainState() error {
-	subnetID, err := helpers.LoadId("subnet")
+	subnetID, err := helpers.LoadId(helpers.SubnetIdPath)
 	if err != nil {
 		return fmt.Errorf("failed to load subnet ID: %w", err)
 	}
