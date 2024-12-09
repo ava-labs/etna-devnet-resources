@@ -20,14 +20,12 @@ go run ./05_L1_genesis/
 echo -e "\n⛓️  Creating chain\n"
 go run ./06_create_chain/
 
-# echo -e "\n🚀 Launching nodes\n"
-# ./07_launch_nodes/launch.sh "node0"
 
 echo -e "\n🔮 Converting chain into L1\n"
 go run ./08_convert_chain/
 
-echo -e "\n🚀 Restarting nodes\n"
-./07_launch_nodes/launch.sh "node0"
+echo -e "\n🚀 Launching node0\n"
+./09_launch_nodes/launch.sh "node0"
 
 echo -e "\n🎯 Activate ProposerVM fork\n"
 go run ./10_activate_proposer_vm/
