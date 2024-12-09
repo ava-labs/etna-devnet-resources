@@ -29,10 +29,10 @@ import (
 )
 
 func main() {
-	port := "9652"
-	log.Printf("Adding validator on port %s\n", port)
-	if err := AddValidator(fmt.Sprintf("http://127.0.0.1:%s", port)); err != nil {
-		log.Fatalf("❌ Failed to add validator on port %s: %s\n", port, err)
+	log.Printf("Adding validator on port 9652\n")
+	err := AddValidator("http://127.0.0.1:9652")
+	if err != nil {
+		log.Fatalf("❌ Failed to add validator on port 9652: %s\n", err)
 	}
 }
 
