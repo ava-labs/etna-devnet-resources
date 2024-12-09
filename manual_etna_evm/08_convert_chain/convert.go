@@ -12,6 +12,7 @@ import (
 
 	"github.com/ava-labs/etna-devnet-resources/manual_etna_evm/config"
 	"github.com/ava-labs/etna-devnet-resources/manual_etna_evm/helpers"
+	"github.com/ava-labs/etna-devnet-resources/manual_etna_evm/helpers/credshelper"
 
 	"github.com/ava-labs/avalanche-cli/cmd/blockchaincmd"
 	"github.com/ava-labs/avalanche-cli/pkg/constants"
@@ -81,7 +82,7 @@ func main() {
 
 	validators := []models.SubnetValidator{}
 
-	nodeID, proofOfPossession, err := helpers.GetNodeInfoRetry("http://127.0.0.1:9650")
+	nodeID, proofOfPossession, err := credshelper.NodeInfoFromCreds(helpers.Node0KeysFolder)
 	if err != nil {
 		log.Fatalf("❌ Failed to get node info: %s\n", err)
 	}
