@@ -28,6 +28,7 @@ docker run -d \
   -e AVALANCHEGO_STAKING_TLS_CERT_FILE_CONTENT=%s \
   -e AVALANCHEGO_STAKING_TLS_KEY_FILE_CONTENT=%s \
   -e BLS_KEY_BASE64=%s \
+  -e AVALANCHEGO_PUBLIC_IP_RESOLUTION_SERVICE=ifconfigme \
   containerman17/avalanchego-subnetevm:v1.12.0_v0.6.12 ;\
   docker logs -f %s
 	`, containerName, containerName, subnetID.String(), stakerCertBase64, stakerKeyBase64, signerKeyBase64, containerName)
