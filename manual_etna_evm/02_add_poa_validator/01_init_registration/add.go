@@ -44,23 +44,12 @@ func noErrVal[T any](val T, err error) T {
 }
 
 func addValidator() error {
-	warpMessageExists, err := helpers.FileExists(helpers.AddValidatorWarpMessagePath)
-	if err != nil {
-		return fmt.Errorf("failed to check if warp message exists: %w", err)
-	}
+	chainID := helpers.LoadId("chain")
+	nodeID := helpers.LoadNodeID("new_validator/nodeId")
+	warpMessageExists := helpers.FileExists(helpers.AddValidatorWarpMessagePath)
 	if warpMessageExists {
 		log.Printf("✅ Warp message already exists, skipping initialization\n")
 		return nil
-	}
-
-	chainID, err := helpers.LoadId("chain")
-	if err != nil {
-		return fmt.Errorf("failed to load chain ID: %w", err)
-	}
-
-	nodeID, err := helpers.LoadNodeID("new_validator/nodeId")
-	if err != nil {
-		return fmt.Errorf("failed to load node ID: %w", err)
 	}
 
 	pop, err := helpers.LoadProofOfPossession("data/new_validator/pop.json")

@@ -26,7 +26,7 @@ import (
 )
 
 func main() {
-	const maxAttempts = 5
+	const maxAttempts = 10
 	const retryDelay = 10 * time.Second
 
 	var lastErr error
