@@ -9,6 +9,7 @@ services:
     network_mode: host
     user: "${CURRENT_UID}:${CURRENT_GID}"
     environment:
+      # These AVALANCHEGO_* ENV vars are not supported by avalanchego by default, we handle them in the entrypoint.sh
       - AVALANCHEGO_CHAIN_CONFIG_DIR=/data/chains
       - AVALANCHEGO_NETWORK_ID=fuji
       - AVALANCHEGO_DATA_DIR=/data/node0
