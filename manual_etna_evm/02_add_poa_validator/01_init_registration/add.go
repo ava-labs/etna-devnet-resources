@@ -29,7 +29,7 @@ import (
 )
 
 func main() {
-	log.Printf("Adding validator on port 9652\n")
+	log.Printf("Adding second validator\n")
 	err := addValidator()
 	if err != nil {
 		log.Fatalf("❌ Failed to add validator: %s\n", err)
