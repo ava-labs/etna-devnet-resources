@@ -7,9 +7,9 @@ import (
 
 	"github.com/ava-labs/etna-devnet-resources/manual_etna_evm/config"
 	"github.com/ava-labs/etna-devnet-resources/manual_etna_evm/helpers"
+	"github.com/ava-labs/etna-devnet-resources/manual_etna_evm/helpers/credshelper"
 
 	"github.com/ava-labs/avalanchego/utils/units"
-	"github.com/ava-labs/avalanchego/vms/platformvm/signer"
 	"github.com/ava-labs/avalanchego/vms/platformvm/txs"
 	"github.com/ava-labs/avalanchego/vms/secp256k1fx"
 	"github.com/ava-labs/avalanchego/wallet/subnet/primary"
@@ -34,28 +34,11 @@ func main() {
 }
 
 func RegisterL1ValidatorOnPChain() error {
-	blsInfoJSON, err := helpers.LoadText("add_validator_bls_json")
-	if err != nil {
-		return fmt.Errorf("loading add_validator_bls_json: %w", err)
-	}
+	warpMessageBytes := helpers.LoadHex(helpers.AddValidatorWarpMessagePath)
 
-	blsInfo := signer.ProofOfPossession{}
-	err = blsInfo.UnmarshalJSON([]byte(blsInfoJSON))
-	if err != nil {
-		return fmt.Errorf("unmarshaling BLS info: %w", err)
-	}
+	_, proofOfPossession := credshelper.NodeInfoFromCreds(helpers.AddValidatorKeysFolder)
 
-	warpMessageBytes, err := helpers.LoadHex("add_validator_warp_message")
-	if err != nil {
-		return fmt.Errorf("loading add_validator_warp_message: %w", err)
-	}
-
-	balance := 1 * units.Avax
-
-	key, err := helpers.LoadSecp256k1PrivateKey(helpers.ValidatorManagerOwnerKeyPath)
-	if err != nil {
-		return fmt.Errorf("failed to load key from file: %s", err)
-	}
+	key := helpers.LoadSecp256k1PrivateKey(helpers.ValidatorManagerOwnerKeyPath)
 
 	kc := secp256k1fx.NewKeychain(key)
 	wallet, err := primary.MakeWallet(context.Background(), &primary.WalletConfig{
@@ -68,8 +51,8 @@ func RegisterL1ValidatorOnPChain() error {
 	}
 
 	unsignedTx, err := wallet.P().Builder().NewRegisterL1ValidatorTx(
-		balance,
-		blsInfo.ProofOfPossession,
+		1*units.Avax,
+		proofOfPossession.ProofOfPossession,
 		warpMessageBytes,
 	)
 	if err != nil {

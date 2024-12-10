@@ -1,6 +1,7 @@
 package credshelper
 
 import (
+	"encoding/base64"
 	"fmt"
 	"log"
 
@@ -9,16 +10,23 @@ import (
 	"github.com/ava-labs/etna-devnet-resources/manual_etna_evm/helpers"
 )
 
-func GenerateCredsIfNotExists(folder string) error {
+func GenerateCredsIfNotExists(folder string) {
 	if err := generateStakerKey(folder); err != nil {
-		return err
+		log.Fatalf("❌ Failed to generate staker key: %s\n", err)
 	}
 
 	if err := generateSignerKey(folder); err != nil {
-		return err
+		log.Fatalf("❌ Failed to generate signer key: %s\n", err)
 	}
+}
+func GetCredsBase64(folder string) (string, string, string) {
+	stakerKey := helpers.LoadBytes(folder + "staker.key")
+	stakerCert := helpers.LoadBytes(folder + "staker.crt")
+	signerKey := helpers.LoadBytes(folder + "signer.key")
 
-	return nil
+	return base64.StdEncoding.EncodeToString(stakerKey),
+		base64.StdEncoding.EncodeToString(stakerCert),
+		base64.StdEncoding.EncodeToString(signerKey)
 }
 
 func generateStakerKey(folder string) error {

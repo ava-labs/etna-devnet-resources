@@ -70,10 +70,8 @@ func main() {
 
 	validators := []models.SubnetValidator{}
 
-	nodeID, proofOfPossession, err := credshelper.NodeInfoFromCreds(helpers.Node0KeysFolder)
-	if err != nil {
-		log.Fatalf("❌ Failed to get node info: %s\n", err)
-	}
+	nodeID, proofOfPossession := credshelper.NodeInfoFromCreds(helpers.Node0KeysFolder)
+
 	publicKey := "0x" + hex.EncodeToString(proofOfPossession.PublicKey[:])
 	pop := "0x" + hex.EncodeToString(proofOfPossession.ProofOfPossession[:])
 

@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/ava-labs/etna-devnet-resources/manual_etna_evm/config"
 	"github.com/ava-labs/etna-devnet-resources/manual_etna_evm/helpers"
@@ -132,9 +133,14 @@ func printPChainState() error {
 }
 
 func printEVMContractLogs() error {
+	port := "9650"
+	if len(os.Args) > 1 {
+		port = os.Args[1]
+	}
+
 	managerAddress := common.HexToAddress(config.ProxyContractAddress)
 
-	ethClient, _, err := helpers.GetLocalEthClient()
+	ethClient, _, err := helpers.GetLocalEthClient(port)
 	if err != nil {
 		return fmt.Errorf("failed to connect to client: %s\n", err)
 	}

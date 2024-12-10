@@ -32,7 +32,7 @@ func main() {
 
 	key := helpers.LoadSecp256k1PrivateKeyECDSA(helpers.ValidatorManagerOwnerKeyPath)
 
-	ethClient, evmChainId, err := helpers.GetLocalEthClient()
+	ethClient, evmChainId, err := helpers.GetLocalEthClient("9650")
 	if err != nil {
 		log.Fatalf("failed to connect to client: %s\n", err)
 	}

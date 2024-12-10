@@ -2,10 +2,10 @@ package main
 
 import (
 	_ "embed"
+	"encoding/hex"
 	"fmt"
 	"log"
 	"math/big"
-	"strings"
 
 	"github.com/ava-labs/etna-devnet-resources/manual_etna_evm/config"
 	"github.com/ava-labs/etna-devnet-resources/manual_etna_evm/helpers"
@@ -39,20 +39,14 @@ func main() {
 		log.Fatalf("failed to get extra peers: %s", err)
 	}
 	aggregatorQuorumPercentage := uint64(0)
-	subnetID, err := helpers.LoadId("subnet")
-	if err != nil {
-		log.Fatalf("failed to load subnet ID: %s", err)
-	}
+	subnetID := helpers.LoadId(helpers.SubnetIdPath)
 	rpcURL := "http://127.0.0.1:9650"
 
 	network := models.NewFujiNetwork()
 	aggregatorLogLevel := logging.Level(logging.Info)
 	aggregatorAllowPrivateIPs := true
 
-	validationID, err := helpers.LoadId("add_validator_validation_id")
-	if err != nil {
-		log.Fatalf("failed to load validator ID: %s", err)
-	}
+	validationID := helpers.LoadId(helpers.AddValidatorValidationIdPath)
 
 	signedMessage, err := ValidatorManagerGetPChainSubnetValidatorRegistrationWarpMessage(
 		network,
@@ -73,22 +67,16 @@ func main() {
 
 	managerAddress := goethereumcommon.HexToAddress(config.ProxyContractAddress)
 
-	privateKey, err := helpers.LoadText("validator_manager_owner_key")
-	if err != nil {
-		log.Fatalf("failed to load private key: %s", err)
-	}
+	privateKey := helpers.LoadSecp256k1PrivateKey(helpers.ValidatorManagerOwnerKeyPath)
 
-	chainID, err := helpers.LoadText("chain")
-	if err != nil {
-		log.Fatalf("failed to load chain ID: %s", err)
-	}
+	chainID := helpers.LoadId(helpers.ChainIdPath)
 
 	nodeURL := fmt.Sprintf("http://%s:%s/ext/bc/%s/rpc", "127.0.0.1", "9650", chainID)
 
 	tx, _, err := ValidatorManagerCompleteValidatorRegistration(
 		nodeURL,
 		managerAddress,
-		strings.TrimSpace(privateKey),
+		hex.EncodeToString(privateKey.Bytes()),
 		signedMessage,
 	)
 	if err != nil {

@@ -9,5 +9,10 @@ var (
 	InitializeValidatorSetTxPath      = "data/initialize_validator_set_tx.txt"
 	L1GenesisPath                     = "data/L1-genesis.json"
 	Node0KeysFolder                   = "data/node0/staking/"
-	AddValidatorWarpMessagePath       = "data/add_validator_warp_message.hex"
+
+	AddValidatorFolder           = "data/add_validator/"
+	AddValidatorKeysFolder       = AddValidatorFolder + "staking/"
+	AddValidatorWarpMessagePath  = AddValidatorFolder + "warp_message.hex"
+	AddValidatorExpiryPath       = AddValidatorFolder + "expiry.txt"
+	AddValidatorValidationIdPath = AddValidatorFolder + "validation_id.txt"
 )
