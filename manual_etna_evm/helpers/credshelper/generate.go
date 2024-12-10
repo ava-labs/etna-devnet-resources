@@ -22,11 +22,7 @@ func GenerateCredsIfNotExists(folder string) error {
 }
 
 func generateStakerKey(folder string) error {
-	exists, err := helpers.FileExists(folder + "staker.key")
-	if err != nil {
-		return fmt.Errorf("failed to check if file exists: %s\n", err)
-	}
-
+	exists := helpers.FileExists(folder + "staker.key")
 	if exists {
 		log.Println("Staker key already exists, skipping...")
 		return nil
@@ -44,11 +40,7 @@ func generateStakerKey(folder string) error {
 }
 
 func generateSignerKey(folder string) error {
-	exists, err := helpers.FileExists(folder + "signer.key")
-	if err != nil {
-		return fmt.Errorf("failed to check if file exists: %s\n", err)
-	}
-
+	exists := helpers.FileExists(folder + "signer.key")
 	if exists {
 		log.Println("Signer key already exists, skipping...")
 		return nil

@@ -29,31 +29,19 @@ import (
 )
 
 func main() {
-	exists, err := helpers.FileExists(helpers.ConversionIdPath)
-	if err != nil {
-		log.Fatalf("❌ Failed to check if conversion_id.txt exists: %s\n", err)
-	}
+	exists := helpers.FileExists(helpers.ConversionIdPath)
 
 	if exists {
 		log.Println("✅ Subnet was already converted to L1")
 		os.Exit(0)
 	}
 
-	chainID, err := helpers.LoadId(helpers.ChainIdPath)
-	if err != nil {
-		log.Fatalf("❌ Failed to load chain ID: %s\n", err)
-	}
+	chainID := helpers.LoadId(helpers.ChainIdPath)
 
-	privKey, err := helpers.LoadSecp256k1PrivateKey(helpers.ValidatorManagerOwnerKeyPath)
-	if err != nil {
-		log.Fatalf("❌ Failed to load key from file: %s\n", err)
-	}
+	privKey := helpers.LoadSecp256k1PrivateKey(helpers.ValidatorManagerOwnerKeyPath)
 	kc := secp256k1fx.NewKeychain(privKey)
 
-	subnetID, err := helpers.LoadId(helpers.SubnetIdPath)
-	if err != nil {
-		log.Fatalf("❌ Failed to load subnet ID: %s\n", err)
-	}
+	subnetID := helpers.LoadId(helpers.SubnetIdPath)
 
 	wallet, err := primary.MakeWallet(context.Background(), &primary.WalletConfig{
 		URI:          config.RPC_URL,
@@ -146,10 +134,7 @@ func main() {
 		log.Fatalf("❌ Failed to create convert subnet tx: %s\n", err)
 	}
 
-	err = helpers.SaveId(helpers.ConversionIdPath, tx.ID())
-	if err != nil {
-		log.Fatalf("❌ Failed to save convert subnet tx ID: %s\n", err)
-	}
+	helpers.SaveId(helpers.ConversionIdPath, tx.ID())
 
 	fmt.Printf("✅ Convert subnet tx ID: %s\n", tx.ID().String())
 }

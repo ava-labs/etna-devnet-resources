@@ -11,17 +11,9 @@ import (
 )
 
 func NodeInfoFromCreds(folder string) (ids.NodeID, *signer.ProofOfPossession, error) {
-	blsKey, err := helpers.LoadBLSKey(folder + "signer.key")
-	if err != nil {
-		return ids.NodeID{}, nil, err
-	}
-
+	blsKey := helpers.LoadBLSKey(folder + "signer.key")
 	pop := signer.NewProofOfPossession(blsKey)
-
-	certString, err := helpers.LoadText(folder + "staker.crt")
-	if err != nil {
-		return ids.NodeID{}, nil, err
-	}
+	certString := helpers.LoadText(folder + "staker.crt")
 
 	block, _ := pem.Decode([]byte(certString))
 	if block == nil || block.Type != "CERTIFICATE" {

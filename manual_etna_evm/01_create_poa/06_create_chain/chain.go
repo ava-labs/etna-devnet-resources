@@ -18,32 +18,20 @@ import (
 )
 
 func main() {
-	exists, err := helpers.FileExists(helpers.ChainIdPath)
-	if err != nil {
-		log.Fatalf("❌ Failed to check if chain ID exists: %s\n", err)
-	}
+	exists := helpers.FileExists(helpers.ChainIdPath)
 	if exists {
 		log.Println("✅ Chain already exists, exiting")
 		return
 	}
 
-	key, err := helpers.LoadSecp256k1PrivateKey(helpers.ValidatorManagerOwnerKeyPath)
-	if err != nil {
-		log.Fatalf("❌ Failed to load key from file: %s\n", err)
-	}
+	key := helpers.LoadSecp256k1PrivateKey(helpers.ValidatorManagerOwnerKeyPath)
 	kc := secp256k1fx.NewKeychain(key)
 
-	subnetID, err := helpers.LoadId(helpers.SubnetIdPath)
-	if err != nil {
-		log.Fatalf("❌ Failed to read subnet ID file: %s\n", err)
-	}
+	subnetID := helpers.LoadId(helpers.SubnetIdPath)
 
 	log.Printf("Using vmID: %s\n", constants.SubnetEVMID)
 
-	genesisString, err := helpers.LoadText(helpers.L1GenesisPath)
-	if err != nil {
-		log.Fatalf("❌ Failed to read genesis: %s\n", err)
-	}
+	genesisString := helpers.LoadText(helpers.L1GenesisPath)
 
 	ctx := context.Background()
 
@@ -78,10 +66,7 @@ func main() {
 	log.Printf("✅ Created new chain %s in %s\n", createChainTx.ID(), time.Since(createChainStartTime))
 
 	// Save the chain ID to file
-	err = helpers.SaveId(helpers.ChainIdPath, createChainTx.ID())
-	if err != nil {
-		log.Printf("❌ Failed to save chain ID to file: %s\n", err)
-	}
+	helpers.SaveId(helpers.ChainIdPath, createChainTx.ID())
 
 	log.Println("✅ Saved chain ID to file")
 }

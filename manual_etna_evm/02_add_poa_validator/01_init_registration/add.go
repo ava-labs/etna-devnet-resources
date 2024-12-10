@@ -36,12 +36,18 @@ func main() {
 	}
 }
 
+func noErrVal[T any](val T, err error) T {
+	if err != nil {
+		panic(err)
+	}
+	return val
+}
+
 func addValidator() error {
-	warpMessageExists, err := helpers.TextFileExists("add_validator_warp_message")
+	warpMessageExists, err := helpers.FileExists(helpers.AddValidatorWarpMessagePath)
 	if err != nil {
 		return fmt.Errorf("failed to check if warp message exists: %w", err)
 	}
-
 	if warpMessageExists {
 		log.Printf("✅ Warp message already exists, skipping initialization\n")
 		return nil
@@ -149,7 +155,7 @@ func addValidator() error {
 		return fmt.Errorf("failed to get subnet validator registration message: %s", err)
 	}
 
-	err = helpers.SaveHex("add_validator_warp_message", signedMessage.Bytes())
+	err = helpers.SaveHex(helpers.AddValidatorWarpMessagePath, signedMessage.Bytes())
 	if err != nil {
 		return fmt.Errorf("saving validator warp message: %w", err)
 	}

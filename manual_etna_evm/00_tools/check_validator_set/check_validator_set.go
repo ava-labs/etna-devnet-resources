@@ -70,10 +70,7 @@ func main() {
 }
 
 func printPChainState() error {
-	subnetID, err := helpers.LoadId(helpers.SubnetIdPath)
-	if err != nil {
-		return fmt.Errorf("failed to load subnet ID: %w", err)
-	}
+	subnetID := helpers.LoadId(helpers.SubnetIdPath)
 
 	// Create JSON-RPC request payloads
 	validatorsPayload := map[string]interface{}{

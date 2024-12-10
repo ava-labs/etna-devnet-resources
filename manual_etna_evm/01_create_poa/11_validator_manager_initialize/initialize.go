@@ -18,31 +18,19 @@ import (
 )
 
 func main() {
-	ecdsaKey, err := helpers.LoadSecp256k1PrivateKeyECDSA(helpers.ValidatorManagerOwnerKeyPath)
-	if err != nil {
-		log.Fatalf("failed to load validator manager key: %w", err)
-	}
+	ecdsaKey := helpers.LoadSecp256k1PrivateKeyECDSA(helpers.ValidatorManagerOwnerKeyPath)
 
-	isInitialized, err := helpers.FileExists(helpers.IsValidatorManagerInitializedPath)
-	if err != nil {
-		log.Fatalf("failed to check if validator manager initialized file exists: %s\n", err)
-	}
+	isInitialized := helpers.FileExists(helpers.IsValidatorManagerInitializedPath)
 	if isInitialized {
 		log.Println("✅ Validator manager was already initialized")
 		return
 	}
 
-	subnetID, err := helpers.LoadId(helpers.SubnetIdPath)
-	if err != nil {
-		log.Fatalf("failed to load subnet ID: %s\n", err)
-	}
+	subnetID := helpers.LoadId(helpers.SubnetIdPath)
 
 	managerAddress := common.HexToAddress(config.ProxyContractAddress)
 
-	key, err := helpers.LoadSecp256k1PrivateKeyECDSA(helpers.ValidatorManagerOwnerKeyPath)
-	if err != nil {
-		log.Fatalf("failed to load key from file: %s\n", err)
-	}
+	key := helpers.LoadSecp256k1PrivateKeyECDSA(helpers.ValidatorManagerOwnerKeyPath)
 
 	ethClient, evmChainId, err := helpers.GetLocalEthClient()
 	if err != nil {
@@ -70,9 +58,7 @@ func main() {
 		log.Fatalf("failed to initialize validator manager: %s\n", err)
 	}
 
-	if err := helpers.SaveText(helpers.IsValidatorManagerInitializedPath, "true"); err != nil {
-		log.Fatalf("failed to save validator manager initialized file: %s\n", err)
-	}
+	helpers.SaveText(helpers.IsValidatorManagerInitializedPath, "true")
 
 	// Replace sleep with transaction wait
 	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Minute)

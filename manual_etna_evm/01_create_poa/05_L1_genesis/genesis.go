@@ -26,10 +26,7 @@ var (
 )
 
 func main() {
-	ownerKey, err := helpers.LoadSecp256k1PrivateKey(helpers.ValidatorManagerOwnerKeyPath)
-	if err != nil {
-		log.Fatalf("failed to load key from file: %s\n", err)
-	}
+	ownerKey := helpers.LoadSecp256k1PrivateKey(helpers.ValidatorManagerOwnerKeyPath)
 
 	ethAddr := pluginEVM.PublicKeyToEthAddress(ownerKey.PublicKey())
 
@@ -151,9 +148,7 @@ func main() {
 		log.Fatalf("❌ Failed to marshal genesis: %s\n", err)
 	}
 
-	if err := helpers.SaveText(helpers.L1GenesisPath, string(prettyJSON)); err != nil {
-		log.Fatalf("❌ Failed to write genesis: %s\n", err)
-	}
+	helpers.SaveText(helpers.L1GenesisPath, string(prettyJSON))
 
 	log.Printf("✅ Successfully wrote genesis to data/L1-genesis.json\n")
 }

@@ -8,6 +8,6 @@ var (
 	IsValidatorManagerInitializedPath = "data/is_validator_manager_initialized.txt"
 	InitializeValidatorSetTxPath      = "data/initialize_validator_set_tx.txt"
 	L1GenesisPath                     = "data/L1-genesis.json"
-
-	Node0KeysFolder = "data/node0/staking/"
+	Node0KeysFolder                   = "data/node0/staking/"
+	AddValidatorWarpMessagePath       = "data/add_validator_warp_message.hex"
 )

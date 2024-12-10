@@ -17,20 +17,14 @@ import (
 )
 
 func main() {
-	exists, err := helpers.FileExists(helpers.SubnetIdPath)
-	if err != nil {
-		log.Fatalf("❌ Failed to check if subnet ID exists: %s\n", err)
-	}
+	exists := helpers.FileExists(helpers.SubnetIdPath)
 	if exists {
 		log.Println("Subnet already exists, exiting")
 		return
 	}
 
 	// If we get here, we need to create a new subnet
-	key, err := helpers.LoadSecp256k1PrivateKey(helpers.ValidatorManagerOwnerKeyPath)
-	if err != nil {
-		log.Fatalf("❌ Failed to load key from file: %s\n", err)
-	}
+	key := helpers.LoadSecp256k1PrivateKey(helpers.ValidatorManagerOwnerKeyPath)
 
 	kc := secp256k1fx.NewKeychain(key)
 	subnetOwner := key.Address()
@@ -65,8 +59,5 @@ func main() {
 	log.Printf("✅ Created new subnet %s in %s\n", createSubnetTx.ID(), time.Since(createSubnetStartTime))
 
 	// Save the subnet ID to file
-	err = helpers.SaveId(helpers.SubnetIdPath, createSubnetTx.ID())
-	if err != nil {
-		log.Printf("❌ Failed to save subnet ID to file: %s\n", err)
-	}
+	helpers.SaveId(helpers.SubnetIdPath, createSubnetTx.ID())
 }
