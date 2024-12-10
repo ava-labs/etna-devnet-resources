@@ -74,17 +74,17 @@ func main() {
 		Timestamp:  uint64(now),
 	}
 
-	proxyAdminBytecode, err := loadHexFile("04_compile_validator_manager/proxy_compiled/deployed_proxy_admin_bytecode.txt")
+	proxyAdminBytecode, err := loadHexFile("01_create_poa/04_compile_validator_manager/proxy_compiled/deployed_proxy_admin_bytecode.txt")
 	if err != nil {
 		log.Fatalf("❌ Failed to get proxy admin deployed bytecode: %s\n", err)
 	}
 
-	transparentProxyBytecode, err := loadHexFile("04_compile_validator_manager/proxy_compiled/deployed_transparent_proxy_bytecode.txt")
+	transparentProxyBytecode, err := loadHexFile("01_create_poa/04_compile_validator_manager/proxy_compiled/deployed_transparent_proxy_bytecode.txt")
 	if err != nil {
 		log.Fatalf("❌ Failed to get transparent proxy deployed bytecode: %s\n", err)
 	}
 
-	validatorMessagesBytecode, err := loadDeployedHexFromJSON("04_compile_validator_manager/compiled/ValidatorMessages.json", nil)
+	validatorMessagesBytecode, err := loadDeployedHexFromJSON("01_create_poa/04_compile_validator_manager/compiled/ValidatorMessages.json", nil)
 	if err != nil {
 		log.Fatalf("❌ Failed to get validator messages deployed bytecode: %s\n", err)
 	}
@@ -92,7 +92,7 @@ func main() {
 	poaValidatorManagerLinkRefs := map[string]string{
 		"contracts/validator-manager/ValidatorMessages.sol:ValidatorMessages": config.ValidatorMessagesAddress[2:],
 	}
-	poaValidatorManagerDeployedBytecode, err := loadDeployedHexFromJSON("04_compile_validator_manager/compiled/PoAValidatorManager.json", poaValidatorManagerLinkRefs)
+	poaValidatorManagerDeployedBytecode, err := loadDeployedHexFromJSON("01_create_poa/04_compile_validator_manager/compiled/PoAValidatorManager.json", poaValidatorManagerLinkRefs)
 	if err != nil {
 		log.Fatalf("❌ Failed to get PoA deployed bytecode: %s\n", err)
 	}

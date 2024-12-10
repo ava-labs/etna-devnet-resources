@@ -5,40 +5,16 @@ services:
       context: .
       dockerfile: Dockerfile
     volumes:
-      - ../data/:/data/
+      - ../../data/:/data/
     network_mode: host
     user: "${CURRENT_UID}:${CURRENT_GID}"
     environment:
-      - TRACK_SUBNETS=${TRACK_SUBNETS}
-      - NODE_NAME=node0
-      - HTTP_PORT=9650
-      - STAKING_PORT=9651
-  node1:
-    container_name: node1
-    build:
-      context: .
-      dockerfile: Dockerfile
-    volumes:
-      - ../data/:/data/
-    network_mode: host
-    user: "${CURRENT_UID}:${CURRENT_GID}"
-    environment:
-      - TRACK_SUBNETS=${TRACK_SUBNETS}
-      - NODE_NAME=node1
-      - HTTP_PORT=9652
-      - STAKING_PORT=9653
-  node2:
-    container_name: node2
-    build:
-      context: .
-      dockerfile: Dockerfile
-    volumes:
-      - ../data/:/data/
-    network_mode: host
-    user: "${CURRENT_UID}:${CURRENT_GID}"
-    environment:
-      - TRACK_SUBNETS=${TRACK_SUBNETS}
-      - NODE_NAME=node2
-      - HTTP_PORT=9654
-      - STAKING_PORT=9655
-
+      - AVALANCHEGO_CHAIN_CONFIG_DIR=/data/chains
+      - AVALANCHEGO_NETWORK_ID=fuji
+      - AVALANCHEGO_DATA_DIR=/data/node0
+      - AVALANCHEGO_PLUGIN_DIR=/plugins/
+      - AVALANCHEGO_HTTP_PORT=9650
+      - AVALANCHEGO_STAKING_PORT=9651
+      - AVALANCHEGO_TRACK_SUBNETS=${AVALANCHEGO_TRACK_SUBNETS}
+      - AVALANCHEGO_HTTP_ALLOWED_HOSTS=*
+      - AVALANCHEGO_HTTP_HOST=0.0.0.0

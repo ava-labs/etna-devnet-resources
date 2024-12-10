@@ -2,8 +2,8 @@
 set -eu -o pipefail
 
 SCRIPT_DIR=$(dirname "$0")
-ICM_COMMIT=$(grep "github.com/ava-labs/icm-contracts" "$SCRIPT_DIR/../go.mod" | cut -d'-' -f5)
-SUBNET_EVM_VERSION=$(grep "github.com/ava-labs/subnet-evm" "$SCRIPT_DIR/../go.mod" | cut -d' ' -f2)
+ICM_COMMIT=$(grep "github.com/ava-labs/icm-contracts" "$SCRIPT_DIR/../../go.mod" | cut -d'-' -f5)
+SUBNET_EVM_VERSION=$(grep "github.com/ava-labs/subnet-evm" "$SCRIPT_DIR/../../go.mod" | cut -d' ' -f2)
 
 echo "ICM_COMMIT: $ICM_COMMIT"
 echo "SUBNET_EVM_VERSION: $SUBNET_EVM_VERSION"
