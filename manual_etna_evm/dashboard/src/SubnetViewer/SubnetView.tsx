@@ -2,7 +2,21 @@ import { useState, useEffect } from "react";
 import { useSubnetViewerStore } from "./subnetViewStore";
 import { info, pvm } from "@avalabs/avalanchejs";
 
-import fastJsonStringify from "fast-json-stringify"
+
+async function JSONRPC(url: string, method: string, params: any) {
+    const response = await fetch(url, {
+        method: "POST",
+        headers: {
+            "content-type": "application/json"
+        },
+        body: JSON.stringify({ jsonrpc: "2.0", id: 1, method, params })
+    });
+    const resp = (await response.json())
+    if (resp.error) {
+        throw new Error(resp.error.message);
+    }
+    return resp.result;
+}
 
 export default function SubnetView() {
     const store = useSubnetViewerStore();
@@ -10,6 +24,54 @@ export default function SubnetView() {
     return (
         <div>
             <SelectSubnet />
+            {["P", "X"].map(chainName => (
+                <APIInfoCard
+                    key={chainName}
+                    subnetId={store.subnetId}
+                    dataFetcher={async (subnetId) => {
+                        return JSONRPC("http://localhost:9650/ext/info", "info.isBootstrapped", { chain: chainName });
+                    }}
+                    title={`info.isBootstrapped('${chainName}')`}
+                    note="await infoApi.isBootstrapped('P') returns peers for some reason, so we do fetch instead"
+                />
+            ))}
+            <APIInfoCard
+                subnetId={store.subnetId}
+                dataFetcher={async (subnetId) => {
+                    return JSONRPC("http://localhost:9650/ext/info", "info.getNodeIP", {});
+                }}
+                title={`info.getNodeIP()`}
+            />
+            <APIInfoCard
+                subnetId={store.subnetId}
+                dataFetcher={async (subnetId) => {
+                    return JSONRPC("http://localhost:9650/ext/info", "info.getNodeVersion", {});
+                }}
+                title={`info.getNodeVersion()`}
+            />
+            <APIInfoCard
+                subnetId={store.subnetId}
+                dataFetcher={async (subnetId) => {
+                    return JSONRPC("http://localhost:9650/ext/info", "info.getVMs", {});
+                }}
+                title={`info.getVMs()`}
+            />
+            <APIInfoCard
+                subnetId={store.subnetId}
+                dataFetcher={async (subnetId) => {
+                    const result = await JSONRPC("http://localhost:9650/ext/info", "info.peers", {});
+                    result.peers = "Removed for brevity";
+                    return result;
+                }}
+                title={`info.peers()`}
+            />
+            <APIInfoCard
+                subnetId={store.subnetId}
+                dataFetcher={async (subnetId) => {
+                    return JSONRPC("http://localhost:9650/ext/info", "info.uptime", {});
+                }}
+                title={`info.uptime()`}
+            />
             <APIInfoCard
                 subnetId={store.subnetId}
                 dataFetcher={async (subnetId) => {
@@ -48,6 +110,7 @@ export default function SubnetView() {
                 subnetId={store.subnetId}
                 dataFetcher={async (subnetId) => {
                     const infoApi = new info.InfoApi("http://localhost:9650");
+
                     const nodeId = await infoApi.getNodeId();
                     const pvmapi = new pvm.PVMApi("http://localhost:9650");
                     return pvmapi.getCurrentValidators({ nodeIDs: [nodeId.nodeID] });
@@ -57,13 +120,13 @@ export default function SubnetView() {
         </div>
     );
 }
-
 function APIInfoCard({
-    subnetId, dataFetcher, title
+    subnetId, dataFetcher, title, note
 }: {
     subnetId: string,
     dataFetcher: (subnetId: string) => Promise<any>,
-    title: string
+    title: string,
+    note?: string
 }) {
     const [data, setData] = useState<any>(null);
     const [error, setError] = useState<string | null>(null);
@@ -80,19 +143,22 @@ function APIInfoCard({
             });
     }, [subnetId]);
 
+    const renderContent = () => {
+        if (error) {
+            return <div className="bg-red-100 text-red-700 p-4 rounded overflow-auto">{error}</div>;
+        }
+        return <pre className="bg-gray-100 p-4 rounded overflow-auto">
+            {JSON.stringify(data, (_, v) => typeof v === 'bigint' ? v.toString() : v, 2)}
+        </pre>;
+    };
+
     return (
         <div className="bg-white rounded-lg shadow-md p-6 m-4">
             <h1 className="text-xl font-bold mb-4">{title}</h1>
-            <JSONOrError data={data} error={error} />
+            {renderContent()}
+            {note && <p className="text-sm text-gray-500 mt-2">{note}</p>}
         </div>
     );
-}
-
-function JSONOrError({ data, error }: { data: any; error: string | null }) {
-    if (error) {
-        return <div className="bg-red-100 text-red-700 p-4 rounded overflow-auto">{error}</div>;
-    }
-    return <pre className="bg-gray-100 p-4 rounded overflow-auto">{JSON.stringify(data, (_, v) => typeof v === 'bigint' ? v.toString() : v, 2)}</pre>;
 }
 
 function SelectSubnet() {
