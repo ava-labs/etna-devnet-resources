@@ -6,6 +6,7 @@ This repository provides a detailed, code-first guide for integrating L1 subnet 
 - Fresh Docker installation (verify by running `docker compose ls` without any dashes)
 - Go 1.22.8+
 
+**Guides:**
 - Part 1: [Create POA L1](./01_create_poa/README.md)
 - Part 2: [Add POA validator](./02_add_poa_validator/README.md)
 
