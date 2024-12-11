@@ -4,7 +4,7 @@ This repository provides a detailed, code-first guide for integrating L1 subnet 
 
 **Requirements:**
 - Fresh Docker installation (verify by running `docker compose ls` without any dashes)
-- Go 1.22.8+
+- Go 1.22.10+
 
 **Guides:**
 - Part 1: [Create POA L1](./01_create_poa/README.md)
