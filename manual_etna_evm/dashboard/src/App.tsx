@@ -1,12 +1,12 @@
-import { useState } from 'react'
+import SubnetView from './SubnetViewer/SubnetView'
 
 function App() {
   return (
-    <>
-      <h1 className="text-3xl font-bold underline">
-        Hello world!
-      </h1>
-    </>
+    <div className="container mx-auto px-4 py-8">
+      <div className="max-w-4xl mx-auto">
+        <SubnetView />
+      </div>
+    </div>
   )
 }
 
