@@ -20,22 +20,20 @@ go run ./01_create_poa/05_L1_genesis/
 echo -e "\n⛓️  Creating chain\n"
 go run ./01_create_poa/06_create_chain/
 
-# FIXME: step 7 is missing
-
 echo -e "\n🔮 Converting chain into L1\n"
-go run ./01_create_poa/08_convert_chain/
+go run ./01_create_poa/07_convert_chain/
 
 echo -e "\n🚀 Launching node0\n"
-./01_create_poa/09_launch_nodes/launch.sh "node0"
+./01_create_poa/08_launch_nodes/launch.sh "node0"
 
 echo -e "\n🎯 Activate ProposerVM fork\n"
-go run ./01_create_poa/10_activate_proposer_vm/
+go run ./01_create_poa/09_activate_proposer_vm/
 
 echo -e "\n🔌 Initialize Validator Manager\n"
-go run ./01_create_poa/11_validator_manager_initialize/ 
+go run ./01_create_poa/10_validator_manager_initialize/
 
 echo -e "\n👥 Initialize validator set\n"
-go run ./01_create_poa/12_initialize_validator_set
+go run ./01_create_poa/11_initialize_validator_set/
 
 echo -e "\n📄 Reading contract logs\n"
 go run ./00_tools/check_validator_set
