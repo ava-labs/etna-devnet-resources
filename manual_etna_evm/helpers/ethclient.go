@@ -9,18 +9,16 @@ import (
 	"github.com/ava-labs/subnet-evm/ethclient"
 )
 
-func GetLocalEthClient() (ethclient.Client, *big.Int, error) {
+func GetLocalEthClient(port string) (ethclient.Client, *big.Int, error) {
 	const maxAttempts = 100
-	L1ChainId, err := LoadId("chain")
-	if err != nil {
-		return nil, nil, fmt.Errorf("failed to load chain ID: %s", err)
-	}
+	L1ChainId := LoadId(ChainIdPath)
 
-	nodeURL := fmt.Sprintf("http://%s:%s/ext/bc/%s/rpc", "127.0.0.1", "9650", L1ChainId)
+	nodeURL := fmt.Sprintf("http://%s:%s/ext/bc/%s/rpc", "127.0.0.1", port, L1ChainId)
 
 	var client ethclient.Client
 	var evmChainId *big.Int
 	var lastErr error
+	var err error
 
 	for i := 0; i < maxAttempts; i++ {
 		if i > 0 {
