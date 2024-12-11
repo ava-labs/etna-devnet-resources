@@ -10,4 +10,4 @@ This repository provides a detailed, code-first guide for integrating L1 subnet 
 - Part 1: [Create POA L1](./01_create_poa/README.md)
 - Part 2: [Add POA validator](./02_add_poa_validator/README.md)
 
-Run everything at once: `./add_node.sh` to start a new L1 on Devnet, `./cleanup.sh` to clean up (preserves your keys)
+Run everything at once: `./create_poa.sh` to start a new L1 on Devnet, `./cleanup.sh` to clean up (preserves your keys)
