@@ -36,5 +36,8 @@ go run ./01_create_poa/10_validator_manager_initialize/
 echo -e "\n👥 Initialize validator set\n"
 go run ./01_create_poa/11_initialize_validator_set/
 
+echo -e "\n⏳ Waiting for P-chain transactions to be mined...\n"
+sleep 60
+
 echo -e "\n📄 Reading contract logs\n"
 go run ./00_tools/check_validator_set
