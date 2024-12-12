@@ -18,108 +18,116 @@ async function JSONRPC(url: string, method: string, params: any) {
     return resp.result;
 }
 
+function Header({ title }: { title: string }) {
+    return (
+        <div className="text-center p-8">
+            <h1 className="text-3xl font-bold">{title}</h1>
+        </div>
+    );
+}
+
+
 export default function SubnetView() {
     const store = useSubnetViewerStore();
 
     return (
-        <div>
+        <div className="container mx-auto px-4 py-8">
             <SelectSubnet />
-            {["P", "X"].map(chainName => (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 auto-rows-auto">
+                <div className="md:col-span-2">
+                    <Header title="Node Info" />
+                </div>
+
+                {["P", "X"].map(chainName => (
+                    <APIInfoCard
+                        key={chainName}
+                        subnetId={store.subnetId}
+                        dataFetcher={async (subnetId) => {
+                            return JSONRPC("http://localhost:9650/ext/info", "info.isBootstrapped", { chain: chainName });
+                        }}
+                        title={`info.isBootstrapped('${chainName}')`}
+                        note="await infoApi.isBootstrapped('P') returns peers for some reason, so we do fetch instead"
+                    />
+                ))}
                 <APIInfoCard
-                    key={chainName}
                     subnetId={store.subnetId}
                     dataFetcher={async (subnetId) => {
-                        return JSONRPC("http://localhost:9650/ext/info", "info.isBootstrapped", { chain: chainName });
+                        return JSONRPC("http://localhost:9650/ext/info", "info.getNodeIP", {});
                     }}
-                    title={`info.isBootstrapped('${chainName}')`}
-                    note="await infoApi.isBootstrapped('P') returns peers for some reason, so we do fetch instead"
+                    title={`info.getNodeIP()`}
                 />
-            ))}
-            <APIInfoCard
-                subnetId={store.subnetId}
-                dataFetcher={async (subnetId) => {
-                    return JSONRPC("http://localhost:9650/ext/info", "info.getNodeIP", {});
-                }}
-                title={`info.getNodeIP()`}
-            />
-            <APIInfoCard
-                subnetId={store.subnetId}
-                dataFetcher={async (subnetId) => {
-                    return JSONRPC("http://localhost:9650/ext/info", "info.getNodeVersion", {});
-                }}
-                title={`info.getNodeVersion()`}
-            />
-            <APIInfoCard
-                subnetId={store.subnetId}
-                dataFetcher={async (subnetId) => {
-                    return JSONRPC("http://localhost:9650/ext/info", "info.getVMs", {});
-                }}
-                title={`info.getVMs()`}
-            />
-            <APIInfoCard
-                subnetId={store.subnetId}
-                dataFetcher={async (subnetId) => {
-                    const result = await JSONRPC("http://localhost:9650/ext/info", "info.peers", {});
-                    result.peers = "Removed for brevity";
-                    return result;
-                }}
-                title={`info.peers()`}
-            />
-            <APIInfoCard
-                subnetId={store.subnetId}
-                dataFetcher={async (subnetId) => {
-                    return JSONRPC("http://localhost:9650/ext/info", "info.uptime", {});
-                }}
-                title={`info.uptime()`}
-            />
-            <APIInfoCard
-                subnetId={store.subnetId}
-                dataFetcher={async (subnetId) => {
-                    const pvmapi = new pvm.PVMApi("https://api.avax-test.network");
-                    return pvmapi.getSubnet({ subnetID: subnetId });
-                }}
-                title="GetSubnet"
-            />
-            <APIInfoCard
-                subnetId={store.subnetId}
-                dataFetcher={async (subnetId) => {
-                    const pvmapi = new pvm.PVMApi("https://api.avax-test.network");
-                    return pvmapi.getValidatorsAt({ subnetID: subnetId, height: "proposed" });
-                }}
-                title="GetValidatorsAt('proposed')"
-            />
-            <APIInfoCard
-                subnetId={store.subnetId}
-                dataFetcher={async (subnetId) => {
-                    const pvmapi = new pvm.PVMApi("https://api.avax-test.network");
-                    const subnet = await pvmapi.getSubnet({ subnetID: subnetId });
-                    return pvmapi.getBalance({ addresses: subnet.controlKeys });
-                }}
-                title="GetBalance(subnet.controlKeys)"
-            />
-            <APIInfoCard
-                subnetId={store.subnetId}
-                dataFetcher={async (subnetId) => {
-                    const pvmapi = new pvm.PVMApi("http://localhost:9650");
-                    const subnet = await pvmapi.getSubnet({ subnetID: subnetId });
-                    return pvmapi.getBlockchainStatus(subnet.managerChainID);
-                }}
-                title="GetBlockchainStatus(subnet.managerChainID)"
-            />
-            <APIInfoCard
-                subnetId={store.subnetId}
-                dataFetcher={async (subnetId) => {
-                    const infoApi = new info.InfoApi("http://localhost:9650");
-
-                    const nodeId = await infoApi.getNodeId();
-                    const pvmapi = new pvm.PVMApi("http://localhost:9650");
-                    return pvmapi.getCurrentValidators({ nodeIDs: [nodeId.nodeID] });
-                }}
-                title="GetCurrentValidators(nodeIDs: [nodeId])"
-            />
+                <APIInfoCard
+                    subnetId={store.subnetId}
+                    dataFetcher={async (subnetId) => {
+                        return JSONRPC("http://localhost:9650/ext/info", "info.getNodeID", {});
+                    }}
+                    title={`info.getNodeID()`}
+                />
+                <APIInfoCard
+                    subnetId={store.subnetId}
+                    dataFetcher={async (subnetId) => {
+                        return JSONRPC("http://localhost:9650/ext/info", "info.getNodeVersion", {});
+                    }}
+                    title={`info.getNodeVersion()`}
+                />
+                <APIInfoCard
+                    subnetId={store.subnetId}
+                    dataFetcher={async (subnetId) => {
+                        return JSONRPC("http://localhost:9650/ext/info", "info.getVMs", {});
+                    }}
+                    title={`info.getVMs()`}
+                />
+                <APIInfoCard
+                    subnetId={store.subnetId}
+                    dataFetcher={async (subnetId) => {
+                        const result = await JSONRPC("http://localhost:9650/ext/info", "info.peers", {});
+                        result.peers = "Removed for brevity";
+                        return result;
+                    }}
+                    title={`info.peers()`}
+                />
+                <div className="md:col-span-2">
+                    <Header title="P-Chain" />
+                </div>
+                <APIInfoCard
+                    subnetId={store.subnetId}
+                    dataFetcher={async (subnetId) => {
+                        const pvmapi = new pvm.PVMApi("https://api.avax-test.network");
+                        return pvmapi.getSubnet({ subnetID: subnetId });
+                    }}
+                    title="GetSubnet"
+                />
+                <APIInfoCard
+                    subnetId={store.subnetId}
+                    dataFetcher={async (subnetId) => {
+                        const pvmapi = new pvm.PVMApi("https://api.avax-test.network");
+                        return pvmapi.getValidatorsAt({ subnetID: subnetId, height: "proposed" });
+                    }}
+                    title="GetValidatorsAt('proposed')"
+                />
+                <APIInfoCard
+                    subnetId={store.subnetId}
+                    dataFetcher={async (subnetId) => {
+                        const pvmapi = new pvm.PVMApi("https://api.avax-test.network");
+                        const subnet = await pvmapi.getSubnet({ subnetID: subnetId });
+                        return pvmapi.getBalance({ addresses: subnet.controlKeys });
+                    }}
+                    title="GetBalance(subnet.controlKeys)"
+                />
+                <APIInfoCard
+                    subnetId={store.subnetId}
+                    dataFetcher={async (subnetId) => {
+                        const pvmapi = new pvm.PVMApi("http://localhost:9650");
+                        const subnet = await pvmapi.getSubnet({ subnetID: subnetId });
+                        return pvmapi.getBlockchainStatus(subnet.managerChainID);
+                    }}
+                    title="GetBlockchainStatus(subnet.managerChainID)"
+                />
+            </div>
         </div>
     );
 }
+
 function APIInfoCard({
     subnetId, dataFetcher, title, note
 }: {
@@ -153,9 +161,11 @@ function APIInfoCard({
     };
 
     return (
-        <div className="bg-white rounded-lg shadow-md p-6 m-4">
+        <div className="bg-white rounded-lg shadow-md p-6 h-fit">
             <h1 className="text-xl font-bold mb-4">{title}</h1>
-            {renderContent()}
+            <div className="min-h-[100px]">
+                {renderContent()}
+            </div>
             {note && <p className="text-sm text-gray-500 mt-2">{note}</p>}
         </div>
     );
@@ -179,7 +189,7 @@ function SelectSubnet() {
     };
 
     return (
-        <div className="bg-white rounded-lg shadow-md p-6 m-4">
+        <div className="bg-white rounded-lg shadow-md p-6 mb-4">
             <form onSubmit={handleSubmit} className="flex flex-col gap-4">
                 <div className="flex items-center gap-2">
                     <label htmlFor="subnetId" className="font-medium">Subnet ID:</label>
@@ -188,6 +198,16 @@ function SelectSubnet() {
                         type="text"
                         value={inputValue}
                         onChange={(e) => setInputValue(e.target.value)}
+                        className="border rounded px-2 py-1 flex-1"
+                    />
+                </div>
+                <div className="flex items-center gap-2">
+                    <label htmlFor="nodeRPCUrl" className="font-medium">Node RPC URL:</label>
+                    <input
+                        id="nodeRPCUrl"
+                        type="text"
+                        value={store.nodeRPCUrl}
+                        onChange={(e) => store.setNodeRPCUrl(e.target.value)}
                         className="border rounded px-2 py-1 flex-1"
                     />
                 </div>
