@@ -9,6 +9,7 @@ import (
 	"github.com/ava-labs/etna-devnet-resources/manual_etna_evm/helpers"
 	"github.com/ava-labs/etna-devnet-resources/manual_etna_evm/helpers/credshelper"
 
+	"github.com/ava-labs/avalanchego/ids"
 	"github.com/ava-labs/avalanchego/utils/units"
 	"github.com/ava-labs/avalanchego/vms/platformvm/txs"
 	"github.com/ava-labs/avalanchego/vms/secp256k1fx"
@@ -34,6 +35,8 @@ func main() {
 }
 
 func RegisterL1ValidatorOnPChain() error {
+	subnetID := helpers.LoadId(helpers.SubnetIdPath)
+
 	warpMessageBytes := helpers.LoadHex(helpers.AddValidatorWarpMessagePath)
 
 	_, proofOfPossession := credshelper.NodeInfoFromCreds(helpers.AddValidatorKeysFolder)
@@ -41,7 +44,9 @@ func RegisterL1ValidatorOnPChain() error {
 	key := helpers.LoadSecp256k1PrivateKey(helpers.ValidatorManagerOwnerKeyPath)
 
 	kc := secp256k1fx.NewKeychain(key)
-	wallet, err := primary.MakeWallet(context.Background(), config.RPC_URL, kc, kc, primary.WalletConfig{})
+	wallet, err := primary.MakeWallet(context.Background(), config.RPC_URL, kc, kc, primary.WalletConfig{
+		SubnetIDs: []ids.ID{subnetID},
+	})
 	if err != nil {
 		log.Fatalf("failed to initialize wallet: %s\n", err)
 	}
