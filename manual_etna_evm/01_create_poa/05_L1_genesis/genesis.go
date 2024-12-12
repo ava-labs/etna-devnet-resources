@@ -26,6 +26,7 @@ var (
 )
 
 func main() {
+
 	ownerKey := helpers.LoadSecp256k1PrivateKey(helpers.ValidatorManagerOwnerKeyPath)
 
 	ethAddr := pluginEVM.PublicKeyToEthAddress(ownerKey.PublicKey())
@@ -86,12 +87,24 @@ func main() {
 		log.Fatalf("❌ Failed to get validator messages deployed bytecode: %s\n", err)
 	}
 
-	poaValidatorManagerLinkRefs := map[string]string{
+	validatorManagerLinkRefs := map[string]string{
 		"contracts/validator-manager/ValidatorMessages.sol:ValidatorMessages": config.ValidatorMessagesAddress[2:],
 	}
-	poaValidatorManagerDeployedBytecode, err := loadDeployedHexFromJSON("01_create_poa/04_compile_validator_manager/compiled/PoAValidatorManager.json", poaValidatorManagerLinkRefs)
-	if err != nil {
-		log.Fatalf("❌ Failed to get PoA deployed bytecode: %s\n", err)
+
+	var validatorManagerDeployedBytecode []byte
+	desiredContractName := helpers.GetDesiredContractName()
+	if desiredContractName == "PoAValidatorManager" {
+		validatorManagerDeployedBytecode, err = loadDeployedHexFromJSON("01_create_poa/04_compile_validator_manager/compiled/PoAValidatorManager.json", validatorManagerLinkRefs)
+		if err != nil {
+			log.Fatalf("❌ Failed to load PoAValidatorManager deployed bytecode: %s\n", err)
+		}
+	} else if desiredContractName == "NativeTokenStakingManager" {
+		validatorManagerDeployedBytecode, err = loadDeployedHexFromJSON("01_create_poa/04_compile_validator_manager/compiled/NativeTokenStakingManager.json", validatorManagerLinkRefs)
+		if err != nil {
+			log.Fatalf("❌ Failed to load NativeTokenStakingManager deployed bytecode: %s\n", err)
+		}
+	} else {
+		log.Fatalf("❌ Invalid contract name: %s\n", desiredContractName)
 	}
 
 	genesis.Alloc[common.HexToAddress(config.ValidatorMessagesAddress)] = types.Account{
@@ -101,7 +114,7 @@ func main() {
 	}
 
 	genesis.Alloc[common.HexToAddress(config.ValidatorContractAddress)] = types.Account{
-		Code:    poaValidatorManagerDeployedBytecode,
+		Code:    validatorManagerDeployedBytecode,
 		Balance: big.NewInt(0),
 		Nonce:   1,
 	}
