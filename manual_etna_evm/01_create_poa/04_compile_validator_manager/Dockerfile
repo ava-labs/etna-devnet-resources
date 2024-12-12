@@ -9,7 +9,7 @@ ENV GOPATH=/root/go
 ENV PATH=$GOPATH/bin:$PATH
 
 ARG SUBNET_EVM_VERSION
-RUN go install github.com/ava-labs/subnet-evm/cmd/abigen@$SUBNET_EVM_VERSION
+# RUN go install github.com/ava-labs/subnet-evm/cmd/abigen@$SUBNET_EVM_VERSION
 
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh

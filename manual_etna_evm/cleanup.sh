@@ -5,6 +5,9 @@
 # 2. Recursively deleting the ./data directory while preserving any *_key.txt files
 # 3. Restoring the preserved *_key.txt files to a fresh ./data directory
 
+echo "DISABLED FIXME: remove this line"
+exit 1
+
 set -euo pipefail
 
 docker rm -f node0 node1 node2 node3 node4 2>/dev/null || true

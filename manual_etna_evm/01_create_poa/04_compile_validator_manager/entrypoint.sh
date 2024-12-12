@@ -20,10 +20,10 @@ fi
 cd /teleporter_src/contracts && forge build
 
 # Extract ABI from the compiled JSON file
-jq .abi /teleporter_src/out/PoAValidatorManager.sol/PoAValidatorManager.json > /teleporter_src/out/PoAValidatorManager.sol/PoAValidatorManager.abi
+# jq .abi /teleporter_src/out/PoAValidatorManager.sol/PoAValidatorManager.json > /teleporter_src/out/PoAValidatorManager.sol/PoAValidatorManager.abi
 
 #NativeTokenStakingManager.sol
-jq .abi /teleporter_src/out/NativeTokenStakingManager.sol/NativeTokenStakingManager.json > /teleporter_src/out/NativeTokenStakingManager.sol/NativeTokenStakingManager.abi
+# jq .abi /teleporter_src/out/NativeTokenStakingManager.sol/NativeTokenStakingManager.json > /teleporter_src/out/NativeTokenStakingManager.sol/NativeTokenStakingManager.abi
 
 cp -r /teleporter_src/out/PoAValidatorManager.sol/*.json /compiled/
 cp -r /teleporter_src/out/ValidatorMessages.sol/*.json /compiled/
