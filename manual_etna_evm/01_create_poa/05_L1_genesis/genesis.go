@@ -107,6 +107,22 @@ func main() {
 		log.Fatalf("❌ Invalid contract name: %s\n", desiredContractName)
 	}
 
+	if desiredContractName == "NativeTokenStakingManager" {
+		rewardCalculatorDeployedBytecode, err := loadDeployedHexFromJSON("01_create_poa/04_compile_validator_manager/compiled/ExampleRewardCalculator.json", nil)
+		if err != nil {
+			log.Fatalf("❌ Failed to load ExampleRewardCalculator deployed bytecode: %s\n", err)
+		}
+		const rewardBasisPoints = 100
+		genesis.Alloc[common.HexToAddress(config.RewardCalculatorAddress)] = types.Account{
+			Code:    rewardCalculatorDeployedBytecode,
+			Balance: big.NewInt(0),
+			Nonce:   1,
+			Storage: map[common.Hash]common.Hash{
+				common.HexToHash("0x0"): common.BigToHash(new(big.Int).SetUint64(rewardBasisPoints)),
+			},
+		}
+	}
+
 	genesis.Alloc[common.HexToAddress(config.ValidatorMessagesAddress)] = types.Account{
 		Code:    validatorMessagesBytecode,
 		Balance: big.NewInt(0),

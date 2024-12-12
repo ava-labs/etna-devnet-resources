@@ -28,5 +28,6 @@ cd /teleporter_src/contracts && forge build
 cp -r /teleporter_src/out/PoAValidatorManager.sol/*.json /compiled/
 cp -r /teleporter_src/out/ValidatorMessages.sol/*.json /compiled/
 cp -r /teleporter_src/out/NativeTokenStakingManager.sol/*.json /compiled/
+cp -r /teleporter_src/out/ExampleRewardCalculator.sol/*.json /compiled/
 
 chown -R $HOST_UID:$HOST_GID /compiled
