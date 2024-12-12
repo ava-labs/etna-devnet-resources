@@ -93,12 +93,15 @@ func main() {
 
 	var validatorManagerDeployedBytecode []byte
 	desiredContractName := helpers.GetDesiredContractName()
+	log.Printf("🔍 Desired contract name: %s\n", desiredContractName)
 	if desiredContractName == "PoAValidatorManager" {
+		log.Printf("🔍 Loading PoAValidatorManager deployed bytecode\n")
 		validatorManagerDeployedBytecode, err = loadDeployedHexFromJSON("01_create_poa/04_compile_validator_manager/compiled/PoAValidatorManager.json", validatorManagerLinkRefs)
 		if err != nil {
 			log.Fatalf("❌ Failed to load PoAValidatorManager deployed bytecode: %s\n", err)
 		}
 	} else if desiredContractName == "NativeTokenStakingManager" {
+		log.Printf("🔍 Loading NativeTokenStakingManager deployed bytecode\n")
 		validatorManagerDeployedBytecode, err = loadDeployedHexFromJSON("01_create_poa/04_compile_validator_manager/compiled/NativeTokenStakingManager.json", validatorManagerLinkRefs)
 		if err != nil {
 			log.Fatalf("❌ Failed to load NativeTokenStakingManager deployed bytecode: %s\n", err)
@@ -108,6 +111,7 @@ func main() {
 	}
 
 	if desiredContractName == "NativeTokenStakingManager" {
+		log.Printf("🔍 Loading ExampleRewardCalculator deployed bytecode\n")
 		rewardCalculatorDeployedBytecode, err := loadDeployedHexFromJSON("01_create_poa/04_compile_validator_manager/compiled/ExampleRewardCalculator.json", nil)
 		if err != nil {
 			log.Fatalf("❌ Failed to load ExampleRewardCalculator deployed bytecode: %s\n", err)

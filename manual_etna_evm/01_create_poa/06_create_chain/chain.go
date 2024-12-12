@@ -11,7 +11,6 @@ import (
 	"github.com/ava-labs/etna-devnet-resources/manual_etna_evm/config"
 	"github.com/ava-labs/etna-devnet-resources/manual_etna_evm/helpers"
 
-	"github.com/ava-labs/avalanchego/ids"
 	"github.com/ava-labs/avalanchego/utils/constants"
 	"github.com/ava-labs/avalanchego/vms/secp256k1fx"
 	"github.com/ava-labs/avalanchego/wallet/subnet/primary"
@@ -38,12 +37,7 @@ func main() {
 	// MakeWallet fetches the available UTXOs owned by [kc] on the network that
 	// [uri] is hosting and registers [subnetID].
 	walletSyncStartTime := time.Now()
-	wallet, err := primary.MakeWallet(ctx, &primary.WalletConfig{
-		URI:          config.RPC_URL,
-		AVAXKeychain: kc,
-		EthKeychain:  kc,
-		SubnetIDs:    []ids.ID{subnetID},
-	})
+	wallet, err := primary.MakeWallet(ctx, config.RPC_URL, kc, kc, primary.WalletConfig{})
 	if err != nil {
 		log.Fatalf("❌ Failed to initialize wallet: %s\n", err)
 	}

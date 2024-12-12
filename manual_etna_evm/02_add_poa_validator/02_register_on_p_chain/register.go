@@ -41,11 +41,7 @@ func RegisterL1ValidatorOnPChain() error {
 	key := helpers.LoadSecp256k1PrivateKey(helpers.ValidatorManagerOwnerKeyPath)
 
 	kc := secp256k1fx.NewKeychain(key)
-	wallet, err := primary.MakeWallet(context.Background(), &primary.WalletConfig{
-		URI:          config.RPC_URL,
-		AVAXKeychain: kc,
-		EthKeychain:  kc,
-	})
+	wallet, err := primary.MakeWallet(context.Background(), config.RPC_URL, kc, kc, primary.WalletConfig{})
 	if err != nil {
 		log.Fatalf("failed to initialize wallet: %s\n", err)
 	}

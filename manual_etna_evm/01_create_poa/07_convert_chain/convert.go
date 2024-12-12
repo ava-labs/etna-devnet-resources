@@ -43,12 +43,7 @@ func main() {
 
 	subnetID := helpers.LoadId(helpers.SubnetIdPath)
 
-	wallet, err := primary.MakeWallet(context.Background(), &primary.WalletConfig{
-		URI:          config.RPC_URL,
-		AVAXKeychain: kc,
-		EthKeychain:  kc,
-		SubnetIDs:    []ids.ID{subnetID},
-	})
+	wallet, err := primary.MakeWallet(context.Background(), config.RPC_URL, kc, kc, primary.WalletConfig{})
 	if err != nil {
 		log.Fatalf("❌ Failed to initialize wallet: %s\n", err)
 	}

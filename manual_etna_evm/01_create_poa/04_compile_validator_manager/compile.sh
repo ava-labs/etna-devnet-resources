@@ -2,6 +2,13 @@
 set -eu -o pipefail
 
 SCRIPT_DIR=$(dirname "$0")
+
+if [ -n "$(find "$SCRIPT_DIR/compiled" -name "*.json" 2>/dev/null)" ] && [ "${1:-}" != "--force" ]; then
+    echo "✅ Validator manager already compiled"
+    exit 0
+fi
+
+
 ICM_COMMIT=$(grep "github.com/ava-labs/icm-contracts" "$SCRIPT_DIR/../../go.mod" | cut -d'-' -f5)
 SUBNET_EVM_VERSION=$(grep "github.com/ava-labs/subnet-evm" "$SCRIPT_DIR/../../go.mod" | cut -d' ' -f2)
 
@@ -14,9 +21,16 @@ CURRENT_UID=$(id -u)
 CURRENT_GID=$(id -g)
 
 docker build -t validator-manager-compiler --build-arg SUBNET_EVM_VERSION=$SUBNET_EVM_VERSION --build-arg ICM_COMMIT=$ICM_COMMIT "$SCRIPT_DIR"
+# docker run -it --rm \
+#     -v "$SCRIPT_DIR/compiled":/compiled \
+#     -v "$SCRIPT_DIR/teleporter_src":/teleporter_src \
+#     -e ICM_COMMIT=$ICM_COMMIT \
+#     -e HOST_UID=$CURRENT_UID \
+#     -e HOST_GID=$CURRENT_GID \
+#     validator-manager-compiler
+
 docker run -it --rm \
     -v "$SCRIPT_DIR/compiled":/compiled \
-    -v "$SCRIPT_DIR/teleporter_src":/teleporter_src \
     -e ICM_COMMIT=$ICM_COMMIT \
     -e HOST_UID=$CURRENT_UID \
     -e HOST_GID=$CURRENT_GID \

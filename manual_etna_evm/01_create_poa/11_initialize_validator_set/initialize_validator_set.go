@@ -69,8 +69,8 @@ func initializeValidatorSet() error {
 
 	chainID := helpers.LoadId(helpers.ChainIdPath)
 
-	validators := []message.SubnetToL1ConverstionValidatorData{}
-	validators = append(validators, message.SubnetToL1ConverstionValidatorData{
+	validators := []message.SubnetToL1ConversionValidatorData{}
+	validators = append(validators, message.SubnetToL1ConversionValidatorData{
 		NodeID:       nodeID[:],
 		BLSPublicKey: proofOfPossession.PublicKey,
 		Weight:       constants.BootstrapValidatorWeight,

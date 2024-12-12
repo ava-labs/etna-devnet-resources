@@ -1,5 +1,8 @@
 # #!/bin/bash
 
+# export CONTRACT_NAME="NativeTokenStakingManager"
+export CONTRACT_NAME="PoAValidatorManager"
+
 set -euo pipefail
 
 echo -e "\n🔑 Generating keys\n"
@@ -12,8 +15,7 @@ echo -e "\n🕸️  Creating subnet\n"
 go run ./01_create_poa/03_create_subnet/
 
 echo -e "\n🛠️ Compiling smart contracts code\n"
-echo -e "Skipping compilation. Uncomment the next line in the script to recompile."
-# ./01_create_poa/04_compile_validator_manager/compile.sh
+./01_create_poa/04_compile_validator_manager/compile.sh
 
 echo -e "\n🧱 Generating genesis\n"
 go run ./01_create_poa/05_L1_genesis/

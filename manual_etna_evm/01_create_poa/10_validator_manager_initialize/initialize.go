@@ -50,6 +50,7 @@ func main() {
 
 	var tx *types.Transaction
 	if helpers.GetDesiredContractName() == "PoAValidatorManager" {
+		log.Printf("🔍 Initializing PoAValidatorManager\n")
 		contract, err := poavalidatormanager.NewPoAValidatorManager(managerAddress, ethClient)
 		if err != nil {
 			log.Fatalf("failed to deploy contract: %s\n", err)
@@ -61,6 +62,7 @@ func main() {
 			MaximumChurnPercentage: 20,
 		}, crypto.PubkeyToAddress(ecdsaKey.PublicKey))
 	} else if helpers.GetDesiredContractName() == "NativeTokenStakingManager" {
+		log.Printf("🔍 Initializing NativeTokenStakingManager\n")
 		contract, err := nativestakingmanager.NewNativeTokenStakingManager(managerAddress, ethClient)
 		if err != nil {
 			log.Fatalf("failed to deploy contract: %s\n", err)
