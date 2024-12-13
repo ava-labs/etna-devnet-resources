@@ -13,6 +13,7 @@ import (
 	"github.com/ava-labs/avalanchego/ids"
 	"github.com/ava-labs/avalanchego/utils/crypto/bls"
 	"github.com/ava-labs/avalanchego/utils/crypto/secp256k1"
+	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
 )
 
@@ -155,4 +156,13 @@ func LoadBLSKey(path string) *bls.SecretKey {
 		panic(fmt.Errorf("parsing BLS key from %s: %w", path, err))
 	}
 	return key
+}
+
+func SaveEVMAddress(path string, address common.Address) {
+	SaveHex(path, address[:])
+}
+
+func LoadEVMAddress(path string) common.Address {
+	addressBytes := LoadHex(path)
+	return common.BytesToAddress(addressBytes)
 }

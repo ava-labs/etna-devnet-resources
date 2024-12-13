@@ -9,6 +9,8 @@ var (
 	InitializeValidatorSetTxPath      = "data/initialize_validator_set_tx.txt"
 	L1GenesisPath                     = "data/L1-genesis.json"
 	Node0KeysFolder                   = "data/node0/staking/"
+	ValidatorManagerAddressPath       = "data/validator_manager_address.txt"
+	RewardCalculatorAddressPath       = "data/reward_calculator_address.txt"
 
 	AddValidatorFolder           = "data/add_validator/"
 	AddValidatorKeysFolder       = AddValidatorFolder + "staking/"

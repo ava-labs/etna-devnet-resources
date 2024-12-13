@@ -21,6 +21,8 @@ import (
 )
 
 func main() {
+	rewardCalculatorAddress := helpers.LoadEVMAddress(helpers.RewardCalculatorAddressPath)
+
 	ecdsaKey := helpers.LoadSecp256k1PrivateKeyECDSA(helpers.ValidatorManagerOwnerKeyPath)
 
 	isInitialized := helpers.FileExists(helpers.IsValidatorManagerInitializedPath)
@@ -80,7 +82,7 @@ func main() {
 			MinimumDelegationFeeBips: 1,
 			MaximumStakeMultiplier:   1,
 			WeightToValueFactor:      big.NewInt(1),
-			RewardCalculator:         common.HexToAddress(config.RewardCalculatorAddress),
+			RewardCalculator:         rewardCalculatorAddress,
 			UptimeBlockchainID:       chainID, //see https://github.com/ava-labs/icm-contracts/blob/87e7d53ff504c13ed702ac2fb3b34521488ebc5d/contracts/validator-manager/UptimeMessageSpec.md
 		})
 	}
