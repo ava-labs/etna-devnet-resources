@@ -14,4 +14,6 @@ var (
 	AddValidatorWarpMessagePath  = AddValidatorFolder + "warp_message.hex"
 	AddValidatorExpiryPath       = AddValidatorFolder + "expiry.txt"
 	AddValidatorValidationIdPath = AddValidatorFolder + "validation_id.txt"
+
+	ExampleRewardCalculatorAddressPath = "data/example_reward_calculator_address.txt"
 )

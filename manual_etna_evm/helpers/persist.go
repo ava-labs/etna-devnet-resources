@@ -13,6 +13,7 @@ import (
 	"github.com/ava-labs/avalanchego/ids"
 	"github.com/ava-labs/avalanchego/utils/crypto/bls"
 	"github.com/ava-labs/avalanchego/utils/crypto/secp256k1"
+	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
 )
 
@@ -114,6 +115,18 @@ func LoadHex(path string) ([]byte, error) {
 		return nil, fmt.Errorf("decoding hex from %s: %w", path, err)
 	}
 	return bytes, nil
+}
+
+func SaveAddress(path string, address common.Address) error {
+	return SaveHex(path, address[:])
+}
+
+func LoadAddress(path string) (common.Address, error) {
+	bytes, err := LoadHex(path)
+	if err != nil {
+		return common.Address{}, err
+	}
+	return common.BytesToAddress(bytes), nil
 }
 
 func SaveNodeID(path string, nodeID ids.NodeID) error {
