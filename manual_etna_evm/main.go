@@ -12,7 +12,7 @@ func main() {
 		log.Fatalf("❌ Failed to execute command: %w\n", err)
 	} else {
 		if len(os.Args) > 1 {
-			log.Printf("✅ Successfully executed command: %s\n", os.Args[1])
+			log.Printf("✅ Successfully executed command: %s\n", os.Args[1:])
 		}
 	}
 }

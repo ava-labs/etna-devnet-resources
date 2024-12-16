@@ -10,8 +10,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/ava-labs/coreth/ethclient"
 	"github.com/ava-labs/etna-devnet-resources/manual_etna_evm/helpers"
+	"github.com/ava-labs/subnet-evm/ethclient"
 	"github.com/spf13/cobra"
 )
 

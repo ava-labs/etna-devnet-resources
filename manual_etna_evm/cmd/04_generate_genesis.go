@@ -122,7 +122,7 @@ var GenerateGenesisCmd = &cobra.Command{
 			Code:    transparentProxyBytecode,
 			Nonce:   1,
 			Storage: map[common.Hash]common.Hash{
-				common.HexToHash("0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc"): common.HexToHash(helpers.DeriveContractAddress(ethAddr, 1).String()),
+				common.HexToHash("0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc"): common.HexToHash(MustDeriveContractAddress(ethAddr, 1).String()),
 				common.HexToHash("0xb53127684a568b3173ae13b9f8a6016e243e63b6e8ee1178d6a717850b5d6103"): common.HexToHash(config.ProxyAdminContractAddress),
 			},
 		}
