@@ -81,31 +81,6 @@ func main() {
 		log.Fatalf("❌ Failed to get transparent proxy deployed bytecode: %s\n", err)
 	}
 
-	validatorMessagesBytecode, err := loadDeployedHexFromJSON("01_create_poa/04_compile_validator_manager/compiled/ValidatorMessages.json", nil)
-	if err != nil {
-		log.Fatalf("❌ Failed to get validator messages deployed bytecode: %s\n", err)
-	}
-
-	poaValidatorManagerLinkRefs := map[string]string{
-		"contracts/validator-manager/ValidatorMessages.sol:ValidatorMessages": config.ValidatorMessagesAddress[2:],
-	}
-	poaValidatorManagerDeployedBytecode, err := loadDeployedHexFromJSON("01_create_poa/04_compile_validator_manager/compiled/PoAValidatorManager.json", poaValidatorManagerLinkRefs)
-	if err != nil {
-		log.Fatalf("❌ Failed to get PoA deployed bytecode: %s\n", err)
-	}
-
-	genesis.Alloc[common.HexToAddress(config.ValidatorMessagesAddress)] = types.Account{
-		Code:    validatorMessagesBytecode,
-		Balance: big.NewInt(0),
-		Nonce:   1,
-	}
-
-	genesis.Alloc[common.HexToAddress(config.ValidatorContractAddress)] = types.Account{
-		Code:    poaValidatorManagerDeployedBytecode,
-		Balance: big.NewInt(0),
-		Nonce:   1,
-	}
-
 	genesis.Alloc[common.HexToAddress(config.ProxyAdminContractAddress)] = types.Account{
 		Balance: big.NewInt(0),
 		Code:    proxyAdminBytecode,
@@ -120,7 +95,7 @@ func main() {
 		Code:    transparentProxyBytecode,
 		Nonce:   1,
 		Storage: map[common.Hash]common.Hash{
-			common.HexToHash("0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc"): common.HexToHash(config.ValidatorContractAddress),
+			common.HexToHash("0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc"): common.HexToHash(helpers.DeriveContractAddress(ethAddr, 1).String()),
 			common.HexToHash("0xb53127684a568b3173ae13b9f8a6016e243e63b6e8ee1178d6a717850b5d6103"): common.HexToHash(config.ProxyAdminContractAddress),
 		},
 	}
