@@ -17,8 +17,8 @@ else
   echo "- No *_key.txt files to move"
 fi
 
-sudo rm -rf data
-echo "- Removed data directory"
+sudo rm -rf data/*.txt data/*.json data/chains/
+echo "- Removed data directory's *.txt and *.json files keeping node keys and data"
 
 mkdir -p data
 if mv data_backup/*_key.txt data/ 2>/dev/null; then

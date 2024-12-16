@@ -19,7 +19,7 @@ docker compose -f "${SCRIPT_DIR}/docker-compose.yml" up -d --build $1
 
 # Add health check loop
 echo "Waiting for subnet to become available..."
-max_attempts=20
+max_attempts=50
 attempt=1
 while [ $attempt -le $max_attempts ]; do
     response=$(curl -s -X POST \
