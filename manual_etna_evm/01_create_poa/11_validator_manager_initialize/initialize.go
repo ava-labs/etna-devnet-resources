@@ -50,6 +50,15 @@ func main() {
 	opts.GasLimit = 8000000
 	opts.GasPrice = nil
 
+	// Double check that the contract is deployed
+	code, err := ethClient.CodeAt(context.Background(), managerAddress, nil)
+	if err != nil {
+		log.Fatalf("failed to get contract code: %s\n", err)
+	}
+	if len(code) == 0 {
+		log.Fatalf("no contract code found at address: %s\n", managerAddress.Hex())
+	}
+
 	var tx *types.Transaction
 	if helpers.GetDesiredContractName() == "PoAValidatorManager" {
 		log.Printf("🔍 Initializing PoAValidatorManager\n")

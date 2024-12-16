@@ -35,7 +35,8 @@ go run ./01_create_poa/10_activate_proposer_vm/
 echo -e "\n🔌 Initialize Validator Manager\n"
 go run ./01_create_poa/11_validator_manager_initialize/
 
-exit 0
+echo "DEBUG: exiting after initializing validator manager"
+exit 1
 
 echo -e "\n👥 Initialize validator set\n"
 go run ./01_create_poa/12_initialize_validator_set/

@@ -5,8 +5,6 @@
 # 2. Recursively deleting the ./data directory while preserving any *_key.txt files
 # 3. Restoring the preserved *_key.txt files to a fresh ./data directory
 
-echo "DISABLED FIXME: remove this line"
-exit 1
 
 set -euo pipefail
 
@@ -20,8 +18,8 @@ else
   echo "- No *_key.txt files to move"
 fi
 
-sudo rm -rf data
-echo "- Removed data directory"
+sudo rm -rf data/*.txt data/*.json data/chains/
+echo "- Removed data directory's *.txt and *.json files"
 
 mkdir -p data
 if mv data_backup/*_key.txt data/ 2>/dev/null; then
