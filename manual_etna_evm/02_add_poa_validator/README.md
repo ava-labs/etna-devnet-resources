@@ -1,3 +1,6 @@
+> Warning! This readme might be outdated. Step numbers might not match the code, folder names, or scripts. But overall, the concepts should be the same.
+
+
 ## Add PoA validator to an existing L1
 
 FIXME: this readme needs some love  

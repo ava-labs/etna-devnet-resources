@@ -1,3 +1,4 @@
+> Warning! This readme might be outdated. Step numbers might not match the code, folder names, or scripts. But overall, the concepts should be the same.
 
 > Note: This guide uses simplified, linear code with hardcoded values to demonstrate concepts clearly. Not intended as a library.
 
