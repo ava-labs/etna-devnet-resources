@@ -1,3 +1,4 @@
+> Warning! This readme might be outdated. Step numbers might not match the code, folder names, or scripts. But overall, the concepts should be the same.
 
 > Note: This guide uses simplified, linear code with hardcoded values to demonstrate concepts clearly. Not intended as a library.
 
@@ -132,7 +133,7 @@ Setup Steps:
 Launches [08_launch_nodes/docker-compose.yml](./08_launch_nodes/docker-compose.yml). It contains only one node for simplicity. Mounts local `./data/` folder as `/data/`.
 
 > Please note that we are using the `containerman17/avalanchego-subnetevm:v1.12.0_v0.6.12` image instead of the official one. This image contains a precompiled SubnetEVM and also allows for more container-canonical configuration via environment variables. You can read more about it here: [https://github.com/containerman17/avalanchego-subnetevm](https://github.com/containerman17/avalanchego-subnetevm).
-
+<!--
 ### 9. 🎯 Activate ProposerVM fork
 
 Source code: [09_activate_proposer_vm/proposer.go](./09_activate_proposer_vm/proposer.go)
@@ -159,7 +160,7 @@ tx, err := contract.Initialize(opts, poavalidatormanager.ValidatorManagerSetting
     MaximumChurnPercentage: 20,
 }, crypto.PubkeyToAddress(ecdsaKey.PublicKey))
 ```
-
+-->>
 ### 11. 👥 Initialize validator set
 
 Source code: [11_initialize_validator_set/initialize_validator_set.go](./11_initialize_validator_set/initialize_validator_set.go)

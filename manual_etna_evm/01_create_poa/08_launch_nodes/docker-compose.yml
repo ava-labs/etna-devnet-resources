@@ -1,7 +1,7 @@
 services:
   node0:
     container_name: node0
-    image: containerman17/avalanchego-subnetevm:v1.12.0_v0.6.12 
+    image: containerman17/avalanchego-subnetevm:v1.12.0_v0.7.0
     volumes:
       - ../../data/:/data/
     network_mode: host

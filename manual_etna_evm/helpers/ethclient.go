@@ -7,6 +7,9 @@ import (
 	"time"
 
 	"github.com/ava-labs/subnet-evm/ethclient"
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/crypto"
+	"github.com/ethereum/go-ethereum/rlp"
 )
 
 func GetLocalEthClient(port string) (ethclient.Client, *big.Int, error) {
@@ -51,4 +54,13 @@ func GetLocalEthClient(port string) (ethclient.Client, *big.Int, error) {
 	}
 
 	return nil, nil, fmt.Errorf("failed after %d attempts with error: %w", maxAttempts, lastErr)
+}
+
+func DeriveContractAddress(from common.Address, nonce uint64) common.Address {
+	encoded, err := rlp.EncodeToBytes([]interface{}{from, nonce})
+	if err != nil {
+		panic(err)
+	}
+	hash := crypto.Keccak256(encoded)
+	return common.BytesToAddress(hash[12:])
 }

@@ -2,13 +2,17 @@ package main
 
 import (
 	_ "embed"
+	"encoding/hex"
 	"encoding/json"
 	"log"
 	"math/big"
+	"strings"
 	"time"
 
 	"github.com/ava-labs/etna-devnet-resources/manual_etna_evm/config"
 	"github.com/ava-labs/etna-devnet-resources/manual_etna_evm/helpers"
+
+	_ "embed"
 
 	_ "embed"
 
@@ -24,6 +28,12 @@ import (
 var (
 	defaultPoAOwnerBalance = new(big.Int).Mul(vm.OneAvax, big.NewInt(10)) // 10 Native Tokens
 )
+
+//go:embed proxy_compiled/deployed_proxy_admin_bytecode.txt
+var proxyAdminBytecodeHexString string
+
+//go:embed proxy_compiled/deployed_transparent_proxy_bytecode.txt
+var transparentProxyBytecodeHexString string
 
 func main() {
 	ownerKey := helpers.LoadSecp256k1PrivateKey(helpers.ValidatorManagerOwnerKeyPath)
@@ -71,39 +81,17 @@ func main() {
 		Timestamp:  uint64(now),
 	}
 
-	proxyAdminBytecode, err := loadHexFile("01_create_poa/04_compile_validator_manager/proxy_compiled/deployed_proxy_admin_bytecode.txt")
+	proxyAdminBytecodeHexString = strings.TrimSpace(strings.TrimPrefix(proxyAdminBytecodeHexString, "0x"))
+	transparentProxyBytecodeHexString = strings.TrimSpace(strings.TrimPrefix(transparentProxyBytecodeHexString, "0x"))
+
+	proxyAdminBytecode, err := hex.DecodeString(proxyAdminBytecodeHexString)
 	if err != nil {
-		log.Fatalf("❌ Failed to get proxy admin deployed bytecode: %s\n", err)
+		log.Fatalf("❌ Failed to decode proxy admin bytecode: %s\n", err)
 	}
 
-	transparentProxyBytecode, err := loadHexFile("01_create_poa/04_compile_validator_manager/proxy_compiled/deployed_transparent_proxy_bytecode.txt")
+	transparentProxyBytecode, err := hex.DecodeString(transparentProxyBytecodeHexString)
 	if err != nil {
-		log.Fatalf("❌ Failed to get transparent proxy deployed bytecode: %s\n", err)
-	}
-
-	validatorMessagesBytecode, err := loadDeployedHexFromJSON("01_create_poa/04_compile_validator_manager/compiled/ValidatorMessages.json", nil)
-	if err != nil {
-		log.Fatalf("❌ Failed to get validator messages deployed bytecode: %s\n", err)
-	}
-
-	poaValidatorManagerLinkRefs := map[string]string{
-		"contracts/validator-manager/ValidatorMessages.sol:ValidatorMessages": config.ValidatorMessagesAddress[2:],
-	}
-	poaValidatorManagerDeployedBytecode, err := loadDeployedHexFromJSON("01_create_poa/04_compile_validator_manager/compiled/PoAValidatorManager.json", poaValidatorManagerLinkRefs)
-	if err != nil {
-		log.Fatalf("❌ Failed to get PoA deployed bytecode: %s\n", err)
-	}
-
-	genesis.Alloc[common.HexToAddress(config.ValidatorMessagesAddress)] = types.Account{
-		Code:    validatorMessagesBytecode,
-		Balance: big.NewInt(0),
-		Nonce:   1,
-	}
-
-	genesis.Alloc[common.HexToAddress(config.ValidatorContractAddress)] = types.Account{
-		Code:    poaValidatorManagerDeployedBytecode,
-		Balance: big.NewInt(0),
-		Nonce:   1,
+		log.Fatalf("❌ Failed to decode transparent proxy bytecode: %s\n", err)
 	}
 
 	genesis.Alloc[common.HexToAddress(config.ProxyAdminContractAddress)] = types.Account{
@@ -120,7 +108,7 @@ func main() {
 		Code:    transparentProxyBytecode,
 		Nonce:   1,
 		Storage: map[common.Hash]common.Hash{
-			common.HexToHash("0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc"): common.HexToHash(config.ValidatorContractAddress),
+			common.HexToHash("0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc"): common.HexToHash(helpers.DeriveContractAddress(ethAddr, 1).String()),
 			common.HexToHash("0xb53127684a568b3173ae13b9f8a6016e243e63b6e8ee1178d6a717850b5d6103"): common.HexToHash(config.ProxyAdminContractAddress),
 		},
 	}
