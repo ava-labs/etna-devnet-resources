@@ -58,7 +58,10 @@ func main() {
 		log.Fatalf("failed to initialize validator manager: %s\n", err)
 	}
 
-	helpers.SaveText(helpers.IsValidatorManagerInitializedPath, "true")
+	err = helpers.SaveText(helpers.IsValidatorManagerInitializedPath, "true")
+	if err != nil {
+		return fmt.Errorf("failed to save validator manager initialized: %s\n", err)
+	}
 
 	// Replace sleep with transaction wait
 	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Minute)

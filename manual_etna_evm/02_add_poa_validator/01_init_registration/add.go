@@ -58,7 +58,10 @@ func main() {
 	evmChainURL := fmt.Sprintf("http://127.0.0.1:9650/ext/bc/%s/rpc", chainID)
 
 	expiry := uint64(time.Now().Add(constants.DefaultValidationIDExpiryDuration).Unix())
-	helpers.SaveUint64(helpers.AddValidatorExpiryPath, expiry)
+	err = helpers.SaveUint64(helpers.AddValidatorExpiryPath, expiry)
+	if err != nil {
+		return fmt.Errorf("failed to save expiry: %s\n", err)
+	}
 
 	managerKey := helpers.LoadSecp256k1PrivateKey(helpers.ValidatorManagerOwnerKeyPath)
 
@@ -128,11 +131,17 @@ func main() {
 		log.Fatalf("failed to get subnet validator registration message: %s", err)
 	}
 
-	helpers.SaveHex(helpers.AddValidatorWarpMessagePath, signedMessage.Bytes())
+	err = helpers.SaveHex(helpers.AddValidatorWarpMessagePath, signedMessage.Bytes())
+	if err != nil {
+		return fmt.Errorf("failed to save warp message: %s\n", err)
+	}
 
 	fmt.Printf("validationID: %s\n", validationID)
 
-	helpers.SaveId(helpers.AddValidatorValidationIdPath, validationID)
+	err = helpers.SaveId(helpers.AddValidatorValidationIdPath, validationID)
+	if err != nil {
+		return fmt.Errorf("failed to save validation ID: %s\n", err)
+	}
 
 }
 
