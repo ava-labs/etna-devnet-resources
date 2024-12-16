@@ -26,9 +26,6 @@ go run ./01_create_poa/07_convert_chain/
 echo -e "\n🚀 Launching node0\n"
 ./01_create_poa/08_launch_nodes/launch.sh "node0"
 
-# echo -e "\n🎯 Activate ProposerVM fork\n"
-# go run ./01_create_poa/09_activate_proposer_vm/
-
 echo -e "\n🔌 Initialize Validator Manager\n"
 go run ./01_create_poa/10_validator_manager_initialize/
 
