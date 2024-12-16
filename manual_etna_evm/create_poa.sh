@@ -11,9 +11,6 @@ go run ./01_create_poa/02_transfer_balance/
 echo -e "\n🕸️  Creating subnet\n"
 go run ./01_create_poa/03_create_subnet/
 
-echo -e "\n🛠️ Compiling smart contracts code\n"
-./01_create_poa/04_compile_validator_manager/compile.sh
-
 echo -e "\n🧱 Generating genesis\n"
 go run ./01_create_poa/05_L1_genesis/
 

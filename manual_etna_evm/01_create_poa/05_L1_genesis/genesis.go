@@ -2,13 +2,17 @@ package main
 
 import (
 	_ "embed"
+	"encoding/hex"
 	"encoding/json"
 	"log"
 	"math/big"
+	"strings"
 	"time"
 
 	"github.com/ava-labs/etna-devnet-resources/manual_etna_evm/config"
 	"github.com/ava-labs/etna-devnet-resources/manual_etna_evm/helpers"
+
+	_ "embed"
 
 	_ "embed"
 
@@ -24,6 +28,12 @@ import (
 var (
 	defaultPoAOwnerBalance = new(big.Int).Mul(vm.OneAvax, big.NewInt(10)) // 10 Native Tokens
 )
+
+//go:embed proxy_compiled/deployed_proxy_admin_bytecode.txt
+var proxyAdminBytecodeHexString string
+
+//go:embed proxy_compiled/deployed_transparent_proxy_bytecode.txt
+var transparentProxyBytecodeHexString string
 
 func main() {
 	ownerKey := helpers.LoadSecp256k1PrivateKey(helpers.ValidatorManagerOwnerKeyPath)
@@ -71,14 +81,17 @@ func main() {
 		Timestamp:  uint64(now),
 	}
 
-	proxyAdminBytecode, err := loadHexFile("01_create_poa/04_compile_validator_manager/proxy_compiled/deployed_proxy_admin_bytecode.txt")
+	proxyAdminBytecodeHexString = strings.TrimSpace(strings.TrimPrefix(proxyAdminBytecodeHexString, "0x"))
+	transparentProxyBytecodeHexString = strings.TrimSpace(strings.TrimPrefix(transparentProxyBytecodeHexString, "0x"))
+
+	proxyAdminBytecode, err := hex.DecodeString(proxyAdminBytecodeHexString)
 	if err != nil {
-		log.Fatalf("❌ Failed to get proxy admin deployed bytecode: %s\n", err)
+		log.Fatalf("❌ Failed to decode proxy admin bytecode: %s\n", err)
 	}
 
-	transparentProxyBytecode, err := loadHexFile("01_create_poa/04_compile_validator_manager/proxy_compiled/deployed_transparent_proxy_bytecode.txt")
+	transparentProxyBytecode, err := hex.DecodeString(transparentProxyBytecodeHexString)
 	if err != nil {
-		log.Fatalf("❌ Failed to get transparent proxy deployed bytecode: %s\n", err)
+		log.Fatalf("❌ Failed to decode transparent proxy bytecode: %s\n", err)
 	}
 
 	genesis.Alloc[common.HexToAddress(config.ProxyAdminContractAddress)] = types.Account{

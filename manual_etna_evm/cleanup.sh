@@ -7,7 +7,7 @@
 
 set -euo pipefail
 
-docker rm -f node0 node1 node2 node3 node4 2>/dev/null || true
+docker stop node0 node1 node2 node3 node4 2>/dev/null || true
 echo "- Removed all containers"
 
 mkdir -p data_backup
