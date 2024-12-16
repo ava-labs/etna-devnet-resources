@@ -24,7 +24,20 @@ echo -e "\n🔮 Converting chain into L1\n"
 go run ./01_create_poa/07_convert_chain/
 
 echo -e "\n🚀 Launching node0\n"
-./01_create_poa/08_launch_nodes/launch.sh "node0"
+for i in {1..3}; do
+  if ./01_create_poa/08_launch_nodes/launch.sh "node0"; then
+    break
+  elif [ $i -eq 3 ]; then
+    echo "Failed to launch node0 after 3 attempts"
+    exit 1
+  else
+    echo "Attempt $i failed, retrying..."
+    sleep 5
+  fi
+done
+
+echo -e "\n📝 Deploying Validator Manager\n"
+go run ./01_create_poa/09_deploy_validator_manager/
 
 echo -e "\n🔌 Initialize Validator Manager\n"
 go run ./01_create_poa/10_validator_manager_initialize/
