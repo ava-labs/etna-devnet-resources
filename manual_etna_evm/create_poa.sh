@@ -11,6 +11,7 @@ go run . convert-to-L1
 go run . launch-node
 go run . deploy-validator-manager
 go run . validator-manager-init
+go run . initialize-validator-set
 
 # echo -e "\n🧱 Generating genesis\n"
 # go run ./01_create_poa/05_L1_genesis/

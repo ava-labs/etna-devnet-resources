@@ -1,4 +1,4 @@
-package main
+package cmd
 
 import (
 	"fmt"
@@ -6,9 +6,6 @@ import (
 	"math/big"
 	"strings"
 	"time"
-
-	"github.com/ava-labs/etna-devnet-resources/manual_etna_evm/config"
-	"github.com/ava-labs/etna-devnet-resources/manual_etna_evm/helpers"
 
 	"github.com/ava-labs/avalanche-cli/cmd/blockchaincmd"
 	"github.com/ava-labs/avalanche-cli/pkg/constants"
@@ -21,34 +18,48 @@ import (
 	"github.com/ava-labs/avalanchego/vms/platformvm/warp"
 	"github.com/ava-labs/avalanchego/vms/platformvm/warp/message"
 	"github.com/ava-labs/avalanchego/vms/platformvm/warp/payload"
+	"github.com/ava-labs/etna-devnet-resources/manual_etna_evm/config"
+	"github.com/ava-labs/etna-devnet-resources/manual_etna_evm/helpers"
 	"github.com/ethereum/go-ethereum/common"
 	goethereumcommon "github.com/ethereum/go-ethereum/common"
+	"github.com/spf13/cobra"
 )
 
-func main() {
-	const maxAttempts = 10
-	const retryDelay = 10 * time.Second
+func init() {
+	rootCmd.AddCommand(initializeValidatorSetCmd)
+}
 
-	var lastErr error
-	for i := 0; i < maxAttempts; i++ {
-		if i > 0 {
-			fmt.Printf("Attempt %d/%d (will sleep for %v before retry)\n", i+1, maxAttempts, retryDelay)
-			time.Sleep(retryDelay)
+var initializeValidatorSetCmd = &cobra.Command{
+	Use:   "initialize-validator-set",
+	Short: "Initialize the validator set",
+	RunE: func(cmd *cobra.Command, args []string) error {
+		const maxAttempts = 10
+		const retryDelay = 10 * time.Second
+
+		var lastErr error
+		for i := 0; i < maxAttempts; i++ {
+			if i > 0 {
+				fmt.Printf("Attempt %d/%d (will sleep for %v before retry)\n", i+1, maxAttempts, retryDelay)
+				time.Sleep(retryDelay)
+			}
+
+			err := initializeValidatorSet()
+			if err == nil {
+				return nil
+			}
+			lastErr = err
+			fmt.Printf("Failed to initialize validator set: %s, retrying...\n", err)
 		}
 
-		err := initializeValidatorSet()
-		if err == nil {
-			return
-		}
-		lastErr = err
-		fmt.Printf("❌ Failed to initialize validator set: %s\n", err)
-	}
-
-	log.Fatalf("❌ Failed to initialize validator set after %d attempts: %s\n", maxAttempts, lastErr)
+		return fmt.Errorf("Failed to initialize validator set after %d attempts: %s\n", maxAttempts, lastErr)
+	},
 }
 
 func initializeValidatorSet() error {
-	alreadyInitialized := helpers.FileExists(helpers.InitializeValidatorSetTxPath)
+	alreadyInitialized, err := helpers.FileExists(helpers.InitializeValidatorSetTxPath)
+	if err != nil {
+		return fmt.Errorf("failed to check if validator set is already initialized: %w", err)
+	}
 	if alreadyInitialized {
 		log.Println("✅ Validator set is already initialized")
 		return nil
@@ -56,9 +67,15 @@ func initializeValidatorSet() error {
 
 	managerAddress := goethereumcommon.HexToAddress(config.ProxyContractAddress)
 
-	subnetID := helpers.LoadId(helpers.SubnetIdPath)
+	subnetID, err := helpers.LoadId(helpers.SubnetIdPath)
+	if err != nil {
+		return fmt.Errorf("failed to load subnet ID: %w", err)
+	}
 
-	subnetConversionIDFromFile := helpers.LoadId(helpers.ConversionIdPath)
+	subnetConversionIDFromFile, err := helpers.LoadId(helpers.ConversionIdPath)
+	if err != nil {
+		return fmt.Errorf("failed to load subnet conversion ID: %w", err)
+	}
 
 	_ = subnetConversionIDFromFile
 
@@ -67,7 +84,10 @@ func initializeValidatorSet() error {
 		return fmt.Errorf("failed to get node info: %w", err)
 	}
 
-	chainID := helpers.LoadId(helpers.ChainIdPath)
+	chainID, err := helpers.LoadId(helpers.ChainIdPath)
+	if err != nil {
+		return fmt.Errorf("failed to load chain ID: %w", err)
+	}
 
 	validators := []message.SubnetToL1ConverstionValidatorData{}
 	validators = append(validators, message.SubnetToL1ConverstionValidatorData{
@@ -134,7 +154,10 @@ func initializeValidatorSet() error {
 	}
 
 	//as plain text
-	privateKey := helpers.LoadText(helpers.ValidatorManagerOwnerKeyPath)
+	privateKey, err := helpers.LoadText(helpers.ValidatorManagerOwnerKeyPath)
+	if err != nil {
+		return fmt.Errorf("failed to load private key: %w", err)
+	}
 
 	type InitialValidatorPayload struct {
 		NodeID       []byte
