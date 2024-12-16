@@ -33,6 +33,8 @@ var initializeValidatorSetCmd = &cobra.Command{
 	Use:   "initialize-validator-set",
 	Short: "Initialize the validator set",
 	RunE: func(cmd *cobra.Command, args []string) error {
+		PrintHeader("🧱 Initializing validator set")
+
 		const maxAttempts = 10
 		const retryDelay = 10 * time.Second
 

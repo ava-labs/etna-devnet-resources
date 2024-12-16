@@ -11,7 +11,14 @@ go run . convert-to-L1
 go run . launch-node
 go run . deploy-validator-manager
 go run . validator-manager-init
+
+go run . print-p-chain-info
+go run . print-contract-logs
+
 go run . initialize-validator-set
+
+go run . print-p-chain-info
+go run . print-contract-logs
 
 # echo -e "\n🧱 Generating genesis\n"
 # go run ./01_create_poa/05_L1_genesis/
