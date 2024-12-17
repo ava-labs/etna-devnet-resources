@@ -1,6 +1,6 @@
 # #!/bin/bash
 
-set -euo pipefail
+set -exuo pipefail
 
 export L1_VALIDATOR_TYPE="pos-native"
 
@@ -14,8 +14,8 @@ go build -o ./etnacli .
 ./etnacli create-chain
 ./etnacli convert-to-L1
 ./etnacli launch-node
-./etnacli deploy-validator-manager 
-./etnacli validator-manager-init
+./etnacli deploy-validator-manager --validator-type=${L1_VALIDATOR_TYPE}
+./etnacli validator-manager-init --validator-type=${L1_VALIDATOR_TYPE}
 
 ./etnacli initialize-validator-set
 

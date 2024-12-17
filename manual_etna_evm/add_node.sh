@@ -1,22 +1,24 @@
-#!/bin/bash
+# #!/bin/bash
 
-set -euo pipefail
+set -exuo pipefail
 
-echo -e "\n🔑 Initialize registration\n"
-go run ./02_add_poa_validator/01_init_registration
+export L1_VALIDATOR_TYPE="pos-native"
 
-echo -e "\n⛓️ Register on P-chain\n"
-go run ./02_add_poa_validator/02_register_on_p_chain
+go build -o ./etnacli .
 
-echo -e "\n✅ Complete validator registration\n"
-go run ./02_add_poa_validator/03_complete_validator_registration
+./etnacli generate-keys
+./etnacli transfer-coins
+./etnacli create-subnet
+./etnacli generate-genesis
+./etnacli create-chain
+./etnacli convert-to-L1
+./etnacli launch-node
+./etnacli deploy-validator-manager --validator-type=$L1_VALIDATOR_TYPE
+./etnacli validator-manager-init --validator-type=$L1_VALIDATOR_TYPE
 
-echo -e "\n⏳ Waiting 60 seconds for transaction finalization...\n"
-sleep 60
+./etnacli initialize-validator-set
 
-echo -e "\n📋 Reading contract logs again\n"
-go run ./00_tools/check_validator_set
+sleep 30
 
-echo -e "\n🖥️ Launching node\n"
-echo "Run the following command to start the node on a remote machine:"
-go run ./02_add_poa_validator/04_print_launch_script
+./etnacli print-p-chain-info
+./etnacli print-contract-logs

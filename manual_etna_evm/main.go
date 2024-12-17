@@ -9,7 +9,7 @@ import (
 
 func main() {
 	if err := cmd.Execute(); err != nil {
-		log.Fatalf("❌ Failed to execute command: %w\n", err)
+		log.Fatalf("❌ Failed to execute command: %s\n", err.Error())
 	} else {
 		if len(os.Args) > 1 {
 			log.Printf("✅ Successfully executed command: %s\n", os.Args[1:])

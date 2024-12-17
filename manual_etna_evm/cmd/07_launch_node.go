@@ -38,7 +38,7 @@ var launchNodeCmd = &cobra.Command{
 	Use:   "launch-node",
 	Short: "Launch a node",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		PrintHeader("🐳 Launching node")
+		PrintHeader("🐳 Launching node (might take up to 5 minutes)")
 
 		subnetID, err := helpers.LoadId(helpers.SubnetIdPath)
 		if err != nil {

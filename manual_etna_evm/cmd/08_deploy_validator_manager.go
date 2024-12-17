@@ -6,6 +6,7 @@ import (
 	"log"
 	"time"
 
+	"github.com/ava-labs/etna-devnet-resources/manual_etna_evm/config"
 	"github.com/ava-labs/etna-devnet-resources/manual_etna_evm/helpers"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
@@ -14,13 +15,20 @@ import (
 
 	"github.com/ava-labs/coreth/plugin/evm"
 	examplerewardcalculator "github.com/ava-labs/icm-contracts/abi-bindings/go/validator-manager/ExampleRewardCalculator"
+	nativetokenstakingmanager "github.com/ava-labs/icm-contracts/abi-bindings/go/validator-manager/NativeTokenStakingManager"
 	poavalidatormanager "github.com/ava-labs/icm-contracts/abi-bindings/go/validator-manager/PoAValidatorManager"
 	"github.com/ava-labs/subnet-evm/accounts/abi/bind"
 	"github.com/ava-labs/subnet-evm/core/types"
 )
 
+var (
+	validatorType string
+)
+
 func init() {
 	rootCmd.AddCommand(deployValidatorManagerCmd)
+	deployValidatorManagerCmd.Flags().StringVar(&validatorType, "validator-type", "", fmt.Sprintf("Type of validator manager to deploy (%s or %s)", config.PoAMode, config.PoSNativeMode))
+	deployValidatorManagerCmd.MarkFlagRequired("validator-type")
 }
 
 var deployValidatorManagerCmd = &cobra.Command{
@@ -66,14 +74,23 @@ var deployValidatorManagerCmd = &cobra.Command{
 		var tx *types.Transaction
 		var exampleRewardCalculatorAddress common.Address
 
-		newContractAddress, tx, _, err = poavalidatormanager.DeployPoAValidatorManager(opts, ethClient, 0)
-		if err != nil {
-			return fmt.Errorf("failed to create contract instance: %w", err)
-		}
+		if validatorType == config.PoAMode {
+			newContractAddress, tx, _, err = poavalidatormanager.DeployPoAValidatorManager(opts, ethClient, 0)
+			if err != nil {
+				return fmt.Errorf("failed to create contract instance: %w", err)
+			}
 
-		exampleRewardCalculatorAddress, tx, _, err = examplerewardcalculator.DeployExampleRewardCalculator(opts, ethClient, 0)
-		if err != nil {
-			return fmt.Errorf("failed to create contract instance: %w", err)
+			exampleRewardCalculatorAddress, tx, _, err = examplerewardcalculator.DeployExampleRewardCalculator(opts, ethClient, 0)
+			if err != nil {
+				return fmt.Errorf("failed to create contract instance: %w", err)
+			}
+		} else if validatorType == config.PoSNativeMode {
+			newContractAddress, tx, _, err = nativetokenstakingmanager.DeployNativeTokenStakingManager(opts, ethClient, 0)
+			if err != nil {
+				return fmt.Errorf("failed to create contract instance: %w", err)
+			}
+		} else {
+			return fmt.Errorf("invalid validator type: %s. Must be either 'poa' or 'pos-native'", validatorType)
 		}
 
 		if newContractAddress != expectedContractAddress {
