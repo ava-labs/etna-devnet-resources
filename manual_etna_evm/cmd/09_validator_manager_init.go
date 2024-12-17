@@ -2,14 +2,17 @@ package cmd
 
 import (
 	"context"
+	"crypto/ecdsa"
 	"encoding/json"
 	"fmt"
 	"log"
 	"time"
 
+	"github.com/ava-labs/avalanchego/ids"
 	"github.com/ava-labs/etna-devnet-resources/manual_etna_evm/config"
 	"github.com/ava-labs/etna-devnet-resources/manual_etna_evm/helpers"
 	"github.com/ava-labs/subnet-evm/core/types"
+	"github.com/ava-labs/subnet-evm/ethclient"
 	"github.com/ava-labs/subnet-evm/interfaces"
 	"github.com/spf13/cobra"
 
@@ -22,6 +25,9 @@ import (
 
 func init() {
 	rootCmd.AddCommand(validatorManagerInitCmd)
+
+	validatorManagerInitCmd.Flags().StringVar(&validatorType, "validator-type", "", "Type of validator manager to deploy (poa or pos-native)")
+	validatorManagerInitCmd.MarkFlagRequired("validator-type")
 }
 
 var validatorManagerInitCmd = &cobra.Command{
@@ -42,26 +48,6 @@ var validatorManagerInitCmd = &cobra.Command{
 		}
 
 		// Check for Initialized event in logs
-		query := interfaces.FilterQuery{
-			Addresses: []common.Address{managerAddress},
-		}
-		logs, err := ethClient.FilterLogs(context.Background(), query)
-		if err != nil {
-			return fmt.Errorf("failed to get contract logs: %w", err)
-		}
-
-		contract, err := poavalidatormanager.NewPoAValidatorManager(managerAddress, ethClient)
-		if err != nil {
-			return fmt.Errorf("failed to create contract instance: %w", err)
-		}
-		for _, vLog := range logs {
-			if _, err := contract.ParseInitialized(vLog); err == nil {
-				log.Printf("Validator manager was already initialized")
-				PrintLogs([]*types.Log{&vLog})
-				return nil
-			}
-		}
-		log.Println("Validator manager was not initialized, initializing...")
 
 		subnetID, err := helpers.LoadId(helpers.SubnetIdPath)
 		if err != nil {
@@ -80,22 +66,16 @@ var validatorManagerInitCmd = &cobra.Command{
 		opts.GasLimit = 8000000
 		opts.GasPrice = nil
 
-		tx, err := contract.Initialize(opts, poavalidatormanager.ValidatorManagerSettings{
-			L1ID:                   subnetID,
-			ChurnPeriodSeconds:     0,
-			MaximumChurnPercentage: 20,
-		}, crypto.PubkeyToAddress(ecdsaKey.PublicKey))
-		if err != nil {
-			return fmt.Errorf("failed to initialize validator manager: %w", err)
-		}
+		var receipt *types.Receipt
+		var tx *types.Transaction
 
-		// Replace sleep with transaction wait
-		ctx, cancel := context.WithTimeout(context.Background(), 2*time.Minute)
-		defer cancel()
-
-		receipt, err := bind.WaitMined(ctx, ethClient, tx)
-		if err != nil {
-			return fmt.Errorf("failed to wait for transaction confirmation: %w", err)
+		if validatorType == "poa" {
+			receipt, tx, err = initializeValidatorManagerPoA(validatorType, managerAddress, ethClient, subnetID, opts, ecdsaKey.PublicKey)
+			if err != nil {
+				return fmt.Errorf("failed to initialize validator manager: %w", err)
+			}
+		} else if validatorType == "pos-native-token-staking" {
+			return fmt.Errorf("not implemented yet")
 		}
 
 		PrintLogs(receipt.Logs)
@@ -104,6 +84,48 @@ var validatorManagerInitCmd = &cobra.Command{
 
 		return nil
 	},
+}
+
+func initializeValidatorManagerPoA(validatorManagerType string, managerAddress common.Address, ethClient ethclient.Client, subnetID ids.ID, opts *bind.TransactOpts, ecdsaPubKey ecdsa.PublicKey) (*types.Receipt, *types.Transaction, error) {
+	logs, err := ethClient.FilterLogs(context.Background(), interfaces.FilterQuery{
+		Addresses: []common.Address{managerAddress},
+	})
+	if err != nil {
+		return nil, nil, fmt.Errorf("failed to get contract logs: %w", err)
+	}
+
+	// Replace sleep with transaction wait
+	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Minute)
+	defer cancel()
+
+	contract, err := poavalidatormanager.NewPoAValidatorManager(managerAddress, ethClient)
+	if err != nil {
+		return nil, nil, fmt.Errorf("failed to create contract instance: %w", err)
+	}
+	for _, vLog := range logs {
+		if _, err := contract.ParseInitialized(vLog); err == nil {
+			log.Printf("Validator manager was already initialized")
+			PrintLogs([]*types.Log{&vLog})
+			return nil, nil, nil
+		}
+	}
+	log.Println("Validator manager was not initialized, initializing...")
+
+	tx, err := contract.Initialize(opts, poavalidatormanager.ValidatorManagerSettings{
+		L1ID:                   subnetID,
+		ChurnPeriodSeconds:     0,
+		MaximumChurnPercentage: 20,
+	}, crypto.PubkeyToAddress(ecdsaPubKey))
+	if err != nil {
+		return nil, nil, fmt.Errorf("failed to initialize validator manager: %w", err)
+	}
+
+	receipt, err := bind.WaitMined(ctx, ethClient, tx)
+	if err != nil {
+		return nil, nil, fmt.Errorf("failed to wait for transaction confirmation: %w", err)
+	}
+
+	return receipt, tx, nil
 }
 
 func PrintLogs(logs []*types.Log) {

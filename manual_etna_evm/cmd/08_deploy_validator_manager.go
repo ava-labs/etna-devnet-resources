@@ -94,6 +94,14 @@ var deployValidatorManagerCmd = &cobra.Command{
 		}
 
 		if newContractAddress != expectedContractAddress {
+			log.Printf(
+				"DEBUG: First five expected contract addresses: %s, %s, %s, %s, %s",
+				MustDeriveContractAddress(myEthAddr, 0),
+				MustDeriveContractAddress(myEthAddr, 1),
+				MustDeriveContractAddress(myEthAddr, 2),
+				MustDeriveContractAddress(myEthAddr, 3),
+				MustDeriveContractAddress(myEthAddr, 4),
+			)
 			return fmt.Errorf("expected contract address %s, got %s", expectedContractAddress, newContractAddress)
 		}
 

@@ -10,7 +10,7 @@ go run . create-chain
 go run . convert-to-L1
 go run . launch-node
 go run . deploy-validator-manager --validator-type=poa
-go run . validator-manager-init
+go run . validator-manager-init --validator-type=poa
 
 go run . initialize-validator-set
 
