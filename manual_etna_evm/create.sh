@@ -21,5 +21,5 @@ go build -o ./etnacli .
 
 sleep 30
 
-./etnacli print-p-chain-info
-./etnacli print-contract-logs
+./etnacli validators
+./etnacli print-contract-logs 9650

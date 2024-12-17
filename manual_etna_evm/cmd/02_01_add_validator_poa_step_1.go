@@ -31,14 +31,14 @@ import (
 )
 
 func init() {
-	rootCmd.AddCommand(AddValidatorCmd)
+	rootCmd.AddCommand(AddPoaValidatorCmd)
 }
 
-var AddValidatorCmd = &cobra.Command{
-	Use:   "add-validator",
+var AddPoaValidatorCmd = &cobra.Command{
+	Use:   "add-poa-validator",
 	Short: "Add a validator to the validator set",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		credsFolder, err := generateAddValidatorFolder()
+		credsFolder, nodeIndex, err := generateAddValidatorFolder()
 		if err != nil {
 			return fmt.Errorf("failed to generate add validator folder: %w", err)
 		}
@@ -47,6 +47,8 @@ var AddValidatorCmd = &cobra.Command{
 		if err != nil {
 			return fmt.Errorf("failed to generate creds: %w", err)
 		}
+
+		log.Printf("New creds folder: %s\n", credsFolder)
 
 		warpMessage, validationID, expiry, err := InitValidatorRegistration(credsFolder)
 		if err != nil {
@@ -84,27 +86,39 @@ var AddValidatorCmd = &cobra.Command{
 			return fmt.Errorf("failed to complete validator registration: %w", err)
 		}
 
+		validatorCMD, err := GetValidatorCMD(credsFolder, nodeIndex)
+		if err != nil {
+			return fmt.Errorf("failed to get validator cmd: %w", err)
+		}
+
+		err = helpers.SaveText(fmt.Sprintf("%s/validator.sh", credsFolder), validatorCMD)
+		if err != nil {
+			return fmt.Errorf("failed to save validator cmd: %w", err)
+		}
+
+		fmt.Println(validatorCMD)
+
 		return nil
 	},
 }
 
-func generateAddValidatorFolder() (string, error) {
-	for i := 0; i < 100; i++ {
-		folderName := fmt.Sprintf("data/add_validator_%d", i)
+func generateAddValidatorFolder() (string, int, error) {
+	for i := 1; i < 100; i++ { //has to start with 1. node0 is already registered
+		folderName := fmt.Sprintf("data/add_validator_%d/", i)
 		exists, err := helpers.FileExists(folderName)
 		if err != nil {
-			return "", fmt.Errorf("failed to check if folder exists: %w", err)
+			return "", 0, fmt.Errorf("failed to check if folder exists: %w", err)
 		}
 		if exists {
 			continue
 		}
 		err = os.MkdirAll(folderName, 0755)
 		if err != nil {
-			return "", fmt.Errorf("failed to create folder: %w", err)
+			return "", 0, fmt.Errorf("failed to create folder: %w", err)
 		}
-		return folderName, nil
+		return folderName, i, nil
 	}
-	return "", fmt.Errorf("failed to generate add validator folder")
+	return "", 0, fmt.Errorf("failed to generate add validator folder")
 }
 
 func InitValidatorRegistration(credsFolder string) (*warp.Message, ids.ID, uint64, error) {
@@ -136,6 +150,8 @@ func InitValidatorRegistration(credsFolder string) (*warp.Message, ids.ID, uint6
 
 	managerAddress := common.HexToAddress(config.ProxyContractAddress)
 
+	validatorWeight := uint64(20)
+
 	_, receipt, err := PoAValidatorManagerInitializeValidatorRegistration(
 		evmChainURL,
 		managerAddress,
@@ -145,7 +161,7 @@ func InitValidatorRegistration(credsFolder string) (*warp.Message, ids.ID, uint6
 		expiry,
 		remainingBalanceOwners,
 		disableOwners,
-		constants.NonBootstrapValidatorWeight,
+		validatorWeight,
 	)
 	if err != nil {
 		if strings.Contains(err.Error(), "node already registered") {
@@ -157,6 +173,8 @@ func InitValidatorRegistration(credsFolder string) (*warp.Message, ids.ID, uint6
 	} else {
 		log.Printf("✅ Validator registration initialized: %s\n", receipt.TxHash)
 	}
+
+	log.Println("Validator registration initialized in the contract, collecting signatures...\n")
 
 	network := models.NewFujiNetwork()
 	aggregatorLogLevel := logging.Level(logging.Info)

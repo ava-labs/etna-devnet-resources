@@ -7,7 +7,10 @@
 
 set -euo pipefail
 
-docker stop node0 node1 node2 node3 node4 2>/dev/null || true
+for i in {0..100}; do
+  docker stop "node${i}" 2>/dev/null || true
+  docker rm "node${i}" 2>/dev/null || true
+done
 echo "- Removed all containers"
 
 mkdir -p data_backup
@@ -17,7 +20,7 @@ else
   echo "- No *_key.txt files to move"
 fi
 
-sudo rm -rf data/*.txt data/*.json data/chains/
+sudo rm -rf data/*.txt data/*.json data/chains/ ./data/add_validator_*
 echo "- Removed data directory's *.txt and *.json files keeping node keys and data"
 
 mkdir -p data

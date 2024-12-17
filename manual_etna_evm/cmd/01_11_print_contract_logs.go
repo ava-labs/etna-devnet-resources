@@ -21,9 +21,17 @@ var printContractLogsCmd = &cobra.Command{
 	Use:   "print-contract-logs",
 	Short: "Print contract logs",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		PrintHeader("🧱 Printing contract logs")
 
-		if err := printEVMContractLogs("9650"); err != nil {
+		var port string
+		if len(args) >= 1 {
+			port = args[0]
+		} else {
+			port = "9650"
+		}
+
+		PrintHeader(fmt.Sprintf("🧱 Printing contract logs from localhost:%s", port))
+
+		if err := printEVMContractLogs(port); err != nil {
 			return fmt.Errorf("failed to print EVM contract logs: %w", err)
 		}
 
