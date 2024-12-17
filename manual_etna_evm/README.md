@@ -6,8 +6,8 @@ This repository provides a detailed, code-first guide for integrating L1 subnet 
 - Fresh Docker installation (verify by running `docker compose ls` without any dashes)
 - Go 1.22.10+
 
-**Guides:**
-- Part 1: [Create POA L1](./01_create_poa/README.md)
-- Part 2: [Add POA validator](./02_add_poa_validator/README.md)
+Run everything at once: `./create.sh` to start a new L1 on Devnet, `./cleanup.sh` to clean up (preserves your keys)
 
-Run everything at once: `./create_poa.sh` to start a new L1 on Devnet, `./cleanup.sh` to clean up (preserves your keys)
+Run `go run . validators` to print validators
+
+Run `go run . logs 9650` to print contract logs from node0, `go run . logs 9652` to print contract logs from node1, etc.

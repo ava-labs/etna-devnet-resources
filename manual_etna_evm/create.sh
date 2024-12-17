@@ -22,4 +22,4 @@ go build -o ./etnacli .
 sleep 30
 
 ./etnacli validators
-./etnacli print-contract-logs 9650
+./etnacli logs 9650

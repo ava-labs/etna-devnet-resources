@@ -18,7 +18,7 @@ func init() {
 }
 
 var printContractLogsCmd = &cobra.Command{
-	Use:   "print-contract-logs",
+	Use:   "logs",
 	Short: "Print contract logs",
 	RunE: func(cmd *cobra.Command, args []string) error {
 
