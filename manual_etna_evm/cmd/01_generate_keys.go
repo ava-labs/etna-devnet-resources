@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"log"
+	"strings"
 
 	"github.com/ava-labs/avalanchego/staking"
 	"github.com/ava-labs/avalanchego/utils/crypto/bls"
@@ -25,6 +26,10 @@ func PrintHeader(header string) {
 }
 
 func GenerateCredsIfNotExists(folder string) error {
+	if !strings.HasSuffix(folder, "/") {
+		folder += "/"
+	}
+
 	if err := generateStakerKey(folder); err != nil {
 		return fmt.Errorf("❌ Failed to generate staker key: %s\n", err)
 	}

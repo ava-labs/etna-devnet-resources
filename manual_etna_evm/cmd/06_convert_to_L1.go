@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strings"
 
 	"github.com/ava-labs/avalanche-cli/cmd/blockchaincmd"
 	"github.com/ava-labs/avalanche-cli/pkg/constants"
@@ -185,6 +186,10 @@ func getMultisigTxOptions(subnetAuthKeys []ids.ShortID, kc *secp256k1fx.Keychain
 }
 
 func NodeInfoFromCreds(folder string) (ids.NodeID, *signer.ProofOfPossession, error) {
+	if !strings.HasSuffix(folder, "/") {
+		folder += "/"
+	}
+
 	blsKey, err := helpers.LoadBLSKey(folder + "signer.key")
 	if err != nil {
 		return ids.NodeID{}, nil, fmt.Errorf("failed to load BLS key: %w", err)
