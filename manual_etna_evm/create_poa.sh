@@ -2,19 +2,24 @@
 
 set -euo pipefail
 
-go run . generate-keys
-go run . transfer-coins
-go run . create-subnet
-go run . generate-genesis
-go run . create-chain
-go run . convert-to-L1
-go run . launch-node
-go run . deploy-validator-manager --validator-type=poa
-go run . validator-manager-init --validator-type=poa
+export L1_VALIDATOR_TYPE="pos-native"
 
-go run . initialize-validator-set
+echo "Building etnacli"
+go build -o ./etnacli .
+
+./etnacli generate-keys
+./etnacli transfer-coins
+./etnacli create-subnet
+./etnacli generate-genesis
+./etnacli create-chain
+./etnacli convert-to-L1
+./etnacli launch-node
+./etnacli deploy-validator-manager 
+./etnacli validator-manager-init
+
+./etnacli initialize-validator-set
 
 sleep 30
 
-go run . print-p-chain-info
-go run . print-contract-logs
+./etnacli print-p-chain-info
+./etnacli print-contract-logs

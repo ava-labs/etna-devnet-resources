@@ -25,9 +25,6 @@ import (
 
 func init() {
 	rootCmd.AddCommand(validatorManagerInitCmd)
-
-	validatorManagerInitCmd.Flags().StringVar(&validatorType, "validator-type", "", "Type of validator manager to deploy (poa or pos-native)")
-	validatorManagerInitCmd.MarkFlagRequired("validator-type")
 }
 
 var validatorManagerInitCmd = &cobra.Command{
@@ -69,13 +66,9 @@ var validatorManagerInitCmd = &cobra.Command{
 		var receipt *types.Receipt
 		var tx *types.Transaction
 
-		if validatorType == "poa" {
-			receipt, tx, err = initializeValidatorManagerPoA(validatorType, managerAddress, ethClient, subnetID, opts, ecdsaKey.PublicKey)
-			if err != nil {
-				return fmt.Errorf("failed to initialize validator manager: %w", err)
-			}
-		} else if validatorType == "pos-native-token-staking" {
-			return fmt.Errorf("not implemented yet")
+		receipt, tx, err = initializeValidatorManagerPoA(managerAddress, ethClient, subnetID, opts, ecdsaKey.PublicKey)
+		if err != nil {
+			return fmt.Errorf("failed to initialize validator manager: %w", err)
 		}
 
 		PrintLogs(receipt.Logs)
@@ -86,7 +79,7 @@ var validatorManagerInitCmd = &cobra.Command{
 	},
 }
 
-func initializeValidatorManagerPoA(validatorManagerType string, managerAddress common.Address, ethClient ethclient.Client, subnetID ids.ID, opts *bind.TransactOpts, ecdsaPubKey ecdsa.PublicKey) (*types.Receipt, *types.Transaction, error) {
+func initializeValidatorManagerPoA(managerAddress common.Address, ethClient ethclient.Client, subnetID ids.ID, opts *bind.TransactOpts, ecdsaPubKey ecdsa.PublicKey) (*types.Receipt, *types.Transaction, error) {
 	logs, err := ethClient.FilterLogs(context.Background(), interfaces.FilterQuery{
 		Addresses: []common.Address{managerAddress},
 	})
