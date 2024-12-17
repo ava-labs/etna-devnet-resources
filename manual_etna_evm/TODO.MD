@@ -1,0 +1,3 @@
+- try to get rid of initialize_validator_set_tx
+- remove convert_log
+- try direct API for Warp messages

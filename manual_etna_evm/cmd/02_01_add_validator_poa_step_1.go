@@ -1,4 +1,4 @@
-package main
+package cmd
 
 import (
 	"encoding/hex"
@@ -11,7 +11,7 @@ import (
 
 	"github.com/ava-labs/etna-devnet-resources/manual_etna_evm/config"
 	"github.com/ava-labs/etna-devnet-resources/manual_etna_evm/helpers"
-	"github.com/ava-labs/etna-devnet-resources/manual_etna_evm/helpers/credshelper"
+	"github.com/spf13/cobra"
 
 	"github.com/ava-labs/avalanche-cli/cmd/blockchaincmd"
 	"github.com/ava-labs/avalanche-cli/pkg/constants"
@@ -30,37 +30,115 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 )
 
-func noErrVal[T any](val T, err error) T {
-	if err != nil {
-		panic(err)
-	}
-	return val
+func init() {
+	rootCmd.AddCommand(AddPoaValidatorCmd)
 }
 
-func main() {
-	err := os.RemoveAll(helpers.AddValidatorFolder)
+var AddPoaValidatorCmd = &cobra.Command{
+	Use:   "add-poa-validator",
+	Short: "Add a validator to the validator set",
+	RunE: func(cmd *cobra.Command, args []string) error {
+		credsFolder, nodeIndex, err := generateAddValidatorFolder()
+		if err != nil {
+			return fmt.Errorf("failed to generate add validator folder: %w", err)
+		}
+
+		err = GenerateCredsIfNotExists(credsFolder)
+		if err != nil {
+			return fmt.Errorf("failed to generate creds: %w", err)
+		}
+
+		log.Printf("New creds folder: %s\n", credsFolder)
+
+		warpMessage, validationID, expiry, err := InitValidatorRegistration(credsFolder)
+		if err != nil {
+			return fmt.Errorf("failed to initialize validator registration: %w", err)
+		}
+
+		log.Printf("Validator registration initialized: %x\n", warpMessage.Bytes())
+		log.Printf("Validation ID: %s\n", validationID)
+		log.Printf("Expiry: %d\n", expiry)
+
+		pChainRegistrationCompleted := false
+		for i := 0; i < 5; i++ {
+			log.Printf("Attempting to register L1 validator on P-chain (attempt %d/5)...", i+1)
+			err = RegisterL1ValidatorOnPChain(warpMessage, credsFolder)
+			if err != nil {
+				log.Printf("Attempt %d failed: %s", i+1, err)
+				if i < 4 {
+					log.Printf("Waiting 10 seconds before retrying...")
+					time.Sleep(10 * time.Second)
+					continue
+				}
+				return fmt.Errorf("all attempts to register L1 validator failed: %w", err)
+			}
+			pChainRegistrationCompleted = true
+			log.Printf("Successfully registered L1 validator on P-chain")
+			break
+		}
+
+		if !pChainRegistrationCompleted {
+			return fmt.Errorf("failed to register L1 validator on P-chain")
+		}
+
+		err = AddValidatorCompleteRegistration(validationID)
+		if err != nil {
+			return fmt.Errorf("failed to complete validator registration: %w", err)
+		}
+
+		validatorCMD, err := GetValidatorCMD(credsFolder, nodeIndex)
+		if err != nil {
+			return fmt.Errorf("failed to get validator cmd: %w", err)
+		}
+
+		err = helpers.SaveText(fmt.Sprintf("%s/validator.sh", credsFolder), validatorCMD)
+		if err != nil {
+			return fmt.Errorf("failed to save validator cmd: %w", err)
+		}
+
+		fmt.Println(validatorCMD)
+
+		return nil
+	},
+}
+
+func generateAddValidatorFolder() (string, int, error) {
+	for i := 1; i < 100; i++ { //has to start with 1. node0 is already registered
+		folderName := fmt.Sprintf("data/add_validator_%d/", i)
+		exists, err := helpers.FileExists(folderName)
+		if err != nil {
+			return "", 0, fmt.Errorf("failed to check if folder exists: %w", err)
+		}
+		if exists {
+			continue
+		}
+		err = os.MkdirAll(folderName, 0755)
+		if err != nil {
+			return "", 0, fmt.Errorf("failed to create folder: %w", err)
+		}
+		return folderName, i, nil
+	}
+	return "", 0, fmt.Errorf("failed to generate add validator folder")
+}
+
+func InitValidatorRegistration(credsFolder string) (*warp.Message, ids.ID, uint64, error) {
+	nodeID, proofOfPossession, err := NodeInfoFromCreds(credsFolder)
 	if err != nil {
-		log.Fatalf("❌ Failed to remove add validator node folder: %s\n", err)
+		return nil, ids.Empty, 0, fmt.Errorf("failed to get node info from creds: %w", err)
 	}
 
-	log.Printf("Cleaned up add validator folder %s\n", helpers.AddValidatorFolder)
-
-	if helpers.FileExists(helpers.AddValidatorValidationIdPath) {
-		log.Printf("✅ Validation ID already exists, skipping initialization\n")
-		return
+	chainID, err := helpers.LoadId(helpers.ChainIdPath)
+	if err != nil {
+		return nil, ids.Empty, 0, fmt.Errorf("failed to load chain ID: %w", err)
 	}
-
-	credshelper.GenerateCredsIfNotExists(helpers.AddValidatorKeysFolder)
-
-	nodeID, proofOfPossession := credshelper.NodeInfoFromCreds(helpers.AddValidatorKeysFolder)
-
-	chainID := helpers.LoadId(helpers.ChainIdPath)
 	evmChainURL := fmt.Sprintf("http://127.0.0.1:9650/ext/bc/%s/rpc", chainID)
 
 	expiry := uint64(time.Now().Add(constants.DefaultValidationIDExpiryDuration).Unix())
-	helpers.SaveUint64(helpers.AddValidatorExpiryPath, expiry)
 
-	managerKey := helpers.LoadSecp256k1PrivateKey(helpers.ValidatorManagerOwnerKeyPath)
+	managerKey, err := helpers.LoadSecp256k1PrivateKey(helpers.ValidatorManagerOwnerKeyPath)
+	if err != nil {
+		return nil, ids.Empty, 0, fmt.Errorf("failed to load manager key: %w", err)
+	}
 
 	pChainAddr := managerKey.Address()
 
@@ -72,6 +150,8 @@ func main() {
 
 	managerAddress := common.HexToAddress(config.ProxyContractAddress)
 
+	validatorWeight := uint64(20)
+
 	_, receipt, err := PoAValidatorManagerInitializeValidatorRegistration(
 		evmChainURL,
 		managerAddress,
@@ -81,7 +161,7 @@ func main() {
 		expiry,
 		remainingBalanceOwners,
 		disableOwners,
-		constants.NonBootstrapValidatorWeight,
+		validatorWeight,
 	)
 	if err != nil {
 		if strings.Contains(err.Error(), "node already registered") {
@@ -94,6 +174,8 @@ func main() {
 		log.Printf("✅ Validator registration initialized: %s\n", receipt.TxHash)
 	}
 
+	log.Println("Validator registration initialized in the contract, collecting signatures...\n")
+
 	network := models.NewFujiNetwork()
 	aggregatorLogLevel := logging.Level(logging.Info)
 	aggregatorQuorumPercentage := uint64(0)
@@ -101,14 +183,18 @@ func main() {
 
 	aggregatorExtraPeerEndpoints, err := blockchaincmd.ConvertURIToPeers([]string{"http://127.0.0.1:9650"})
 	if err != nil {
-		log.Fatalf("failed to get extra peers: %w", err)
+		return nil, ids.Empty, 0, fmt.Errorf("failed to get extra peers: %w", err)
 	}
 
 	blsPublicKey := [48]byte(proofOfPossession.PublicKey[:])
 	weight := constants.NonBootstrapValidatorWeight
 
-	subnetID := helpers.LoadId(helpers.SubnetIdPath)
-	signedMessage, validationID, err := ValidatorManagerGetSubnetValidatorRegistrationMessage(
+	subnetID, err := helpers.LoadId(helpers.SubnetIdPath)
+	if err != nil {
+		return nil, ids.Empty, 0, fmt.Errorf("failed to load subnet ID: %w", err)
+	}
+
+	warpMessage, validationID, err := ValidatorManagerGetSubnetValidatorRegistrationMessage(
 		network,
 		aggregatorLogLevel,
 		aggregatorQuorumPercentage,
@@ -125,15 +211,10 @@ func main() {
 		uint64(weight),
 	)
 	if err != nil {
-		log.Fatalf("failed to get subnet validator registration message: %s", err)
+		return nil, ids.Empty, 0, fmt.Errorf("failed to get subnet validator registration message: %w", err)
 	}
 
-	helpers.SaveHex(helpers.AddValidatorWarpMessagePath, signedMessage.Bytes())
-
-	fmt.Printf("validationID: %s\n", validationID)
-
-	helpers.SaveId(helpers.AddValidatorValidationIdPath, validationID)
-
+	return warpMessage, validationID, uint64(expiry), nil
 }
 
 func ValidatorManagerGetSubnetValidatorRegistrationMessage(
