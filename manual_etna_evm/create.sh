@@ -2,7 +2,7 @@
 
 set -exuo pipefail
 
-export L1_VALIDATOR_TYPE="pos-native"
+export L1_VALIDATOR_TYPE="poa"
 
 echo "Building etnacli"
 go build -o ./etnacli .

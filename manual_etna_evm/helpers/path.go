@@ -9,11 +9,7 @@ var (
 	L1GenesisPath                = "data/L1-genesis.json"
 	Node0KeysFolder              = "data/node0/staking/"
 
-	AddValidatorFolder           = "data/add_validator/"
-	AddValidatorKeysFolder       = AddValidatorFolder + "staking/"
-	AddValidatorWarpMessagePath  = AddValidatorFolder + "warp_message.hex"
-	AddValidatorExpiryPath       = AddValidatorFolder + "expiry.txt"
-	AddValidatorValidationIdPath = AddValidatorFolder + "validation_id.txt"
+	AddValidatorFolder = "data/add_validator/"
 
 	ExampleRewardCalculatorAddressPath = "data/example_reward_calculator_address.txt"
 )
