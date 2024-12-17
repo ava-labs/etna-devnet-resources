@@ -9,13 +9,12 @@ go run . generate-genesis
 go run . create-chain
 go run . convert-to-L1
 go run . launch-node
-go run . deploy-validator-manager
+go run . deploy-validator-manager --validator-type=poa
 go run . validator-manager-init
 
-go run . print-p-chain-info
-go run . print-contract-logs
-
 go run . initialize-validator-set
+
+sleep 30
 
 go run . print-p-chain-info
 go run . print-contract-logs

@@ -129,10 +129,12 @@ func GetLocalEthClient(port string) (ethclient.Client, *big.Int, error) {
 	var evmChainId *big.Int
 	var lastErr error
 
+	sleepSeconds := 5
+
 	for i := 0; i < maxAttempts; i++ {
 		if i > 0 {
 			log.Printf("Attempt %d/%d to connect to node (will sleep for %d seconds before retry)",
-				i+1, maxAttempts, i)
+				i+1, maxAttempts, sleepSeconds)
 		}
 
 		client, err = ethclient.DialContext(context.Background(), nodeURL)
@@ -141,7 +143,7 @@ func GetLocalEthClient(port string) (ethclient.Client, *big.Int, error) {
 			if i > 0 {
 				fmt.Printf("Failed to connect: %s\n", err)
 			}
-			time.Sleep(time.Duration(i) * time.Second)
+			time.Sleep(time.Duration(sleepSeconds) * time.Second)
 			continue
 		}
 
@@ -150,9 +152,9 @@ func GetLocalEthClient(port string) (ethclient.Client, *big.Int, error) {
 			lastErr = fmt.Errorf("failed to get chain ID: %s", err)
 			if i > 0 {
 				log.Printf("chain is not ready yet: %s (will sleep for %d seconds before retry)\n",
-					strings.TrimSpace(string(lastErr.Error())), i)
+					strings.TrimSpace(string(lastErr.Error())), sleepSeconds)
 			}
-			time.Sleep(time.Duration(i) * time.Second)
+			time.Sleep(time.Duration(sleepSeconds) * time.Second)
 			continue
 		}
 
