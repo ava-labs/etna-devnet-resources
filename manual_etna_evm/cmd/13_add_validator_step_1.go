@@ -57,6 +57,33 @@ var AddValidatorCmd = &cobra.Command{
 		log.Printf("Validation ID: %s\n", validationID)
 		log.Printf("Expiry: %d\n", expiry)
 
+		pChainRegistrationCompleted := false
+		for i := 0; i < 5; i++ {
+			log.Printf("Attempting to register L1 validator on P-chain (attempt %d/5)...", i+1)
+			err = RegisterL1ValidatorOnPChain(warpMessage, credsFolder)
+			if err != nil {
+				log.Printf("Attempt %d failed: %s", i+1, err)
+				if i < 4 {
+					log.Printf("Waiting 10 seconds before retrying...")
+					time.Sleep(10 * time.Second)
+					continue
+				}
+				return fmt.Errorf("all attempts to register L1 validator failed: %w", err)
+			}
+			pChainRegistrationCompleted = true
+			log.Printf("Successfully registered L1 validator on P-chain")
+			break
+		}
+
+		if !pChainRegistrationCompleted {
+			return fmt.Errorf("failed to register L1 validator on P-chain")
+		}
+
+		err = AddValidatorCompleteRegistration(validationID)
+		if err != nil {
+			return fmt.Errorf("failed to complete validator registration: %w", err)
+		}
+
 		return nil
 	},
 }
@@ -81,11 +108,6 @@ func generateAddValidatorFolder() (string, error) {
 }
 
 func InitValidatorRegistration(credsFolder string) (*warp.Message, ids.ID, uint64, error) {
-	err := os.RemoveAll(helpers.AddValidatorFolder)
-	if err != nil {
-		return nil, ids.Empty, 0, fmt.Errorf("failed to remove add validator node folder: %w", err)
-	}
-
 	nodeID, proofOfPossession, err := NodeInfoFromCreds(credsFolder)
 	if err != nil {
 		return nil, ids.Empty, 0, fmt.Errorf("failed to get node info from creds: %w", err)
