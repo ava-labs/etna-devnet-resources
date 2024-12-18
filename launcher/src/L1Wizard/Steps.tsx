@@ -1,88 +1,36 @@
 //TODO: update icons
 
-const steps = {
-    "genesis": {
-        title: "Create genesis",
-        description: "Allocations and precompiles",
-        icon: <svg className="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
-            <path fill-rule="evenodd" d="M3.559 4.544c.355-.35.834-.544 1.33-.544H19.11c.496 0 .975.194 1.33.544.356.35.559.829.559 1.331v9.25c0 .502-.203.981-.559 1.331-.355.35-.834.544-1.33.544H15.5l-2.7 3.6a1 1 0 0 1-1.6 0L8.5 17H4.889c-.496 0-.975-.194-1.33-.544A1.868 1.868 0 0 1 3 15.125v-9.25c0-.502.203-.981.559-1.331ZM7.556 7.5a1 1 0 1 0 0 2h8a1 1 0 0 0 0-2h-8Zm0 3.5a1 1 0 1 0 0 2H12a1 1 0 1 0 0-2H7.556Z" clip-rule="evenodd" />
-        </svg>
-    },
-    "generate-keys": {
-        title: "Generate keys",
-        description: "Generate keys for your nodes",
-        icon: <svg className="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
-            <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 12H4m12 0-4 4m4-4-4-4m3-4h2a3 3 0 0 1 3 3v10a3 3 0 0 1-3 3h-2" />
-        </svg>
-    },
-    "create-l1": {
-        title: "Deploy contracts",
-        description: "Deploy contracts on the genesis",
-        icon: <svg className="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
-            <path d="m3 2 1.578 17.834L12 22l7.468-2.165L21 2H3Zm13.3 14.722-4.293 1.204H12l-4.297-1.204-.297-3.167h2.108l.15 1.526 2.335.639 2.34-.64.245-3.05h-7.27l-.187-2.006h7.64l.174-2.006H6.924l-.176-2.006h10.506l-.954 10.71Z" />
-        </svg>
+import { useWizardStore } from "./store";
+import { stepList } from "./store";
 
-    },
-    "launch-nodes": {
-        title: "Launch nodes",
-        description: "Launch nodes on your infra",
-        icon: <svg className="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
-            <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 10h18M6 14h2m3 0h5M3 7v10a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1V7a1 1 0 0 0-1-1H4a1 1 0 0 0-1 1Z" />
-        </svg>
-
-    },
-    "add-to-wallet": {
-        title: "Add to wallet",
-        description: "Add your L1 to your wallet",
-        icon: <svg className="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
-            <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 8v8m0-8h8M8 8H6a2 2 0 1 1 2-2v2Zm0 8h8m-8 0H6a2 2 0 1 0 2 2v-2Zm8 0V8m0 8h2a2 2 0 1 1-2 2v-2Zm0-8h2a2 2 0 1 0-2-2v2Z" />
-        </svg>
-
-    },
-    "deploy-validator-manager": {
-        title: "Deploy validator manager",
-        description: "Deploy contract on your L1",
-        icon: <svg className="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
-            <path fill-rule="evenodd" d="M12 8a1 1 0 0 0-1 1v10H9a1 1 0 1 0 0 2h11a1 1 0 0 0 1-1V9a1 1 0 0 0-1-1h-8Zm4 10a2 2 0 1 1 0-4 2 2 0 0 1 0 4Z" clip-rule="evenodd" />
-            <path fill-rule="evenodd" d="M5 3a2 2 0 0 0-2 2v6h6V9a3 3 0 0 1 3-3h8c.35 0 .687.06 1 .17V5a2 2 0 0 0-2-2H5Zm4 10H3v2a2 2 0 0 0 2 2h4v-4Z" clip-rule="evenodd" />
-        </svg>
-
-    },
-    "initialize-validator-manager": {
-        title: "Initialize validator manager",
-        description: "Initialize validator manager on the genesis",
-        icon: <svg className="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
-            <path fill-rule="evenodd" d="M3 6a3 3 0 1 1 4 2.83v6.34a3.001 3.001 0 1 1-2 0V8.83A3.001 3.001 0 0 1 3 6Zm11.207-2.707a1 1 0 0 1 0 1.414L13.914 5H15a4 4 0 0 1 4 4v6.17a3.001 3.001 0 1 1-2 0V9a2 2 0 0 0-2-2h-1.086l.293.293a1 1 0 0 1-1.414 1.414l-2-2a1 1 0 0 1 0-1.414l2-2a1 1 0 0 1 1.414 0Z" clip-rule="evenodd" />
-        </svg>
-    },
-}
-export default function Steps({ activeStep }: { activeStep: keyof typeof steps }) {
-    const stepKeys = Object.keys(steps) as (keyof typeof steps)[];
+export default function Steps() {
+    const { currentStep } = useWizardStore();
+    const stepKeys = Object.keys(stepList) as (keyof typeof stepList)[];
 
     return (
-        <ol className="relative text-gray-500 border-s border-gray-200 dark:border-gray-700 dark:text-gray-400">
+        <ol className="relative text-gray-500 border-s border-gray-200">
             {stepKeys.map((stepKey, index) => {
-                const step = steps[stepKey];
-                const isActive = stepKey === activeStep;
-                const isPast = stepKeys.indexOf(activeStep) > index;
+                const step = stepList[stepKey];
+                const isActive = stepKey === currentStep;
+                const isPast = stepKeys.indexOf(currentStep) > index;
 
                 return (
                     <li key={stepKey} className="mb-10 ms-6 last:mb-0">
-                        <span className={`absolute flex items-center justify-center w-8 h-8 rounded-full -start-4 ring-2 ring-white dark:ring-gray-900 
-                            ${isPast ? 'bg-green-200 dark:bg-green-900' :
-                                isActive ? 'bg-gray-100 dark:bg-gray-700 ring-blue-500 dark:ring-blue-500' :
-                                    'bg-gray-100 dark:bg-gray-700'}`}>
+                        <span className={`absolute flex items-center justify-center w-8 h-8 rounded-full -start-4 ring-2 ring-white 
+                            ${isPast ? 'bg-green-200' :
+                                isActive ? 'bg-gray-100 ring-blue-500' :
+                                    'bg-gray-100'}`}>
                             {isPast ? (
-                                <svg className="w-3.5 h-3.5 text-green-500 dark:text-green-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 16 12">
+                                <svg className="w-3.5 h-3.5 text-green-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 16 12">
                                     <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M1 5.917 5.724 10.5 15 1.5" />
                                 </svg>
                             ) : (
-                                <div className={`${isActive ? 'text-blue-500 dark:text-blue-400' : ''}`}>
+                                <div className={`${isActive ? 'text-blue-500' : ''}`}>
                                     {step.icon}
                                 </div>
                             )}
                         </span>
-                        <h3 className={`font-medium leading-tight ${isActive ? 'text-bold text-black dark:text-white' : ''}`}>
+                        <h3 className={`font-medium leading-tight ${isActive ? 'text-bold text-black' : ''}`}>
                             {step.title}
                         </h3>
                         <p className="text-sm">{step.description}</p>
