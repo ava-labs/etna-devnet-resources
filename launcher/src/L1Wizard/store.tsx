@@ -78,6 +78,6 @@ export const useWizardStore = create<WizardState>((set) => ({
         return state;
     }),
     nodesCount: 3,
-    setNodesCount: (count: number) => set((state) => ({ nodesCount: count }))
+    setNodesCount: (count: number) => set(() => ({ nodesCount: count }))
 }));
 
