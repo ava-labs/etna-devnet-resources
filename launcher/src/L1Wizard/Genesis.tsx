@@ -3,17 +3,17 @@ import { getWalletAddress } from './wallet';
 import { useWizardStore } from './store';
 
 export default function Genesis() {
-    const [address, setAddress] = useState('');
+    const { ownerEthAddress, setOwnerEthAddress, advanceFrom } = useWizardStore();
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState('');
-    const { advanceFrom } = useWizardStore();
+
 
     const handleConnectWallet = async () => {
         setIsLoading(true);
         setError('');
         try {
             const walletAddress = await getWalletAddress();
-            setAddress(walletAddress);
+            setOwnerEthAddress(walletAddress);
         } catch (err: any) {
             setError(err.message || 'Failed to connect wallet');
         } finally {
@@ -40,8 +40,8 @@ export default function Genesis() {
                     <div className="flex-grow">
                         <input
                             type="text"
-                            value={address}
-                            onChange={(e) => setAddress(e.target.value)}
+                            value={ownerEthAddress}
+                            onChange={(e) => setOwnerEthAddress(e.target.value)}
                             placeholder="Wallet Address"
                             className="w-full p-2 border border-gray-200 rounded-md"
                         />
@@ -64,8 +64,8 @@ export default function Genesis() {
 
             <button
                 onClick={handleContinue}
-                disabled={!isValidEthereumAddress(address)}
-                className={`px-4 py-2 rounded-md ${!isValidEthereumAddress(address)
+                disabled={!isValidEthereumAddress(ownerEthAddress)}
+                className={`px-4 py-2 rounded-md ${!isValidEthereumAddress(ownerEthAddress)
                     ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
                     : 'bg-blue-500 text-white hover:bg-blue-600'
                     }`}

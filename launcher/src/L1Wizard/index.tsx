@@ -1,3 +1,4 @@
+import CreateL1 from "./CreateL1";
 import GenerateKeys from "./GenerateKeys";
 import Genesis from "./Genesis";
 import Steps from "./Steps";
@@ -7,11 +8,7 @@ import { stepList, useWizardStore } from "./store";
 const stepComponents: Record<keyof typeof stepList, React.ReactNode> = {
     'genesis': <Genesis />,
     'generate-keys': <GenerateKeys />,
-    'create-l1': <div>TODO: Create L1</div>,
-    'launch-nodes': <div>TODO: Launch Nodes</div>,
-    'add-to-wallet': <div>TODO: Add to Wallet</div>,
-    'deploy-validator-manager': <div>TODO: Deploy Validator Manager</div>,
-    'initialize-validator-manager': <div>TODO: Initialize Validator Manager</div>
+    'create-l1': <CreateL1 />,
 }
 
 
