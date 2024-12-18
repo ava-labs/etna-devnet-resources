@@ -26,7 +26,7 @@ export default function Genesis() {
     }
 
     return (
-        <div className="max-w-2xl">
+        <div className="">
             <h1 className="text-2xl font-medium mb-6">Genesis Settings</h1>
 
             {error && (

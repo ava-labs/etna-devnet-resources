@@ -63,6 +63,8 @@ export const stepList = {
 interface WizardState {
     currentStep: keyof typeof stepList;
     advanceFrom: (givenStep: keyof typeof stepList) => void;
+    nodesCount: number;
+    setNodesCount: (count: number) => void;
 }
 
 export const useWizardStore = create<WizardState>((set) => ({
@@ -74,6 +76,8 @@ export const useWizardStore = create<WizardState>((set) => ({
             return { currentStep: stepKeys[currentIndex + 1] };
         }
         return state;
-    })
+    }),
+    nodesCount: 3,
+    setNodesCount: (count: number) => set((state) => ({ nodesCount: count }))
 }));
 

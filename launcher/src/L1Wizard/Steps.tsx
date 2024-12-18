@@ -1,5 +1,3 @@
-//TODO: update icons
-
 import { useWizardStore } from "./store";
 import { stepList } from "./store";
 

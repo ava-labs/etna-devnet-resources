@@ -1,3 +1,4 @@
+import GenerateKeys from "./GenerateKeys";
 import Genesis from "./Genesis";
 import Steps from "./Steps";
 import { stepList, useWizardStore } from "./store";
@@ -5,7 +6,7 @@ import { stepList, useWizardStore } from "./store";
 
 const stepComponents: Record<keyof typeof stepList, React.ReactNode> = {
     'genesis': <Genesis />,
-    'generate-keys': <div>TODO: Generate Keys</div>,
+    'generate-keys': <GenerateKeys />,
     'create-l1': <div>TODO: Create L1</div>,
     'launch-nodes': <div>TODO: Launch Nodes</div>,
     'add-to-wallet': <div>TODO: Add to Wallet</div>,
