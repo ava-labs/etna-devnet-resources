@@ -16,11 +16,11 @@ export default function L1Wizard() {
     const { currentStep } = useWizardStore()
 
     return (
-        <div className="flex">
-            <div className="w-80 p-4">
+        <div className="flex container mx-auto max-w-5xl py-8">
+            <div className="w-80 p-4 shrink-0">
                 <Steps />
             </div>
-            <div className="flex-1 pl-4">
+            <div className="flex-1 pl-4 min-w-0">
                 <div className="h-full">
                     {stepComponents[currentStep]}
                 </div>

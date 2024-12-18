@@ -1,6 +1,3 @@
-import { create } from 'zustand'
-
-
 export const stepList = {
     "genesis": {
         title: "Create genesis",
@@ -59,6 +56,9 @@ export const stepList = {
     }
 }
 
+import { create } from 'zustand'
+import { StateCreator } from 'zustand'
+import { persist, createJSONStorage } from 'zustand/middleware'
 
 interface WizardState {
     ownerEthAddress: string;
@@ -71,9 +71,12 @@ interface WizardState {
     setChainId: (chainId: number) => void;
     genesisString: string;
     regenerateGenesis: () => Promise<void>;
+    nodePopJsons: string[];
+    setNodePopJsons: (nodePopJsons: string[]) => void;
 }
 
-export const useWizardStore = create<WizardState>((set, get) => ({
+
+const wizardStoreFunc: StateCreator<WizardState> = (set, get) => ({
     ownerEthAddress: "",
     setOwnerEthAddress: (address: string) => set(() => ({ ownerEthAddress: address })),
     currentStep: Object.keys(stepList)[0] as keyof typeof stepList,
@@ -91,8 +94,7 @@ export const useWizardStore = create<WizardState>((set, get) => ({
     nodesCount: 3,
     setNodesCount: (count: number) => set(() => ({ nodesCount: count })),
     chainId: Math.floor(Math.random() * 1000000) + 1,
-    setChainId: (chainId: number) => set(() => ({ chainId: chainId }))
-    ,
+    setChainId: (chainId: number) => set(() => ({ chainId: chainId })),
     genesisString: "",
     regenerateGenesis: async () => {
         const params = new URLSearchParams({
@@ -106,6 +108,19 @@ export const useWizardStore = create<WizardState>((set, get) => ({
         }
         const genesis = await response.text();
         set({ genesisString: genesis });
-    }
-}));
+    },
+    nodePopJsons: ["", "", "", "", "", "", "", "", "", ""],
+    setNodePopJsons: (nodePopJsons: string[]) => set(() => ({ nodePopJsons: nodePopJsons })),
+})
 
+export const useWizardStore = window.location.origin.startsWith("http://localhost:")
+    ? create<WizardState>()(
+        persist(
+            wizardStoreFunc,
+            {
+                name: 'wizard-storage',
+                storage: createJSONStorage(() => localStorage),
+            }
+        )
+    )
+    : create<WizardState>()(wizardStoreFunc);

@@ -126,8 +126,8 @@ export default function Genesis() {
                 <label className="block text-sm text-gray-500 mb-2">
                     Genesis JSON:
                 </label>
-                <div className="bg-gray-50 overflow-x-auto overflow-y-auto break-all text-sm font-mono max-w-3xl">
-                    <pre className="w-full p-3  rounded-md">
+                <div className="bg-gray-50 overflow-x-auto text-sm font-mono border border-gray-200 rounded-md">
+                    <pre className="w-full p-3 break-words overflow-auto">
                         {genesisString}
                     </pre>
                 </div>
