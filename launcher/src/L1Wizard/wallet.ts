@@ -8,7 +8,7 @@ declare global {
 
 export async function getWalletAddress() {
     const walletClient = createWalletClient({
-        transport: custom(window.ethereum!)
+        transport: custom(window.ethereum)
     })
     const [account] = await walletClient.requestAddresses()
     if (!account) {

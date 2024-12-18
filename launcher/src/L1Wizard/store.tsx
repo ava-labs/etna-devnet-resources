@@ -67,9 +67,13 @@ interface WizardState {
     advanceFrom: (givenStep: keyof typeof stepList, direction?: "up" | "down") => void;
     nodesCount: number;
     setNodesCount: (count: number) => void;
+    chainId: number;
+    setChainId: (chainId: number) => void;
+    genesisString: string;
+    regenerateGenesis: () => Promise<void>;
 }
 
-export const useWizardStore = create<WizardState>((set) => ({
+export const useWizardStore = create<WizardState>((set, get) => ({
     ownerEthAddress: "",
     setOwnerEthAddress: (address: string) => set(() => ({ ownerEthAddress: address })),
     currentStep: Object.keys(stepList)[0] as keyof typeof stepList,
@@ -85,6 +89,23 @@ export const useWizardStore = create<WizardState>((set) => ({
         return state;
     }),
     nodesCount: 3,
-    setNodesCount: (count: number) => set(() => ({ nodesCount: count }))
+    setNodesCount: (count: number) => set(() => ({ nodesCount: count })),
+    chainId: Math.floor(Math.random() * 1000000) + 1,
+    setChainId: (chainId: number) => set(() => ({ chainId: chainId }))
+    ,
+    genesisString: "",
+    regenerateGenesis: async () => {
+        const params = new URLSearchParams({
+            ownerEthAddressString: get().ownerEthAddress,
+            evmChainId: get().chainId.toString()
+        });
+
+        const response = await fetch(`/api/generateGenesis?${params}`);
+        if (!response.ok) {
+            throw new Error('Failed to generate genesis');
+        }
+        const genesis = await response.text();
+        set({ genesisString: genesis });
+    }
 }));
 
