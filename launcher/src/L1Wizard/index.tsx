@@ -1,13 +1,15 @@
-import CreateL1 from "./CreateL1";
+import PasteKeys from "./PasteKeys";
 import GenerateKeys from "./GenerateKeys";
 import Genesis from "./Genesis";
 import Steps from "./Steps";
 import { stepList, useWizardStore } from "./store";
+import CreateL1 from "./CreateL1";
 
 
 const stepComponents: Record<keyof typeof stepList, React.ReactNode> = {
     'genesis': <Genesis />,
     'generate-keys': <GenerateKeys />,
+    'paste-keys': <PasteKeys />,
     'create-l1': <CreateL1 />,
 }
 

@@ -23,7 +23,7 @@ export default function Steps() {
                                     <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M1 5.917 5.724 10.5 15 1.5" />
                                 </svg>
                             ) : (
-                                <div className={`${isActive ? 'text-blue-500' : ''}`}>
+                                <div className={`${isActive ? 'text-blue-500 outline outline-2 outline-blue-500 rounded-full p-1' : ''}`}>
                                     {step.icon}
                                 </div>
                             )}

@@ -17,9 +17,10 @@ const popRequest = `curl -X POST --data '{
 const stopScript = `docker stop avalanchego; docker rm avalanchego`
 
 import { useWizardStore } from './store';
+import NextPrev from './ui/NextPrev';
 
 export default function GenerateKeys() {
-    const { nodesCount, setNodesCount, advanceFrom } = useWizardStore();
+    const { nodesCount, setNodesCount } = useWizardStore();
     const nodeCounts = [1, 3, 5];
 
     return <>
@@ -40,9 +41,19 @@ export default function GenerateKeys() {
                         />
                         <label htmlFor={`nodes-${count}`} className="w-full py-3 ms-2 text-sm font-medium text-gray-900">
                             {count} {count === 1 ? 'Node' : 'Nodes'}
+                            {count === 1 && (
+                                <span className="ms-2 bg-red-100 text-red-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
+                                    Dev
+                                </span>
+                            )}
                             {count === 3 && (
+                                <span className="ms-2 bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
+                                    Testnet
+                                </span>
+                            )}
+                            {count === 5 && (
                                 <span className="ms-2 bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
-                                    Recommended
+                                    Mainnet
                                 </span>
                             )}
                         </label>
@@ -69,19 +80,6 @@ export default function GenerateKeys() {
             Please don't forget to stop the nodes or subsequent steps will fail.
         </p>
 
-        <div className="flex justify-between">
-            <button
-                onClick={() => advanceFrom('generate-keys', 'down')}
-                className="px-4 py-2 rounded-md bg-gray-100 hover:bg-gray-200"
-            >
-                Previous
-            </button>
-            <button
-                onClick={() => advanceFrom('generate-keys')}
-                className="px-4 py-2 rounded-md bg-blue-500 text-white hover:bg-blue-600"
-            >
-                Continue
-            </button>
-        </div>
+        <NextPrev nextDisabled={false} currentStepName="generate-keys" />
     </>
 }
