@@ -28,6 +28,7 @@ func logRequest(next http.HandlerFunc) http.HandlerFunc {
 }
 
 var lastImportTime time.Time = time.Date(1970, 1, 1, 0, 0, 0, 0, time.UTC)
+var compileTs int64 = 0
 
 func main() {
 	mux := http.NewServeMux()
@@ -40,6 +41,15 @@ func main() {
 
 	mux.HandleFunc("/api/genesis", logRequest(generateGenesis))
 	mux.HandleFunc("/api/create", logRequest(createL1))
+	mux.HandleFunc("/api/compiled", logRequest(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "text/plain")
+		if compileTs == 0 {
+			fi, _ := os.Stat(os.Args[0])
+			compileTs = fi.ModTime().Unix()
+		}
+
+		w.Write([]byte(strconv.FormatInt(compileTs, 10)))
+	}))
 	mux.HandleFunc("/api/addr/c", logRequest(func(w http.ResponseWriter, r *http.Request) {
 		cChainAddr := evm.PublicKeyToEthAddress(privKey.PublicKey())
 		w.Header().Set("Content-Type", "text/plain")
