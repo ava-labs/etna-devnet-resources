@@ -139,7 +139,7 @@ var TransferCoinsCmd = &cobra.Command{
 	},
 }
 
-var MIN_BALANCE = units.Avax + 100*units.MilliAvax
+var MIN_BALANCE = 3*units.Avax + 100*units.MilliAvax
 var MIN_BALANCE_STRING = GetBalanceString(big.NewInt(int64(MIN_BALANCE)), 9)
 
 func GetBalanceString(balance *big.Int, decimals int) string {

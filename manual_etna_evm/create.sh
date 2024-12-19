@@ -19,7 +19,3 @@ go build -o ./etnacli .
 
 ./etnacli initialize-validator-set
 
-sleep 30
-
-./etnacli validators
-./etnacli logs 9650

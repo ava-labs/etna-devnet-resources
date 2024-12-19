@@ -32,8 +32,8 @@ func init() {
 }
 
 var removeValidatorStep1Cmd = &cobra.Command{
-	Use:   "remove-validator",
-	Short: "Remove validator",
+	Use:   "remove-poa-validator",
+	Short: "Remove PoA validator",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		subnetID, err := helpers.LoadId(helpers.SubnetIdPath)
 		if err != nil {

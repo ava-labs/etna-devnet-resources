@@ -42,9 +42,9 @@ docker run -d \
   -e BLS_KEY_BASE64=%s \
   -e AVALANCHEGO_PUBLIC_IP_RESOLUTION_SERVICE=ifconfigme \
   -e AVALANCHEGO_PARTIAL_SYNC_PRIMARY_NETWORK=true \
-  containerman17/avalanchego-subnetevm:v1.12.0_v0.7.0 ;\
+  containerman17/avalanchego-subnetevm:v1.12.0_v0.7.0 ;
 
-	`, containerName, containerName, httpPort, stakingPort, subnetID.String(), stakerCertBase64, stakerKeyBase64, signerKeyBase64, containerName)
+	`, containerName, containerName, httpPort, stakingPort, subnetID.String(), stakerCertBase64, stakerKeyBase64, signerKeyBase64)
 
 	return script, nil
 }
