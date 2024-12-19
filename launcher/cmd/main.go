@@ -8,11 +8,20 @@ import (
 	"strconv"
 
 	"github.com/ava-labs/avalanchego/api/info"
+	"github.com/ava-labs/coreth/plugin/evm"
+	"github.com/ava-labs/etna-devnet-resources/launcher/pkg/balance"
+	"github.com/ava-labs/etna-devnet-resources/launcher/pkg/config"
 	"github.com/ava-labs/etna-devnet-resources/launcher/pkg/genesis"
 )
 
 func main() {
 	mux := http.NewServeMux()
+
+	log.Println("Loading or generating private key")
+	privKey := config.LoadOrGeneratePrivateKey()
+
+	log.Println("Importing C-chain balance to P-chain")
+	balance.ImportCToP(privKey, config.GetRPCUrl())
 
 	// Serve static files from dist directory
 	fs := http.FileServer(http.Dir("dist"))
@@ -20,6 +29,12 @@ func main() {
 
 	mux.HandleFunc("/api/generateGenesis", generateGenesis)
 	mux.HandleFunc("/api/createL1", createL1)
+	mux.HandleFunc("/api/cChainAddr", func(w http.ResponseWriter, r *http.Request) {
+		cChainAddr := evm.PublicKeyToEthAddress(privKey.PublicKey())
+		w.Header().Set("Content-Type", "text/plain")
+		w.Write([]byte(cChainAddr.Hex()))
+	})
+
 	port := "3000"
 	log.Printf("Server starting on port %s", port)
 	if err := http.ListenAndServe(":"+port, mux); err != nil {
