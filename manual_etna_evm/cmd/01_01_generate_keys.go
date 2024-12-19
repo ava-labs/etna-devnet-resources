@@ -7,6 +7,7 @@ import (
 
 	"github.com/ava-labs/avalanchego/staking"
 	"github.com/ava-labs/avalanchego/utils/crypto/bls"
+	"github.com/ava-labs/avalanchego/utils/crypto/secp256k1"
 	"github.com/ava-labs/etna-devnet-resources/manual_etna_evm/helpers"
 	"github.com/spf13/cobra"
 )
@@ -17,6 +18,19 @@ var GenerateKeysCmd = &cobra.Command{
 	Long:  `Generate keys for the L1`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		PrintHeader("🔑 Generating keys")
+
+		keyExists, err := helpers.FileExists(helpers.ValidatorManagerOwnerKeyPath)
+		if err != nil {
+			return fmt.Errorf("failed to check if validator manager owner key exists: %w", err)
+		}
+		if !keyExists {
+			ownerKey, err := secp256k1.NewPrivateKey()
+			if err != nil {
+				return fmt.Errorf("failed to generate validator manager owner key: %w", err)
+			}
+			helpers.SaveSecp256k1PrivateKey(helpers.ValidatorManagerOwnerKeyPath, ownerKey)
+		}
+
 		return GenerateCredsIfNotExists(helpers.Node0KeysFolder)
 	},
 }

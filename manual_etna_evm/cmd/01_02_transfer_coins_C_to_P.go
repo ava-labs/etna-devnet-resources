@@ -73,7 +73,7 @@ var TransferCoinsCmd = &cobra.Command{
 			log.Printf("Balance %s is less than minimum balance: %s\n", GetBalanceString(cChainBalance, 9), MIN_BALANCE_STRING)
 			log.Printf("Please visit https://test.core.app/tools/testnet-faucet/?subnet=c&token=c \n")
 			log.Printf("Use this address to request funds: %s\n", cChainAddr.Hex())
-			return fmt.Errorf("top up the C-chain balance to at least %s", MIN_BALANCE_STRING)
+			return fmt.Errorf("transfer to your Fuji C-chain address %s balance to at least %s AVAX", cChainAddr.Hex(), MIN_BALANCE_STRING)
 		} else {
 			log.Printf("C-chain balance sufficient: current %s, required %s\n", GetBalanceString(cChainBalance, 9), MIN_BALANCE_STRING)
 		}
@@ -139,7 +139,7 @@ var TransferCoinsCmd = &cobra.Command{
 	},
 }
 
-var MIN_BALANCE = units.Avax + 100*units.MilliAvax
+var MIN_BALANCE = 3*units.Avax + 100*units.MilliAvax
 var MIN_BALANCE_STRING = GetBalanceString(big.NewInt(int64(MIN_BALANCE)), 9)
 
 func GetBalanceString(balance *big.Int, decimals int) string {

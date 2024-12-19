@@ -9,7 +9,5 @@ var (
 	L1GenesisPath                = "data/L1-genesis.json"
 	Node0KeysFolder              = "data/node0/staking/"
 
-	AddValidatorFolder = "data/add_validator/"
-
 	ExampleRewardCalculatorAddressPath = "data/example_reward_calculator_address.txt"
 )
