@@ -17,6 +17,9 @@ RUN --mount=type=cache,target=/go/pkg/mod \
 
 FROM debian:bookworm
 WORKDIR /app
+
+RUN apt-get update && apt-get install -y ca-certificates && rm -rf /var/lib/apt/lists/*
+
 COPY --from=node-builder /app/dist ./dist
 COPY --from=go-builder /app/server .
 

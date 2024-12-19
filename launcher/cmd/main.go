@@ -26,7 +26,7 @@ func logRequest(next http.HandlerFunc) http.HandlerFunc {
 	}
 }
 
-var lastImportTime time.Time = time.Now()
+var lastImportTime time.Time = time.Date(1970, 1, 1, 0, 0, 0, 0, time.UTC)
 
 func main() {
 	mux := http.NewServeMux()
