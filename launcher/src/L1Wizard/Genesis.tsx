@@ -3,7 +3,7 @@ import { getWalletAddress } from './wallet';
 import { useWizardStore } from './store';
 
 export default function Genesis() {
-    const { ownerEthAddress, setOwnerEthAddress, advanceFrom, chainId, setChainId, genesisString, regenerateGenesis } = useWizardStore();
+    const { ownerEthAddress, setOwnerEthAddress, advanceFrom, chainId, setChainId, genesisString, regenerateGenesis, l1Name, setL1Name } = useWizardStore();
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState('');
     const [isRegenerating, setIsRegenerating] = useState(false);
@@ -25,9 +25,11 @@ export default function Genesis() {
         advanceFrom('genesis')
     }
 
-    const handleInputChange = (field: 'chainId' | 'ownerEthAddress', value: any) => {
+    const handleInputChange = (field: 'chainId' | 'ownerEthAddress' | 'l1Name', value: any) => {
         if (field === 'chainId') {
             setChainId(parseInt(value));
+        } else if (field === 'l1Name') {
+            setL1Name(value);
         } else {
             setOwnerEthAddress(value);
         }
@@ -55,7 +57,18 @@ export default function Genesis() {
                 </div>
             )}
 
-
+            <div className="mb-6">
+                <input
+                    type="text"
+                    value={l1Name}
+                    onChange={(e) => handleInputChange('l1Name', e.target.value)}
+                    placeholder="L1 Name"
+                    className="w-full p-2 border border-gray-200 rounded-md"
+                />
+                <p className="mt-2 text-sm text-gray-500">
+                    The name of your L1 blockchain.
+                </p>
+            </div>
 
             <div className="mb-6">
                 <input
@@ -67,7 +80,7 @@ export default function Genesis() {
                     className="w-full p-2 border border-gray-200 rounded-md"
                 />
                 <p className="mt-2 text-sm text-gray-500">
-                    Unique identifier for your blockchain network.
+                    Unique identifier for your blockchain network.  Check if it's unique <a href={`https://chainlist.org/?search=${chainId}`} target="_blank" rel="noopener noreferrer" className="text-blue-500 underline hover:text-blue-600">on chainlist.org</a>.
                 </p>
             </div>
 

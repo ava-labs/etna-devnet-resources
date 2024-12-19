@@ -80,12 +80,17 @@ interface WizardState {
     regenerateGenesis: () => Promise<void>;
     nodePopJsons: string[];
     setNodePopJsons: (nodePopJsons: string[]) => void;
+    l1Name: string;
+    setL1Name: (l1Name: string) => void;
 }
 
+
+import generateName from 'boring-name-generator'
 
 const wizardStoreFunc: StateCreator<WizardState> = (set, get) => ({
     ownerEthAddress: "",
     setOwnerEthAddress: (address: string) => set(() => ({ ownerEthAddress: address })),
+
     currentStep: Object.keys(stepList)[0] as keyof typeof stepList,
     advanceFrom: (givenStep, direction: "up" | "down" = "up") => set((state) => {
         const stepKeys = Object.keys(stepList) as (keyof typeof stepList)[];
@@ -98,10 +103,13 @@ const wizardStoreFunc: StateCreator<WizardState> = (set, get) => ({
         }
         return state;
     }),
+
     nodesCount: 1,
     setNodesCount: (count: number) => set(() => ({ nodesCount: count })),
+
     chainId: Math.floor(Math.random() * 1000000) + 1,
     setChainId: (chainId: number) => set(() => ({ chainId: chainId })),
+
     genesisString: "",
     regenerateGenesis: async () => {
         const params = new URLSearchParams({
@@ -116,8 +124,12 @@ const wizardStoreFunc: StateCreator<WizardState> = (set, get) => ({
         const genesis = await response.text();
         set({ genesisString: genesis });
     },
+
     nodePopJsons: ["", "", "", "", "", "", "", "", "", ""],
     setNodePopJsons: (nodePopJsons: string[]) => set(() => ({ nodePopJsons: nodePopJsons })),
+
+    l1Name: generateName().spaced.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ') + " L1",
+    setL1Name: (l1Name: string) => set(() => ({ l1Name: l1Name })),
 })
 
 export const useWizardStore = window.location.origin.startsWith("http://localhost:")

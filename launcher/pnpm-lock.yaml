@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      boring-name-generator:
+        specifier: ^1.0.3
+        version: 1.0.3
       react:
         specifier: ^18.3.1
         version: 18.3.1
@@ -660,6 +663,10 @@ packages:
     resolution: {integrity: sha512-Ceh+7ox5qe7LJuLHoY0feh3pHuUDHAcRUeyL2VYghZwfpkNIy/+8Ocg0a3UuSoYzavmylwuLWQOf3hl0jjMMIw==}
     engines: {node: '>=8'}
 
+  boring-name-generator@1.0.3:
+    resolution: {integrity: sha512-1wEo1pNahY9js7Vkp1RQa/VWdWrXYJnVAmsHV3Pw/0YzspjABLw7dcekjukOMTIYWr8ir/aG0GX1eoEkYhpnUg==}
+    hasBin: true
+
   brace-expansion@1.1.11:
     resolution: {integrity: sha512-iCuPHDFgrHX7H2vEI/5xpz07zSHB00TpugqhmYtVmMO6518mCuRMoOYFldEBl0g187ufozdaHgWKcYFb61qGiA==}
 
@@ -707,6 +714,10 @@ packages:
 
   commander@4.1.1:
     resolution: {integrity: sha512-NOKm8xhkzAjzFx8B2v5OAHT+u5pRQc2UCa2Vq9jYL/31o2wi9mxBA7LIFs3sV5VSC49z6pEhfbMULvShKj26WA==}
+    engines: {node: '>= 6'}
+
+  commander@6.2.1:
+    resolution: {integrity: sha512-U7VdrJFnJgo4xjrHpTzu0yrHPGImdsmD95ZlgYSEajAn2JKzDhDTPG9kBTefmObL2w/ngeZnilk+OV9CG3d7UA==}
     engines: {node: '>= 6'}
 
   concat-map@0.0.1:
@@ -2036,6 +2047,11 @@ snapshots:
 
   binary-extensions@2.3.0: {}
 
+  boring-name-generator@1.0.3:
+    dependencies:
+      commander: 6.2.1
+      lodash: 4.17.21
+
   brace-expansion@1.1.11:
     dependencies:
       balanced-match: 1.0.2
@@ -2092,6 +2108,8 @@ snapshots:
   color-name@1.1.4: {}
 
   commander@4.1.1: {}
+
+  commander@6.2.1: {}
 
   concat-map@0.0.1: {}
 
