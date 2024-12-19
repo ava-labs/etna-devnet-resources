@@ -16,6 +16,7 @@ import (
 	"github.com/ava-labs/etna-devnet-resources/launcher/pkg/balance"
 	"github.com/ava-labs/etna-devnet-resources/launcher/pkg/config"
 	"github.com/ava-labs/etna-devnet-resources/launcher/pkg/genesis"
+	"github.com/ava-labs/etna-devnet-resources/launcher/pkg/l1"
 )
 
 func logRequest(next http.HandlerFunc) http.HandlerFunc {
@@ -86,6 +87,7 @@ func main() {
 type CreateL1Request struct {
 	GenesisString string                `json:"genesisString"`
 	Nodes         []info.GetNodeIDReply `json:"nodes"`
+	L1Name        string                `json:"l1Name"`
 }
 
 func createL1(w http.ResponseWriter, r *http.Request) {
@@ -117,11 +119,49 @@ func createL1(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	time.Sleep(10 * time.Second)
+	if len(req.L1Name) < 1 || len(req.L1Name) > 32 {
+		http.Error(w, "L1Name name must be between 1 and 32 characters", http.StatusBadRequest)
+		return
+	}
+
+	if _, hasMock := r.URL.Query()["mock"]; hasMock {
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(map[string]string{
+			"chainID":      "24dnYhG4YgY2xpmccLJvgrq91DZuTtciU8GiLcHHBzNdSdN7TM",
+			"subnetID":     "uBqfpRFjEDnaA4tJhULzrgszt1yaH65Cb4NigfY59LL56wcDH",
+			"conversionID": "272Da6ib1eGfH72UYEnhNJHhJA77bNgLMZwT3vGwZSJeao9WEH",
+		})
+		return
+	}
+
+	privKey := config.LoadOrGeneratePrivateKey()
+
+	params := l1.CreateL1Params{
+		PrivateKey:     privKey,
+		RpcURL:         config.GetRPCUrl(),
+		Genesis:        req.GenesisString,
+		ManagerAddress: evm.PublicKeyToEthAddress(privKey.PublicKey()),
+		NodeInfos:      req.Nodes,
+		ChainName:      req.L1Name,
+	}
+
+	chainID, subnetID, conversionID, err := l1.CreateL1(params)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	log.Printf("Chain ID: %s", chainID.String())
+	log.Printf("Subnet ID: %s", subnetID.String())
+	log.Printf("Conversion ID: %s", conversionID.String())
 
 	w.Header().Set("Content-Type", "application/json")
-	w.Write([]byte("{}"))
 
+	json.NewEncoder(w).Encode(map[string]string{
+		"chainID":      chainID.String(),
+		"subnetID":     subnetID.String(),
+		"conversionID": conversionID.String(),
+	})
 }
 
 func generateGenesis(w http.ResponseWriter, r *http.Request) {

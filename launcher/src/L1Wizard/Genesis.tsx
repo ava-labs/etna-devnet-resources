@@ -2,8 +2,16 @@ import { useState } from 'react';
 import { getWalletAddress } from './wallet';
 import { useWizardStore } from './store';
 
+function isValidL1Name(name: string): boolean {
+    return name.split('').every(char => {
+        const code = char.charCodeAt(0);
+        return code <= 127 && // MaxASCII check
+            (char.match(/[a-zA-Z0-9 ]/) !== null); // only letters, numbers, spaces
+    });
+}
+
 export default function Genesis() {
-    const { ownerEthAddress, setOwnerEthAddress, advanceFrom, chainId, setChainId, genesisString, regenerateGenesis, l1Name, setL1Name } = useWizardStore();
+    const { ownerEthAddress, setOwnerEthAddress, advanceFrom, evmChainId, setEvmChainId, genesisString, regenerateGenesis, l1Name, setL1Name } = useWizardStore();
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState('');
     const [isRegenerating, setIsRegenerating] = useState(false);
@@ -25,9 +33,9 @@ export default function Genesis() {
         advanceFrom('genesis')
     }
 
-    const handleInputChange = (field: 'chainId' | 'ownerEthAddress' | 'l1Name', value: any) => {
-        if (field === 'chainId') {
-            setChainId(parseInt(value));
+    const handleInputChange = (field: 'evmChainId' | 'ownerEthAddress' | 'l1Name', value: any) => {
+        if (field === 'evmChainId') {
+            setEvmChainId(parseInt(value));
         } else if (field === 'l1Name') {
             setL1Name(value);
         } else {
@@ -63,24 +71,32 @@ export default function Genesis() {
                     value={l1Name}
                     onChange={(e) => handleInputChange('l1Name', e.target.value)}
                     placeholder="L1 Name"
-                    className="w-full p-2 border border-gray-200 rounded-md"
+                    className={`w-full p-2 border rounded-md ${l1Name && !isValidL1Name(l1Name)
+                        ? 'border-red-500 text-red-500'
+                        : 'border-gray-200'
+                        }`}
                 />
-                <p className="mt-2 text-sm text-gray-500">
-                    The name of your L1 blockchain.
+                <p className={`mt-2 text-sm ${l1Name && !isValidL1Name(l1Name)
+                    ? 'text-red-500'
+                    : 'text-gray-500'
+                    }`}>
+                    {l1Name && !isValidL1Name(l1Name)
+                        ? 'Only letters, numbers, and spaces are allowed'
+                        : 'The name of your L1 blockchain.'}
                 </p>
             </div>
 
             <div className="mb-6">
                 <input
                     type="number"
-                    value={chainId}
-                    onChange={(e) => handleInputChange('chainId', e.target.value)}
-                    onBlur={() => handleInputChange('chainId', chainId)}
+                    value={evmChainId}
+                    onChange={(e) => handleInputChange('evmChainId', e.target.value)}
+                    onBlur={() => handleInputChange('evmChainId', evmChainId)}
                     placeholder="Chain ID"
                     className="w-full p-2 border border-gray-200 rounded-md"
                 />
                 <p className="mt-2 text-sm text-gray-500">
-                    Unique identifier for your blockchain network.  Check if it's unique <a href={`https://chainlist.org/?search=${chainId}`} target="_blank" rel="noopener noreferrer" className="text-blue-500 underline hover:text-blue-600">on chainlist.org</a>.
+                    Unique identifier for your blockchain network.  Check if it's unique <a href={`https://chainlist.org/?search=${evmChainId}`} target="_blank" rel="noopener noreferrer" className="text-blue-500 underline hover:text-blue-600">on chainlist.org</a>.
                 </p>
             </div>
 
@@ -115,8 +131,8 @@ export default function Genesis() {
             <div className="mb-6 flex justify-between">
                 <button
                     onClick={handleGenerateGenesis}
-                    disabled={!chainId || !ownerEthAddress || isRegenerating}
-                    className={`px-4 py-2 rounded-md ${!chainId || !ownerEthAddress || isRegenerating
+                    disabled={!evmChainId || !ownerEthAddress || isRegenerating}
+                    className={`px-4 py-2 rounded-md ${!evmChainId || !ownerEthAddress || isRegenerating
                         ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
                         : 'bg-blue-500 text-white hover:bg-blue-600'
                         }`}
@@ -125,8 +141,8 @@ export default function Genesis() {
                 </button>
                 <button
                     onClick={handleContinue}
-                    disabled={!isValidEthereumAddress(ownerEthAddress) || !genesisString}
-                    className={`px-4 py-2 rounded-md ${!isValidEthereumAddress(ownerEthAddress) || !genesisString
+                    disabled={!isValidEthereumAddress(ownerEthAddress) || !genesisString || !isValidL1Name(l1Name)}
+                    className={`px-4 py-2 rounded-md ${!isValidEthereumAddress(ownerEthAddress) || !genesisString || !isValidL1Name(l1Name)
                         ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
                         : 'bg-blue-500 text-white hover:bg-blue-600'
                         }`}

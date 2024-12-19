@@ -74,14 +74,20 @@ interface WizardState {
     advanceFrom: (givenStep: keyof typeof stepList, direction?: "up" | "down") => void;
     nodesCount: number;
     setNodesCount: (count: number) => void;
-    chainId: number;
-    setChainId: (chainId: number) => void;
+    evmChainId: number;
+    setEvmChainId: (chainId: number) => void;
     genesisString: string;
     regenerateGenesis: () => Promise<void>;
     nodePopJsons: string[];
     setNodePopJsons: (nodePopJsons: string[]) => void;
     l1Name: string;
     setL1Name: (l1Name: string) => void;
+    chainId: string;
+    setChainId: (chainId: string) => void;
+    subnetId: string;
+    setSubnetId: (subnetId: string) => void;
+    conversionId: string;
+    setConversionId: (conversionId: string) => void;
 }
 
 
@@ -110,17 +116,11 @@ const wizardStoreFunc: StateCreator<WizardState> = (set, get) => ({
     nodesCount: 1,
     setNodesCount: (count: number) => set(() => ({ nodesCount: count })),
 
-    chainId: Math.floor(Math.random() * 1000000) + 1,
-    setChainId: (chainId: number) => set(() => ({
-        chainId: chainId,
-        genesisString: ""
-    })),
-
     genesisString: "",
     regenerateGenesis: async () => {
         const params = new URLSearchParams({
             ownerEthAddressString: get().ownerEthAddress,
-            evmChainId: get().chainId.toString()
+            evmChainId: get().evmChainId.toString()
         });
 
         const response = await fetch(`/api/genesis?${params}`);
@@ -140,11 +140,28 @@ const wizardStoreFunc: StateCreator<WizardState> = (set, get) => ({
     nodePopJsons: ["", "", "", "", "", "", "", "", "", ""],
     setNodePopJsons: (nodePopJsons: string[]) => set(() => ({ nodePopJsons: nodePopJsons })),
 
-    l1Name: generateName().spaced.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ') + " L1",
+    l1Name: (generateName().spaced.split('-').join(' ').split(' ').map((word: string) => word.charAt(0).toUpperCase() + word.slice(1)).join(' ') + " L1"),
     setL1Name: (l1Name: string) => set(() => ({ l1Name: l1Name })),
+
+    chainId: "",
+    setChainId: (chainId: string) => set(() => ({ chainId: chainId })),
+
+    subnetId: "",
+    setSubnetId: (subnetId: string) => set(() => ({ subnetId: subnetId })),
+
+    conversionId: "",
+    setConversionId: (conversionId: string) => set(() => ({ conversionId: conversionId })),
+
+    evmChainId: Math.floor(Math.random() * 1000000) + 1,
+    setEvmChainId: (chainId: number) => set(() => ({
+        evmChainId: chainId,
+        genesisString: ""
+    })),
 })
 
-export const useWizardStore = window.location.origin.startsWith("http://localhost:")
+
+
+export const useWizardStore = window.location.origin.startsWith("http://localhost:") || window.location.origin.startsWith("http://tokyo:")
     ? create<WizardState>()(
         persist(
             wizardStoreFunc,
