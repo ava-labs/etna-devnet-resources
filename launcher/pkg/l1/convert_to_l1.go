@@ -16,7 +16,7 @@ import (
 	"github.com/ava-labs/avalanchego/vms/platformvm/signer"
 	"github.com/ava-labs/avalanchego/vms/secp256k1fx"
 	"github.com/ava-labs/avalanchego/wallet/subnet/primary"
-	goethereumcommon "github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/common"
 )
 
 type SubnetValidator struct {
@@ -30,7 +30,7 @@ type ConvertToL1Params struct {
 	PrivateKey     *secp256k1.PrivateKey
 	SubnetID       ids.ID
 	ChainID        ids.ID
-	ManagerAddress goethereumcommon.Address
+	ManagerAddress common.Address
 	NodeInfos      []info.GetNodeIDReply
 	RpcUrl         string
 }

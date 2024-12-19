@@ -6,14 +6,14 @@ import (
 	"github.com/ava-labs/avalanchego/api/info"
 	"github.com/ava-labs/avalanchego/ids"
 	"github.com/ava-labs/avalanchego/utils/crypto/secp256k1"
-	goethereumcommon "github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/common"
 )
 
 type CreateL1Params struct {
 	PrivateKey     *secp256k1.PrivateKey
 	RpcURL         string
 	Genesis        string
-	ManagerAddress goethereumcommon.Address
+	ManagerAddress common.Address
 	NodeInfos      []info.GetNodeIDReply
 	ChainName      string
 }
