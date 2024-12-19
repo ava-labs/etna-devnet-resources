@@ -1,11 +1,15 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
+	"fmt"
 	"log"
+	"math/big"
 	"net/http"
 	"os"
 	"strconv"
+	"time"
 
 	"github.com/ava-labs/avalanchego/api/info"
 	"github.com/ava-labs/coreth/plugin/evm"
@@ -14,26 +18,63 @@ import (
 	"github.com/ava-labs/etna-devnet-resources/launcher/pkg/genesis"
 )
 
+func logRequest(next http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		start := time.Now()
+		next(w, r)
+		log.Printf("%s %s - %v", r.Method, r.URL.Path, time.Since(start))
+	}
+}
+
+var lastImportTime time.Time = time.Now()
+
 func main() {
 	mux := http.NewServeMux()
 
 	log.Println("Loading or generating private key")
 	privKey := config.LoadOrGeneratePrivateKey()
 
-	log.Println("Importing C-chain balance to P-chain")
-	balance.ImportCToP(privKey, config.GetRPCUrl())
-
 	// Serve static files from dist directory
 	fs := http.FileServer(http.Dir("dist"))
 	mux.Handle("/", fs)
 
-	mux.HandleFunc("/api/generateGenesis", generateGenesis)
-	mux.HandleFunc("/api/createL1", createL1)
-	mux.HandleFunc("/api/cChainAddr", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/genesis", logRequest(generateGenesis))
+	mux.HandleFunc("/api/create", logRequest(createL1))
+	mux.HandleFunc("/api/addr/c", logRequest(func(w http.ResponseWriter, r *http.Request) {
 		cChainAddr := evm.PublicKeyToEthAddress(privKey.PublicKey())
 		w.Header().Set("Content-Type", "text/plain")
 		w.Write([]byte(cChainAddr.Hex()))
-	})
+	}))
+	mux.HandleFunc("/api/balance/c", logRequest(func(w http.ResponseWriter, r *http.Request) {
+		cChainAddr := evm.PublicKeyToEthAddress(privKey.PublicKey())
+		myBalance, err := balance.CheckCChainBalance(context.Background(), cChainAddr, config.GetRPCUrl())
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		if time.Since(lastImportTime) > 1*time.Minute && myBalance.Cmp(new(big.Int).Exp(big.NewInt(10), big.NewInt(18), nil)) > 0 {
+			lastImportTime = time.Now()
+			_, err = balance.ImportCToP(privKey, config.GetRPCUrl())
+			if err != nil {
+				log.Printf("Failed to import C-chain balance to P-chain: %v", err)
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+		}
+
+		w.Header().Set("Content-Type", "text/plain")
+		w.Write([]byte(balance.GetBalanceString(myBalance, 18)))
+	}))
+	mux.HandleFunc("/api/balance/p", logRequest(func(w http.ResponseWriter, r *http.Request) {
+		myBalance, err := balance.CheckPChainBalance(context.Background(), privKey.Address(), config.GetRPCUrl())
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		w.Header().Set("Content-Type", "text/plain")
+		w.Write([]byte(balance.GetBalanceString(myBalance, 9)))
+	}))
 
 	port := "3000"
 	log.Printf("Server starting on port %s", port)
@@ -93,8 +134,9 @@ func generateGenesis(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	if evmChainId < 1 || evmChainId > 1000000 {
-		http.Error(w, "Invalid evmChainId", http.StatusBadRequest)
+	maxEvmChainId := 1000000
+	if evmChainId < 1 || evmChainId > maxEvmChainId {
+		http.Error(w, fmt.Sprintf("Invalid evmChainId, should be between 1 and %d", maxEvmChainId), http.StatusBadRequest)
 		return
 	}
 

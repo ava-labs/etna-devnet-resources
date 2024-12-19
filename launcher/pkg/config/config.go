@@ -13,9 +13,17 @@ func GetRPCUrl() string {
 	return "https://api.avax-test.network"
 }
 
+var privateKeyFolder = "."
+
+func init() {
+	if os.Getenv("PRIV_KEY_FOLDER") != "" {
+		privateKeyFolder = os.Getenv("PRIV_KEY_FOLDER")
+	}
+}
+
 func LoadOrGeneratePrivateKey() *secp256k1.PrivateKey {
 	// Try to load private key from file
-	keyBytes, err := os.ReadFile("./priv.hex")
+	keyBytes, err := os.ReadFile(privateKeyFolder + "/priv.hex")
 	if err == nil {
 		// File exists, try to load key
 		text := strings.TrimPrefix(strings.TrimSpace(string(keyBytes)), "0x")

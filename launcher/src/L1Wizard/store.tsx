@@ -89,7 +89,10 @@ import generateName from 'boring-name-generator'
 
 const wizardStoreFunc: StateCreator<WizardState> = (set, get) => ({
     ownerEthAddress: "",
-    setOwnerEthAddress: (address: string) => set(() => ({ ownerEthAddress: address })),
+    setOwnerEthAddress: (address: string) => set(() => ({
+        ownerEthAddress: address,
+        genesisString: "",
+    })),
 
     currentStep: Object.keys(stepList)[0] as keyof typeof stepList,
     advanceFrom: (givenStep, direction: "up" | "down" = "up") => set((state) => {
@@ -108,7 +111,10 @@ const wizardStoreFunc: StateCreator<WizardState> = (set, get) => ({
     setNodesCount: (count: number) => set(() => ({ nodesCount: count })),
 
     chainId: Math.floor(Math.random() * 1000000) + 1,
-    setChainId: (chainId: number) => set(() => ({ chainId: chainId })),
+    setChainId: (chainId: number) => set(() => ({
+        chainId: chainId,
+        genesisString: ""
+    })),
 
     genesisString: "",
     regenerateGenesis: async () => {
@@ -117,9 +123,15 @@ const wizardStoreFunc: StateCreator<WizardState> = (set, get) => ({
             evmChainId: get().chainId.toString()
         });
 
-        const response = await fetch(`/api/generateGenesis?${params}`);
+        const response = await fetch(`/api/genesis?${params}`);
         if (!response.ok) {
-            throw new Error('Failed to generate genesis');
+            let errorMessage = response.statusText;
+            try {
+                errorMessage = await response.text()
+            } catch (e) {
+                console.error(e)
+            }
+            throw new Error('Failed to generate genesis: ' + errorMessage);
         }
         const genesis = await response.text();
         set({ genesisString: genesis });
