@@ -53,7 +53,7 @@ export default function CreateL1() {
         errors.slice(0, nodesCount).some(error => error);
 
     return <>
-        <h1 className="text-2xl font-medium mb-6">Create an L1</h1>
+        <h1 className="text-2xl font-medium mb-6">Paste node PoP</h1>
 
         <h3 className="mb-4 font-medium">Paste the node credentials for each node:</h3>
         {Array.from({ length: nodesCount }).map((_, index) => (

@@ -31,7 +31,6 @@ var lastImportTime time.Time = time.Date(1970, 1, 1, 0, 0, 0, 0, time.UTC)
 func main() {
 	mux := http.NewServeMux()
 
-	log.Println("Loading or generating private key")
 	privKey := config.LoadOrGeneratePrivateKey()
 
 	// Serve static files from dist directory
@@ -117,6 +116,11 @@ func createL1(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
+
+	time.Sleep(10 * time.Second)
+
+	w.Header().Set("Content-Type", "application/json")
+	w.Write([]byte("{}"))
 
 }
 
