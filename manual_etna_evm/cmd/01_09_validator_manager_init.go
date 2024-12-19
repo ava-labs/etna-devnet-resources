@@ -81,6 +81,8 @@ var validatorManagerInitCmd = &cobra.Command{
 			if err != nil {
 				return fmt.Errorf("failed to initialize validator manager: %w", err)
 			}
+		} else {
+			return fmt.Errorf("invalid validator type: %s", validatorType)
 		}
 
 		PrintLogs(receipt.Logs)
