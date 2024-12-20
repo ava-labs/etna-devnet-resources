@@ -25,8 +25,7 @@ export default function LaunchValidators() {
       <h1 className="text-2xl font-medium mb-6">Launch L1 Validators</h1>
 
       <h3 className="mb-4 font-medium">
-        Launch this on each of your {nodesCount} validator node
-        {nodesCount > 1 ? 's' : ''}:
+        {nodesCount > 1 ? 'Launch this on each of your ' + nodesCount + ' validator node' + (nodesCount > 1 ? 's' : '') + ':' : 'Launch this on your validator node:'}
       </h3>
       <pre className="bg-gray-100 p-4 rounded-md mb-4">
         {dockerCommand(subnetId)}
