@@ -5,6 +5,7 @@ import Steps from "./Steps";
 import { stepList, useWizardStore } from "./store";
 import CreateL1 from "./CreateL1";
 import { TechInfo } from "./TechInfo";
+import LaunchValidators from "./LaunchValidators";
 
 
 const stepComponents: Record<keyof typeof stepList, React.ReactNode> = {
@@ -12,6 +13,7 @@ const stepComponents: Record<keyof typeof stepList, React.ReactNode> = {
     'generate-keys': <GenerateKeys />,
     'paste-keys': <PasteKeys />,
     'create-l1': <CreateL1 />,
+    "launch-validators": <LaunchValidators />,
 }
 
 
@@ -20,7 +22,7 @@ export default function L1Wizard() {
 
     return (
         <>
-            <div className="flex container mx-auto max-w-5xl py-8">
+            <div className="flex container mx-auto max-w-6xl py-8">
                 <div className="w-80 p-4 shrink-0">
                     <Steps />
                 </div>

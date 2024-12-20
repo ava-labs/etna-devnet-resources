@@ -24,9 +24,10 @@ func init() {
 var privKeyCache *secp256k1.PrivateKey = nil
 
 func LoadOrGeneratePrivateKey() *secp256k1.PrivateKey {
+	privKeyPath := privateKeyFolder + "/priv.hex"
 	if privKeyCache == nil {
 		// Try to load private key from file
-		keyBytes, err := os.ReadFile(privateKeyFolder + "/priv.hex")
+		keyBytes, err := os.ReadFile(privKeyPath)
 		if err == nil {
 			// File exists, try to load key
 			text := strings.TrimPrefix(strings.TrimSpace(string(keyBytes)), "0x")
@@ -50,7 +51,7 @@ func LoadOrGeneratePrivateKey() *secp256k1.PrivateKey {
 
 		// Save key to file
 		keyHex := hex.EncodeToString(key.Bytes())
-		err = os.WriteFile("./priv.hex", []byte(keyHex), 0600)
+		err = os.WriteFile(privKeyPath, []byte(keyHex), 0600)
 		if err != nil {
 			panic(fmt.Errorf("failed to save private key: %w", err))
 		}

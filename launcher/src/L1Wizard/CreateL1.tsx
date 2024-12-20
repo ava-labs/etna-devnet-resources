@@ -21,7 +21,9 @@ export default function CreateL1() {
 
     const [isCreating, setIsCreating] = useState(false);
     const [error, setError] = useState<string | null>(null);
-    const [status, setStatus] = useState<StepStatus>('waiting');
+    const [status, setStatus] = useState<StepStatus>(() =>
+        chainId && subnetId && conversionId ? 'success' : 'waiting'
+    );
     const [showConfetti, setShowConfetti] = useState(false);
     const [windowSize, setWindowSize] = useState({
         width: window.innerWidth,
@@ -107,9 +109,10 @@ export default function CreateL1() {
             case 'waiting':
                 return (
                     <div className="w-5 h-5">
-                        <svg className="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
-                            <path stroke="currentColor" strokeLinecap="round" strokeWidth="2" d="M6 12h.01m6 0h.01m5.99 0h.01" />
+                        <svg className="w-6 h-6 text-gray-800" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-width="2" d="M6 12h.01m6 0h.01m5.99 0h.01" />
                         </svg>
+
                     </div>
                 );
         }

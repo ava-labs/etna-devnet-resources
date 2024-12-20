@@ -63,7 +63,7 @@ export const TechInfo = () => {
             {address}<br />
             P-Chain: {pBalance} AVAX, C-Chain {cBalance} AVAX
             <br />
-            Current release compiled {compileTs ? timeAgo.format(new Date(parseInt(compileTs) * 1000)) : ''}
+            Release compiled {compileTs ? timeAgo.format(new Date(parseInt(compileTs) * 1000)) : ''}
         </div>
     );
 };

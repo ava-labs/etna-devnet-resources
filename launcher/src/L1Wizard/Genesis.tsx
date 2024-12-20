@@ -112,7 +112,7 @@ export default function Genesis() {
                             className="w-full p-2 border border-gray-200 rounded-md"
                         />
                     </div>
-                    <button
+                    {window.ethereum && <button
                         onClick={handleConnectWallet}
                         disabled={isLoading}
                         className={`px-4 py-2 rounded-md ${isLoading
@@ -121,7 +121,7 @@ export default function Genesis() {
                             }`}
                     >
                         {isLoading ? 'Loading...' : 'Fill from Wallet'}
-                    </button>
+                    </button>}
                 </div>
                 <p className="mt-2 text-sm text-gray-500">
                     This address will receive all tokens and control in case of Proof of Authority chain.

@@ -136,10 +136,11 @@ func createL1(w http.ResponseWriter, r *http.Request) {
 
 	if _, hasMock := r.URL.Query()["mock"]; hasMock {
 		w.Header().Set("Content-Type", "application/json")
+
 		json.NewEncoder(w).Encode(map[string]string{
-			"chainID":      "24dnYhG4YgY2xpmccLJvgrq91DZuTtciU8GiLcHHBzNdSdN7TM",
-			"subnetID":     "uBqfpRFjEDnaA4tJhULzrgszt1yaH65Cb4NigfY59LL56wcDH",
-			"conversionID": "272Da6ib1eGfH72UYEnhNJHhJA77bNgLMZwT3vGwZSJeao9WEH",
+			"chainID":      "5j7qVbopYzXePpaGsnwxokBdymE5JkKX79iFxNNXgdADae7kV",
+			"subnetID":     "V5gvPemfF4F1MqWZEAMeYjFDWBkUekpSGbcGWTSvKrPNUrVAf",
+			"conversionID": "2wdaS5jwMvwZRVdFtVTZ1v6p8x3fmJ2pUQWeu46V918jb3Mb5n",
 		})
 		return
 	}
