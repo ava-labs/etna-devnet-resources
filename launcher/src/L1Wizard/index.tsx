@@ -6,6 +6,7 @@ import { stepList, useWizardStore } from "./store";
 import CreateL1 from "./CreateL1";
 import { TechInfo } from "./TechInfo";
 import LaunchValidators from "./LaunchValidators";
+import LaunchRpcNode from "./LaunchRpcNode";
 
 
 const stepComponents: Record<keyof typeof stepList, React.ReactNode> = {
@@ -14,6 +15,7 @@ const stepComponents: Record<keyof typeof stepList, React.ReactNode> = {
     'paste-keys': <PasteKeys />,
     'create-l1': <CreateL1 />,
     "launch-validators": <LaunchValidators />,
+    "launch-rpc-node": <LaunchRpcNode />,
 }
 
 
