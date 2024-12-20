@@ -2,8 +2,9 @@ import { useWizardStore } from './store';
 import NextPrev from './ui/NextPrev';
 import { useState } from 'react';
 import Note from './ui/Note';
+import { CONTAINER_VERSION } from './constants';
 
-const dockerCommand = (subnetID: string) => `mkdir -p ~/.avalanchego/staking; docker run -it -d \\
+const dockerCommand = (subnetID: string) => `docker run -it -d \\
   --name avalanchego \\
   --network host \\
   -v ~/.avalanchego:/home/avalanche/.avalanchego \\
@@ -12,7 +13,7 @@ const dockerCommand = (subnetID: string) => `mkdir -p ~/.avalanchego/staking; do
   -e AVALANCHEGO_TRACK_SUBNETS=${subnetID} \\
   -e HOME=/home/avalanche \\
   --user $(id -u):$(id -g) \\
-  containerman17/avalanchego-subnetevm:v1.12.1_v0.7.0`
+  containerman17/avalanchego-subnetevm:${CONTAINER_VERSION}`
 
 
 export default function LaunchValidators() {

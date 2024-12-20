@@ -6,7 +6,7 @@ const dockerCommand = `mkdir -p ~/.avalanchego/staking; docker run -it -d \\
   -e AVALANCHEGO_PARTIAL_SYNC_PRIMARY_NETWORK=true \\
   -e HOME=/home/avalanche \\
   --user $(id -u):$(id -g) \\
-  containerman17/avalanchego-subnetevm:v1.12.1_v0.7.0`
+  containerman17/avalanchego-subnetevm:${CONTAINER_VERSION}`
 
 const popRequest = `curl -X POST --data '{ 
     "jsonrpc":"2.0", 
@@ -16,6 +16,7 @@ const popRequest = `curl -X POST --data '{
 
 const stopScript = `docker stop avalanchego; docker rm avalanchego`
 
+import { CONTAINER_VERSION } from './constants';
 import { useWizardStore } from './store';
 import NextPrev from './ui/NextPrev';
 
