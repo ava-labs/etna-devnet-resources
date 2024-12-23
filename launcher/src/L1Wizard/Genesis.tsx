@@ -11,7 +11,7 @@ function isValidL1Name(name: string): boolean {
 }
 
 export default function Genesis() {
-    const { ownerEthAddress, setOwnerEthAddress, advanceFrom, evmChainId, setEvmChainId, genesisString, regenerateGenesis, l1Name, setL1Name } = useWizardStore();
+    const { ownerEthAddress, setOwnerEthAddress, advanceFrom, evmChainId, setEvmChainId, genesisString, regenerateGenesis, l1Name, setL1Name, tokenSymbol, setTokenSymbol } = useWizardStore();
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState('');
     const [isRegenerating, setIsRegenerating] = useState(false);
@@ -125,6 +125,19 @@ export default function Genesis() {
                 </div>
                 <p className="mt-2 text-sm text-gray-500">
                     This address will receive all tokens and control in case of Proof of Authority chain.
+                </p>
+            </div>
+
+            <div className="mb-6">
+                <input
+                    type="text"
+                    value={tokenSymbol}
+                    onChange={(e) => setTokenSymbol(e.target.value)}
+                    placeholder="Token Symbol"
+                    className="w-full p-2 border border-gray-200 rounded-md"
+                />
+                <p className="mt-2 text-sm text-gray-500">
+                    The symbol (ticker) of your blockchain's native token (e.g., AAA, TEST). Do not use existing tickers like AVAX, ETH, etc.
                 </p>
             </div>
 

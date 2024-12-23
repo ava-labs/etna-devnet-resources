@@ -1,5 +1,3 @@
-import { createWalletClient, custom } from 'viem'
-
 declare global {
     interface Window {
         ethereum?: any;
@@ -7,12 +5,14 @@ declare global {
 }
 
 export async function getWalletAddress() {
-    const walletClient = createWalletClient({
-        transport: custom(window.ethereum)
-    })
-    const [account] = await walletClient.requestAddresses()
-    if (!account) {
-        throw new Error('No account found')
+    if (!window.ethereum) {
+        throw new Error('No wallet detected');
     }
-    return account
+
+    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+    if (!accounts || accounts.length === 0) {
+        throw new Error('No account found');
+    }
+
+    return accounts[0]; // Return the first account
 }

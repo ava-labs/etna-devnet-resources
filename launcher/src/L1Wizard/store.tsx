@@ -53,14 +53,14 @@ export const stepList = {
             <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7h1v12a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1V5a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v14a1 1 0 0 0 1 1h11.5M7 14h6m-6 3h6m0-10h.5m-.5 3h.5M7 7h3v3H7V7Z" />
         </svg>
     },
-    // "add-to-wallet": {
-    //     title: "Add to wallet",
-    //     description: "Add your L1 to your wallet",
-    //     icon: <svg className="w-6 h-6 text-gray-800" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" >
-    //         <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 8v8m0-8h8M8 8H6a2 2 0 1 1 2-2v2Zm0 8h8m-8 0H6a2 2 0 1 0 2 2v-2Zm8 0V8m0 8h2a2 2 0 1 1-2 2v-2Zm0-8h2a2 2 0 1 0-2-2v2Z" />
-    //     </svg >
+    "add-to-wallet": {
+        title: "Add to wallet",
+        description: "Add your L1 to your wallet",
+        icon: <svg className="w-6 h-6 text-gray-800" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" >
+            <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 8v8m0-8h8M8 8H6a2 2 0 1 1 2-2v2Zm0 8h8m-8 0H6a2 2 0 1 0 2 2v-2Zm8 0V8m0 8h2a2 2 0 1 1-2 2v-2Zm0-8h2a2 2 0 1 0-2-2v2Z" />
+        </svg >
+    },
 
-    // },
     // "deploy-validator-manager": {
     //     title: "Deploy validator manager",
     //     description: "Deploy contract on your L1",
@@ -113,6 +113,8 @@ interface WizardState {
     setRpcAddress: (address: string) => void;
     rpcVerified: boolean;
     setRpcVerified: (verified: boolean) => void;
+    tokenSymbol: string;
+    setTokenSymbol: (symbol: string) => void;
 }
 
 
@@ -194,11 +196,15 @@ const wizardStoreFunc: StateCreator<WizardState> = (set, get) => ({
 
     rpcVerified: false,
     setRpcVerified: (verified) => set(() => ({ rpcVerified: verified })),
+
+    tokenSymbol: "TEST",
+    setTokenSymbol: (symbol: string) => set(() => ({ tokenSymbol: symbol })),
 })
 
 
+const shouldPersist = true//window.location.origin.startsWith("http://localhost:") || window.location.origin.startsWith("http://tokyo:")
 
-export const useWizardStore = window.location.origin.startsWith("http://localhost:") || window.location.origin.startsWith("http://tokyo:")
+export const useWizardStore = shouldPersist
     ? create<WizardState>()(
         persist(
             wizardStoreFunc,
