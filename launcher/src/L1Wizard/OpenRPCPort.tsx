@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { useWizardStore } from './store';
 import NextPrev from './ui/NextPrev';
 import Note from './ui/Note';
@@ -75,9 +74,6 @@ const DomainSelector = ({
                 />
                 <label htmlFor="domain-yes" className="w-full py-3 ms-2 text-sm font-medium text-gray-900">
                     I have a domain
-                    <span className="ms-2 bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
-                        Recommended
-                    </span>
                 </label>
             </div>
         </li>
@@ -132,23 +128,29 @@ const isValidIP = (ip: string): boolean => {
 };
 
 export default function OpenRPCPort() {
-    const { nodesCount } = useWizardStore();
-    const [locationType, setLocationType] = useState<LocationType>('local');
-    const [domainType, setDomainType] = useState<DomainType>('has-domain');
-    const [address, setAddress] = useState('');
-    const [isVerified, setIsVerified] = useState(false);
+    const {
+        nodesCount,
+        rpcLocationType,
+        setRpcLocationType,
+        rpcDomainType,
+        setRpcDomainType,
+        rpcAddress,
+        setRpcAddress,
+        rpcVerified,
+        setRpcVerified
+    } = useWizardStore();
 
     const getRpcEndpoint = () => {
-        if (locationType === 'local') return 'http://localhost:8080';
-        if (domainType === 'no-domain') return `https://${address}.nip.io`;
-        return `https://${address}`;
+        if (rpcLocationType === 'local') return 'http://localhost:8080';
+        if (rpcDomainType === 'no-domain') return `https://${rpcAddress}.nip.io`;
+        return `https://${rpcAddress}`;
     };
 
     const isAddressValid = () => {
-        if (domainType === 'no-domain') {
-            return isValidIP(address);
+        if (rpcDomainType === 'no-domain') {
+            return isValidIP(rpcAddress);
         }
-        return isValidDomain(address);
+        return isValidDomain(rpcAddress);
     };
 
     return (
@@ -176,30 +178,30 @@ export default function OpenRPCPort() {
             <div className="mb-6">
                 <h3 className="mb-4 font-medium">Where is your RPC node running?</h3>
                 <LocationSelector
-                    value={locationType}
-                    onChange={setLocationType}
+                    value={rpcLocationType}
+                    onChange={setRpcLocationType}
                     nodesCount={nodesCount}
                 />
             </div>
 
-            {locationType === 'local' && (
+            {rpcLocationType === 'local' && (
                 <div className="mb-6">
                     <p className="mb-4">Your RPC endpoint will be available at: <code className="bg-gray-100 px-2 py-1 rounded">http://localhost:8080</code></p>
                 </div>
             )}
 
-            {locationType === 'remote' && (
+            {rpcLocationType === 'remote' && (
                 <>
                     <div className="mb-6">
                         <h3 className="mb-4 font-medium">Do you have a domain name?</h3>
-                        <DomainSelector value={domainType} onChange={setDomainType} />
+                        <DomainSelector value={rpcDomainType} onChange={setRpcDomainType} />
                     </div>
 
                     <div className="mb-6">
                         <label className="block text-sm font-medium mb-2">
-                            {domainType === 'no-domain' ? 'Server IP Address:' : 'Domain Name:'}
+                            {rpcDomainType === 'no-domain' ? 'Server IP Address:' : 'Domain Name:'}
                         </label>
-                        {domainType === 'manual-ssl' && (
+                        {rpcDomainType === 'manual-ssl' && (
                             <div className="mb-4 bg-gray-50 p-4 rounded-md">
                                 <p className="mb-2 font-medium">Configure your reverse proxy:</p>
                                 <p className="text-sm text-gray-600">
@@ -207,7 +209,7 @@ export default function OpenRPCPort() {
                                 </p>
                             </div>
                         )}
-                        {domainType === 'no-domain' && (
+                        {rpcDomainType === 'no-domain' && (
                             <div className="mb-4 bg-gray-50 p-4 rounded-md">
                                 <p className="mb-2 font-medium">Get your server's public IP:</p>
                                 <pre className="bg-gray-100 p-3 rounded-md mb-2">curl checkip.amazonaws.com</pre>
@@ -216,39 +218,39 @@ export default function OpenRPCPort() {
                         )}
                         <input
                             type="text"
-                            value={address}
-                            onChange={(e) => setAddress(e.target.value)}
-                            placeholder={domainType === 'no-domain' ? '123.45.67.89' : 'example.com'}
-                            className={`w-full p-2 border rounded-md mb-2 ${address && !isAddressValid()
+                            value={rpcAddress}
+                            onChange={(e) => setRpcAddress(e.target.value)}
+                            placeholder={rpcDomainType === 'no-domain' ? '123.45.67.89' : 'example.com'}
+                            className={`w-full p-2 border rounded-md mb-2 ${rpcAddress && !isAddressValid()
                                 ? 'border-red-500 text-red-500'
                                 : 'border-gray-200'
                                 }`}
                         />
-                        {address && !isAddressValid() && (
+                        {rpcAddress && !isAddressValid() && (
                             <p className="text-red-500 text-sm mb-2">
-                                {domainType === 'no-domain'
+                                {rpcDomainType === 'no-domain'
                                     ? 'Please enter a valid IP address (e.g., 123.45.67.89)'
                                     : 'Please enter a valid domain name (e.g., example.com)'}
                             </p>
                         )}
 
-                        {domainType === 'no-domain' && address && isAddressValid() && (
+                        {rpcDomainType === 'no-domain' && rpcAddress && isAddressValid() && (
                             <Note>
-                                We'll use nip.io service to create a domain-like address: <code className="bg-blue-100 px-1 py-0.5 rounded">{`${address}.nip.io`}</code>
+                                We'll use nip.io service to create a domain-like address: <code className="bg-blue-100 px-1 py-0.5 rounded">{`${rpcAddress}.nip.io`}</code>
                             </Note>
                         )}
 
-                        {address && isAddressValid() && domainType !== 'manual-ssl' && (
+                        {rpcAddress && isAddressValid() && rpcDomainType !== 'manual-ssl' && (
                             <>
                                 <h3 className="mt-6 mb-4 font-medium">Set up HTTPS proxy:</h3>
                                 <pre className="bg-gray-100 p-4 rounded-md mb-4">
-                                    {caddyDockerCommand(domainType === 'no-domain' ? `${address}.nip.io` : address)}
+                                    {caddyDockerCommand(rpcDomainType === 'no-domain' ? `${rpcAddress}.nip.io` : rpcAddress)}
                                 </pre>
                             </>
                         )}
                     </div>
 
-                    {address && isAddressValid() && (
+                    {rpcAddress && isAddressValid() && (
                         <div className="mb-6">
                             <h3 className="mb-4 font-medium">Verify your setup:</h3>
                             <div className="mb-4">
@@ -275,8 +277,8 @@ export default function OpenRPCPort() {
                                 <input
                                     type="checkbox"
                                     id="verifySetup"
-                                    checked={isVerified}
-                                    onChange={(e) => setIsVerified(e.target.checked)}
+                                    checked={rpcVerified}
+                                    onChange={(e) => setRpcVerified(e.target.checked)}
                                     className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
                                 />
                                 <label htmlFor="verifySetup" className="ml-2">
@@ -289,7 +291,7 @@ export default function OpenRPCPort() {
             )}
 
             <NextPrev
-                nextDisabled={locationType === 'remote' && (!isAddressValid() || !isVerified)}
+                nextDisabled={rpcLocationType === 'remote' && (!isAddressValid() || !rpcVerified)}
                 currentStepName="open-rpc-port"
             />
         </>

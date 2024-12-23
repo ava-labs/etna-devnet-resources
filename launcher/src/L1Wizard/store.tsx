@@ -105,6 +105,14 @@ interface WizardState {
     setSubnetId: (subnetId: string) => void;
     conversionId: string;
     setConversionId: (conversionId: string) => void;
+    rpcLocationType: 'local' | 'remote';
+    setRpcLocationType: (type: 'local' | 'remote') => void;
+    rpcDomainType: 'has-domain' | 'no-domain' | 'manual-ssl';
+    setRpcDomainType: (type: 'has-domain' | 'no-domain' | 'manual-ssl') => void;
+    rpcAddress: string;
+    setRpcAddress: (address: string) => void;
+    rpcVerified: boolean;
+    setRpcVerified: (verified: boolean) => void;
 }
 
 
@@ -174,6 +182,18 @@ const wizardStoreFunc: StateCreator<WizardState> = (set, get) => ({
         evmChainId: chainId,
         genesisString: ""
     })),
+
+    rpcLocationType: 'local',
+    setRpcLocationType: (type) => set(() => ({ rpcLocationType: type })),
+
+    rpcDomainType: 'has-domain',
+    setRpcDomainType: (type) => set(() => ({ rpcDomainType: type })),
+
+    rpcAddress: '',
+    setRpcAddress: (address) => set(() => ({ rpcAddress: address })),
+
+    rpcVerified: false,
+    setRpcVerified: (verified) => set(() => ({ rpcVerified: verified })),
 })
 
 
