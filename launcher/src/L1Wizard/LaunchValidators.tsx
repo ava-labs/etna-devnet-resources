@@ -11,6 +11,7 @@ const dockerCommand = (subnetID: string) => `docker run -it -d \\
   -e AVALANCHEGO_NETWORK_ID=fuji \\
   -e AVALANCHEGO_PARTIAL_SYNC_PRIMARY_NETWORK=true \\
   -e AVALANCHEGO_TRACK_SUBNETS=${subnetID} \\
+  -e AVALANCHEGO_PUBLIC_IP_RESOLUTION_SERVICE=ifconfigme \\
   -e HOME=/home/avalanche \\
   --user $(id -u):$(id -g) \\
   containerman17/avalanchego-subnetevm:${CONTAINER_VERSION}`
@@ -78,6 +79,9 @@ export default function LaunchValidators() {
       <Note>
         <code className="font-mono bg-blue-100 px-1 py-0.5 rounded">{chainId}</code> is the chain ID
       </Note>
+
+      <p className="mb-4">At first, it will return <code>404 page not found</code> as the node is not bootstrapped yet.</p>
+
 
 
       <p className="mb-4">

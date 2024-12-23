@@ -15,6 +15,7 @@ const dockerCommand = (subnetID: string) => `mkdir -p ~/.avalanchego_rpc/staking
   -e AVALANCHEGO_STAKING_PORT=9653 \\
   -e AVALANCHEGO_HTTP_ALLOWED_HOSTS=* \\
   -e AVALANCHEGO_HTTP_HOST=0.0.0.0 \\
+  -e AVALANCHEGO_PUBLIC_IP_RESOLUTION_SERVICE=ifconfigme \\
   -e HOME=/home/avalanche \\
   --user $(id -u):$(id -g) \\
   containerman17/avalanchego-subnetevm:${CONTAINER_VERSION}`;
