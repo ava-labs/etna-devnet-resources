@@ -7,7 +7,7 @@ import CreateL1 from "./CreateL1";
 import { TechInfo } from "./TechInfo";
 import LaunchValidators from "./LaunchValidators";
 import LaunchRpcNode from "./LaunchRpcNode";
-
+import OpenRPCPort from "./OpenRPCPort";
 
 const stepComponents: Record<keyof typeof stepList, React.ReactNode> = {
     'genesis': <Genesis />,
@@ -16,6 +16,7 @@ const stepComponents: Record<keyof typeof stepList, React.ReactNode> = {
     'create-l1': <CreateL1 />,
     "launch-validators": <LaunchValidators />,
     "launch-rpc-node": <LaunchRpcNode />,
+    "open-rpc-port": <OpenRPCPort />,
 }
 
 
