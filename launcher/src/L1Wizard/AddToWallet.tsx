@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useWizardStore } from './store';
 import NextPrev from './ui/NextPrev';
 import Note from './ui/Note';
+import { getWalletAddress } from './wallet';
 
 export const AddToWallet = () => {
     const { evmChainId, l1Name, rpcLocationType, rpcAddress, rpcDomainType, tokenSymbol, chainId } = useWizardStore();
@@ -17,12 +18,7 @@ export const AddToWallet = () => {
 
     const checkAccountBalance = async (): Promise<{ address: string; balance: number } | null> => {
         try {
-            const accounts = await window.ethereum.request({ method: 'eth_accounts' });
-            if (!accounts || accounts.length === 0) {
-                throw new Error('No accounts found in the wallet.');
-            }
-
-            const account = accounts[0];
+            const account = await getWalletAddress()
             const rpcUrl = getRpcEndpoint();
             const response = await fetch(rpcUrl, {
                 method: 'POST',
@@ -143,6 +139,13 @@ export const AddToWallet = () => {
                 </button>
             </div>
 
+            {balanceError && (
+                <div className="bg-red-50 border-l-4 border-red-400 p-4 mb-6">
+                    <h3 className="font-medium mb-2">Error</h3>
+                    <p>{balanceError}</p>
+                </div>
+            )}
+
             {isAdded && balanceInfo && (
                 <div className="bg-green-50 border-l-4 border-green-400 p-4 mb-6">
                     <h3 className="font-medium mb-2">Wallet Added Successfully</h3>
@@ -150,13 +153,6 @@ export const AddToWallet = () => {
                         Balance of account <span className="font-mono">{balanceInfo.address}</span> is{' '}
                         <span className="font-bold">{balanceInfo.balance.toFixed(4)} {tokenSymbol}</span>.
                     </p>
-                </div>
-            )}
-
-            {isAdded && balanceError && (
-                <div className="bg-red-50 border-l-4 border-red-400 p-4 mb-6">
-                    <h3 className="font-medium mb-2">Balance Check Failed</h3>
-                    <p>{balanceError}</p>
                 </div>
             )}
 

@@ -9,6 +9,7 @@ import LaunchValidators from "./LaunchValidators";
 import LaunchRpcNode from "./LaunchRpcNode";
 import OpenRPCPort from "./OpenRPCPort";
 import { AddToWallet } from "./AddToWallet";
+import DeployContracts from "./DeployContracts";
 
 const stepComponents: Record<keyof typeof stepList, React.ReactNode> = {
     'genesis': <Genesis />,
@@ -19,6 +20,7 @@ const stepComponents: Record<keyof typeof stepList, React.ReactNode> = {
     "launch-rpc-node": <LaunchRpcNode />,
     "open-rpc-port": <OpenRPCPort />,
     "add-to-wallet": <AddToWallet />,
+    "deploy-contracts": <DeployContracts />,
 }
 
 
