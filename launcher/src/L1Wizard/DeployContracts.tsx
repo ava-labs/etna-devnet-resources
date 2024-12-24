@@ -7,10 +7,10 @@ import { createPublicClient, createWalletClient, custom, http, Chain, defineChai
 import { privateKeyToAccount } from 'viem/accounts';
 
 const PROXY_ADMIN_ADDRESS = '0xC0fFEE1234567890aBCdeF1234567890abcDef34' as const;
-const PROXY_ADDRESS = '0xfEeDC0DE00000000000000000000000000000000' as const;
+const PROXY_ADDRESS = '0x0Feedc0de0000000000000000000000000000000' as const;
 
 // Function selectors
-const GET_IMPLEMENTATION_SELECTOR = '0xf9633eab'; // keccak256('getProxyImplementation(address)').slice(0, 10)
+const GET_IMPLEMENTATION_SELECTOR = '0x204e1c7a'; // keccak256('getProxyImplementation(address)').slice(0, 10)
 const UPGRADE_TO_SELECTOR = '0x3659cfe6'; // keccak256('upgradeTo(address)').slice(0, 10)
 
 interface DeploymentStatus {
@@ -246,6 +246,7 @@ export default function DeployContracts() {
             const result = await publicClient.call({
                 account: address,
                 to: PROXY_ADMIN_ADDRESS,
+                // data: "0x204e1c7a0000000000000000000000000feedc0de0000000000000000000000000000000",
                 data: `${GET_IMPLEMENTATION_SELECTOR}${PROXY_ADDRESS.slice(2).padStart(64, '0')}` as `0x${string}`,
             });
 
