@@ -5,13 +5,14 @@ import PoAValidatorManager from "../../contract_compiler/compiled/PoAValidatorMa
 import ValidatorMessages from "../../contract_compiler/compiled/ValidatorMessages.json"
 import { createPublicClient, createWalletClient, custom, http, Chain, defineChain, keccak256, encodeAbiParameters, parseAbiParameters, toHex } from 'viem';
 import { privateKeyToAccount } from 'viem/accounts';
+import NextPrev from './ui/NextPrev';
 
 const PROXY_ADMIN_ADDRESS = '0xC0fFEE1234567890aBCdeF1234567890abcDef34' as const;
 const PROXY_ADDRESS = '0x0Feedc0de0000000000000000000000000000000' as const;
 
 // Function selectors
 const GET_IMPLEMENTATION_SELECTOR = '0x204e1c7a'; // keccak256('getProxyImplementation(address)').slice(0, 10)
-const UPGRADE_TO_SELECTOR = '0x3659cfe6'; // keccak256('upgradeTo(address)').slice(0, 10)
+const UPGRADE_TO_SELECTOR = '0x99a88ec4'; // keccak256('upgradeTo(address)').slice(0, 10)
 
 interface DeploymentStatus {
     status: 'not_started' | 'deploying' | 'error' | 'success';
@@ -246,7 +247,6 @@ export default function DeployContracts() {
             const result = await publicClient.call({
                 account: address,
                 to: PROXY_ADMIN_ADDRESS,
-                // data: "0x204e1c7a0000000000000000000000000feedc0de0000000000000000000000000000000",
                 data: `${GET_IMPLEMENTATION_SELECTOR}${PROXY_ADDRESS.slice(2).padStart(64, '0')}` as `0x${string}`,
             });
 
@@ -306,7 +306,7 @@ export default function DeployContracts() {
             const hash = await walletClient.sendTransaction({
                 account: address,
                 to: PROXY_ADMIN_ADDRESS,
-                data: `${UPGRADE_TO_SELECTOR}${upgradeData.slice(2)}` as `0x${string}`,
+                data: `0x99a88ec40000000000000000000000000feedc0de0000000000000000000000000000000000000000000000000000000bdacb8607d56add0aa0ed1d824b9901c30bc7e55`
             });
 
             // Wait for transaction to complete
@@ -314,7 +314,8 @@ export default function DeployContracts() {
                 chain,
                 transport: http(),
             });
-            await publicClient.waitForTransactionReceipt({ hash });
+            const receipt = await publicClient.waitForTransactionReceipt({ hash });
+            console.log("receipt", receipt);
 
             // Check new implementation
             const result = await publicClient.call({
@@ -364,93 +365,97 @@ export default function DeployContracts() {
         };
 
         return (
-            <div className={`p-4 rounded-lg border ${statusColors[deployment.status]} mb-4`}>
-                <div className="flex items-center justify-between mb-2">
-                    <h3 className="font-medium">{title}</h3>
-                    <span className={`text-sm ${deployment.status === 'error' ? 'text-red-600' : ''}`}>
-                        {statusText[deployment.status]}
-                    </span>
+            <>
+                <div className={`p-4 rounded-lg border ${statusColors[deployment.status]} mb-4`}>
+                    <div className="flex items-center justify-between mb-2">
+                        <h3 className="font-medium">{title}</h3>
+                        <span className={`text-sm ${deployment.status === 'error' ? 'text-red-600' : ''}`}>
+                            {statusText[deployment.status]}
+                        </span>
+                    </div>
+
+                    {deployment.error && (
+                        <div className="text-sm text-red-600 mb-2">{deployment.error}</div>
+                    )}
+
+                    {deployment.address && (
+                        <div className="mb-2">
+                            <div className="text-sm text-gray-500 mb-1">Contract Address:</div>
+                            <div className="flex items-center bg-white rounded p-2 border border-gray-100">
+                                <code className="font-mono text-sm flex-1 break-all">{deployment.address}</code>
+                                <button
+                                    onClick={() => handleCopyToClipboard(deployment.address!)}
+                                    className="ml-2 px-2 py-1 text-xs bg-gray-100 hover:bg-gray-200 rounded"
+                                >
+                                    Copy
+                                </button>
+                            </div>
+                        </div>
+                    )}
+
+                    {deployment.txHash && (
+                        <div>
+                            <div className="text-sm text-gray-500 mb-1">Transaction:</div>
+                            <div className="flex items-center bg-white rounded p-2 border border-gray-100">
+                                <code className="font-mono text-sm flex-1 break-all">{deployment.txHash}</code>
+                                <button
+                                    onClick={() => handleCopyToClipboard(deployment.txHash!)}
+                                    className="ml-2 px-2 py-1 text-xs bg-gray-100 hover:bg-gray-200 rounded"
+                                >
+                                    Copy
+                                </button>
+                            </div>
+                        </div>
+                    )}
+
+                    {deployment.currentImplementation && (
+                        <div className="mb-2">
+                            <div className="text-sm text-gray-500 mb-1">Current Implementation:</div>
+                            <div className="flex items-center bg-white rounded p-2 border border-gray-100">
+                                <code className="font-mono text-sm flex-1 break-all">{deployment.currentImplementation}</code>
+                                <button
+                                    onClick={() => handleCopyToClipboard(deployment.currentImplementation!)}
+                                    className="ml-2 px-2 py-1 text-xs bg-gray-100 hover:bg-gray-200 rounded"
+                                >
+                                    Copy
+                                </button>
+                            </div>
+                        </div>
+                    )}
+
+                    {deployment.status === 'not_started' && (
+                        <button
+                            onClick={
+                                title === 'ValidatorMessages' ? handleDeployValidatorMessages :
+                                    title === 'ValidatorManager' ? handleDeployValidatorManager :
+                                        handleUpdateProxyAddress
+                            }
+                            disabled={
+                                title === 'ValidatorManager' && deploymentState.validatorMessages.status !== 'success' ||
+                                title === 'Proxy' && deploymentState.validatorManager.status !== 'success'
+                            }
+                            className={`mt-2 w-full p-2 rounded ${(title === 'ValidatorManager' && deploymentState.validatorMessages.status !== 'success') ||
+                                (title === 'Proxy' && deploymentState.validatorManager.status !== 'success')
+                                ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                                : 'bg-blue-500 text-white hover:bg-blue-600'
+                                }`}
+                        >
+                            Deploy
+                        </button>
+                    )}
+
+                    {title === 'Proxy' && deployment.status === 'success' && deploymentState.validatorManager.status === 'success' && (
+                        <button
+                            onClick={handleUpdateProxyAddress}
+                            className="mt-2 w-full p-2 rounded bg-blue-500 text-white hover:bg-blue-600"
+                        >
+                            Update Implementation
+                        </button>
+                    )}
+
                 </div>
 
-                {deployment.error && (
-                    <div className="text-sm text-red-600 mb-2">{deployment.error}</div>
-                )}
-
-                {deployment.address && (
-                    <div className="mb-2">
-                        <div className="text-sm text-gray-500 mb-1">Contract Address:</div>
-                        <div className="flex items-center bg-white rounded p-2 border border-gray-100">
-                            <code className="font-mono text-sm flex-1 break-all">{deployment.address}</code>
-                            <button
-                                onClick={() => handleCopyToClipboard(deployment.address!)}
-                                className="ml-2 px-2 py-1 text-xs bg-gray-100 hover:bg-gray-200 rounded"
-                            >
-                                Copy
-                            </button>
-                        </div>
-                    </div>
-                )}
-
-                {deployment.txHash && (
-                    <div>
-                        <div className="text-sm text-gray-500 mb-1">Transaction:</div>
-                        <div className="flex items-center bg-white rounded p-2 border border-gray-100">
-                            <code className="font-mono text-sm flex-1 break-all">{deployment.txHash}</code>
-                            <button
-                                onClick={() => handleCopyToClipboard(deployment.txHash!)}
-                                className="ml-2 px-2 py-1 text-xs bg-gray-100 hover:bg-gray-200 rounded"
-                            >
-                                Copy
-                            </button>
-                        </div>
-                    </div>
-                )}
-
-                {deployment.currentImplementation && (
-                    <div className="mb-2">
-                        <div className="text-sm text-gray-500 mb-1">Current Implementation:</div>
-                        <div className="flex items-center bg-white rounded p-2 border border-gray-100">
-                            <code className="font-mono text-sm flex-1 break-all">{deployment.currentImplementation}</code>
-                            <button
-                                onClick={() => handleCopyToClipboard(deployment.currentImplementation!)}
-                                className="ml-2 px-2 py-1 text-xs bg-gray-100 hover:bg-gray-200 rounded"
-                            >
-                                Copy
-                            </button>
-                        </div>
-                    </div>
-                )}
-
-                {deployment.status === 'not_started' && (
-                    <button
-                        onClick={
-                            title === 'ValidatorMessages' ? handleDeployValidatorMessages :
-                                title === 'ValidatorManager' ? handleDeployValidatorManager :
-                                    handleUpdateProxyAddress
-                        }
-                        disabled={
-                            title === 'ValidatorManager' && deploymentState.validatorMessages.status !== 'success' ||
-                            title === 'Proxy' && deploymentState.validatorManager.status !== 'success'
-                        }
-                        className={`mt-2 w-full p-2 rounded ${(title === 'ValidatorManager' && deploymentState.validatorMessages.status !== 'success') ||
-                            (title === 'Proxy' && deploymentState.validatorManager.status !== 'success')
-                            ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                            : 'bg-blue-500 text-white hover:bg-blue-600'
-                            }`}
-                    >
-                        Deploy
-                    </button>
-                )}
-
-                {title === 'Proxy' && deployment.status === 'success' && deploymentState.validatorManager.status === 'success' && (
-                    <button
-                        onClick={handleUpdateProxyAddress}
-                        className="mt-2 w-full p-2 rounded bg-blue-500 text-white hover:bg-blue-600"
-                    >
-                        Update Implementation
-                    </button>
-                )}
-            </div>
+            </>
         );
     };
 
@@ -460,6 +465,10 @@ export default function DeployContracts() {
             {renderDeploymentStatus(deploymentState.validatorMessages, 'ValidatorMessages')}
             {renderDeploymentStatus(deploymentState.validatorManager, 'ValidatorManager')}
             {renderDeploymentStatus(deploymentState.proxy, 'Proxy')}
+            <NextPrev
+                nextDisabled={true}
+                currentStepName="deploy-contracts"
+            />
         </div>
     );
 }
