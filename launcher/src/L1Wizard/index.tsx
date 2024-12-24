@@ -1,7 +1,7 @@
 import PasteKeys from "./PasteKeys";
 import GenerateKeys from "./GenerateKeys";
 import Genesis from "./Genesis";
-import Steps from "./Steps";
+import Steps from "./ui/Steps";
 import { stepList, useWizardStore } from "./store";
 import CreateL1 from "./CreateL1";
 import { TechInfo } from "./TechInfo";
