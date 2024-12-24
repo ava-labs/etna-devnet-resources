@@ -18,7 +18,7 @@ const dockerCommand = (subnetID: string) => `mkdir -p ~/.avalanchego_rpc/staking
   -e AVALANCHEGO_PUBLIC_IP_RESOLUTION_SERVICE=ifconfigme \\
   -e HOME=/home/avalanche \\
   --user $(id -u):$(id -g) \\
-  containerman17/avalanchego-subnetevm:${CONTAINER_VERSION}`;
+  containerman17/easy-avalanchego:${CONTAINER_VERSION}`;
 
 export default function LaunchRpcNode() {
     const { subnetId, chainId, evmChainId } = useWizardStore();

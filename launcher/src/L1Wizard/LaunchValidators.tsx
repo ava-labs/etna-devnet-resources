@@ -14,7 +14,7 @@ const dockerCommand = (subnetID: string) => `docker run -it -d \\
   -e AVALANCHEGO_PUBLIC_IP_RESOLUTION_SERVICE=ifconfigme \\
   -e HOME=/home/avalanche \\
   --user $(id -u):$(id -g) \\
-  containerman17/avalanchego-subnetevm:${CONTAINER_VERSION}`
+  containerman17/easy-avalanchego:${CONTAINER_VERSION}`
 
 
 export default function LaunchValidators() {

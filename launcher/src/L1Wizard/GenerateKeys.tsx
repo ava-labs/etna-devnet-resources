@@ -6,7 +6,7 @@ const dockerCommand = `mkdir -p ~/.avalanchego/staking; docker run -it -d \\
   -e AVALANCHEGO_PARTIAL_SYNC_PRIMARY_NETWORK=true \\
   -e HOME=/home/avalanche \\
   --user $(id -u):$(id -g) \\
-  containerman17/avalanchego-subnetevm:${CONTAINER_VERSION}`
+  containerman17/easy-avalanchego:${CONTAINER_VERSION}`
 
 const popRequest = `curl -X POST --data '{ 
     "jsonrpc":"2.0", 
