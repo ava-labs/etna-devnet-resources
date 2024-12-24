@@ -1,16 +1,24 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useWizardStore } from './store';
 import { getWalletAddress } from './wallet';
 import PoAValidatorManager from "../../contract_compiler/compiled/PoAValidatorManager.json"
 import ValidatorMessages from "../../contract_compiler/compiled/ValidatorMessages.json"
-import { createPublicClient, createWalletClient, custom, http, Chain, defineChain, keccak256 } from 'viem';
+import { createPublicClient, createWalletClient, custom, http, Chain, defineChain, keccak256, encodeAbiParameters, parseAbiParameters, toHex } from 'viem';
 import { privateKeyToAccount } from 'viem/accounts';
+
+const PROXY_ADMIN_ADDRESS = '0xC0fFEE1234567890aBCdeF1234567890abcDef34' as const;
+const PROXY_ADDRESS = '0xfEeDC0DE00000000000000000000000000000000' as const;
+
+// Function selectors
+const GET_IMPLEMENTATION_SELECTOR = '0xf9633eab'; // keccak256('getProxyImplementation(address)').slice(0, 10)
+const UPGRADE_TO_SELECTOR = '0x3659cfe6'; // keccak256('upgradeTo(address)').slice(0, 10)
 
 interface DeploymentStatus {
     status: 'not_started' | 'deploying' | 'error' | 'success';
     error?: string;
     address?: `0x${string}`;
     txHash?: `0x${string}`;
+    currentImplementation?: `0x${string}`;
 }
 
 interface DeploymentState {
@@ -211,9 +219,132 @@ export default function DeployContracts() {
         }
     };
 
+    useEffect(() => {
+        checkProxyImplementation();
+    }, []);
+
+    const checkProxyImplementation = async () => {
+        try {
+            if (!window.ethereum) {
+                throw new Error('No wallet detected');
+            }
+
+            const chain = getChainConfig();
+            const publicClient = createPublicClient({
+                chain,
+                transport: http(),
+            });
+
+            const walletClient = createWalletClient({
+                chain,
+                transport: custom(window.ethereum),
+            });
+
+            const [address] = await walletClient.requestAddresses();
+
+            // Call getProxyImplementation using staticCall with proxy address parameter
+            const result = await publicClient.call({
+                account: address,
+                to: PROXY_ADMIN_ADDRESS,
+                data: `${GET_IMPLEMENTATION_SELECTOR}${PROXY_ADDRESS.slice(2).padStart(64, '0')}` as `0x${string}`,
+            });
+
+            if (result.data) {
+                const implementation = `0x${result.data.slice(-40)}` as `0x${string}`;
+                setDeploymentState(prev => ({
+                    ...prev,
+                    proxy: {
+                        ...prev.proxy,
+                        status: 'success',
+                        currentImplementation: implementation
+                    }
+                }));
+            }
+        } catch (err: any) {
+            console.error('Failed to check proxy implementation:', err);
+            setDeploymentState(prev => ({
+                ...prev,
+                proxy: {
+                    status: 'error',
+                    error: err.message || 'Failed to check proxy implementation'
+                }
+            }));
+        }
+    };
+
     const handleUpdateProxyAddress = async () => {
-        // Will implement next
-        console.log('Updating Proxy Address...');
+        if (!deploymentState.validatorManager.address) {
+            throw new Error('ValidatorManager address not found');
+        }
+
+        setDeploymentState(prev => ({
+            ...prev,
+            proxy: { status: 'deploying' }
+        }));
+
+        try {
+            if (!window.ethereum) {
+                throw new Error('No wallet detected');
+            }
+
+            const chain = getChainConfig();
+            const walletClient = createWalletClient({
+                chain,
+                transport: custom(window.ethereum),
+            });
+
+            const [address] = await walletClient.requestAddresses();
+
+            // Encode upgrade function call
+            const upgradeData = encodeAbiParameters(
+                parseAbiParameters('address implementation'),
+                [deploymentState.validatorManager.address]
+            );
+
+            // Call upgrade function
+            const hash = await walletClient.sendTransaction({
+                account: address,
+                to: PROXY_ADMIN_ADDRESS,
+                data: `${UPGRADE_TO_SELECTOR}${upgradeData.slice(2)}` as `0x${string}`,
+            });
+
+            // Wait for transaction to complete
+            const publicClient = createPublicClient({
+                chain,
+                transport: http(),
+            });
+            await publicClient.waitForTransactionReceipt({ hash });
+
+            // Check new implementation
+            const result = await publicClient.call({
+                account: PROXY_ADMIN_ADDRESS,
+                to: PROXY_ADMIN_ADDRESS,
+                data: `${GET_IMPLEMENTATION_SELECTOR}${deploymentState.validatorManager.address!.slice(2).padStart(64, '0')}` as `0x${string}`,
+            });
+
+            if (result.data) {
+                const implementation = `0x${result.data.slice(-40)}` as `0x${string}`;
+                setDeploymentState(prev => ({
+                    ...prev,
+                    proxy: {
+                        status: 'success',
+                        txHash: hash,
+                        currentImplementation: implementation
+                    }
+                }));
+            } else {
+                throw new Error('Failed to get implementation address');
+            }
+        } catch (err: any) {
+            console.error('Proxy update failed:', err);
+            setDeploymentState(prev => ({
+                ...prev,
+                proxy: {
+                    status: 'error',
+                    error: err.message || 'Failed to update proxy'
+                }
+            }));
+        }
     };
 
     const renderDeploymentStatus = (deployment: DeploymentStatus, title: string) => {
@@ -274,6 +405,21 @@ export default function DeployContracts() {
                     </div>
                 )}
 
+                {deployment.currentImplementation && (
+                    <div className="mb-2">
+                        <div className="text-sm text-gray-500 mb-1">Current Implementation:</div>
+                        <div className="flex items-center bg-white rounded p-2 border border-gray-100">
+                            <code className="font-mono text-sm flex-1 break-all">{deployment.currentImplementation}</code>
+                            <button
+                                onClick={() => handleCopyToClipboard(deployment.currentImplementation!)}
+                                className="ml-2 px-2 py-1 text-xs bg-gray-100 hover:bg-gray-200 rounded"
+                            >
+                                Copy
+                            </button>
+                        </div>
+                    </div>
+                )}
+
                 {deployment.status === 'not_started' && (
                     <button
                         onClick={
@@ -292,6 +438,15 @@ export default function DeployContracts() {
                             }`}
                     >
                         Deploy
+                    </button>
+                )}
+
+                {title === 'Proxy' && deployment.status === 'success' && deploymentState.validatorManager.status === 'success' && (
+                    <button
+                        onClick={handleUpdateProxyAddress}
+                        className="mt-2 w-full p-2 rounded bg-blue-500 text-white hover:bg-blue-600"
+                    >
+                        Update Implementation
                     </button>
                 )}
             </div>
