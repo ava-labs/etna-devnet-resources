@@ -10,8 +10,10 @@ import LaunchRpcNode from "./LaunchRpcNode";
 import OpenRPCPort from "./OpenRPCPort";
 import { AddToWallet } from "./AddToWallet";
 import DeployContracts from "./DeployContracts";
+import Welcome from "./Welcome";
 
 const stepComponents: Record<keyof typeof stepList, React.ReactNode> = {
+    'welcome': <Welcome />,
     'genesis': <Genesis />,
     'generate-keys': <GenerateKeys />,
     'paste-keys': <PasteKeys />,

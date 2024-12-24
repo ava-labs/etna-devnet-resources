@@ -1,4 +1,12 @@
 export const stepList = {
+    "welcome": {
+        title: "Welcome",
+        description: "Get started",
+        icon: <svg className="w-6 h-6 text-gray-800" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+            <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 14l9-5-9-5-9 5 9 5Z" />
+            <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 20v-7" />
+        </svg>
+    },
     "genesis": {
         title: "Create genesis",
         description: "Allocations and precompiles",
