@@ -215,3 +215,10 @@ export const useWizardStore = shouldPersist
         )
     )
     : create<WizardState>()(wizardStoreFunc);
+
+export const resetStore = () => {
+    if (confirm('Are you sure you want to start over? This will reset all progress.')) {
+        localStorage.removeItem('wizard-storage');
+        window.location.reload();
+    }
+};
