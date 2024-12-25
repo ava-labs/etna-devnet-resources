@@ -9,9 +9,9 @@ export default function Welcome() {
         </p>
 
         <p className="mb-4">
-            If you're looking for a full-service solution that includes hosting, monitoring and maintenance of the L1's validators for you and offers many additional features check out <a href="https://avacloud.io/" target="_blank">AvaCloud</a>.
+            If you're looking for a full-service solution that includes hosting, monitoring and maintenance of the L1's validators for you and offers many additional features check out <a href="https://avacloud.io/" target="_blank" className="text-blue-500 hover:text-blue-700 underline">AvaCloud</a>.
         </p>
-       
-         <NextPrev nextDisabled={false} currentStepName="welcome" />
+
+        <NextPrev nextDisabled={false} currentStepName="welcome" />
     </>;
 }
