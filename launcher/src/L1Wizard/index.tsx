@@ -32,18 +32,17 @@ export default function L1Wizard() {
 
     return (
         <>
-            <div className="flex container mx-auto max-w-6xl py-8">
-                <div className="w-80 p-4 shrink-0">
+            <div className="container mx-auto max-w-6xl p-8 flex flex-col lg:flex-row">
+                <div className="w-full lg:w-80 mb-8">
                     <Steps />
                 </div>
-                <div className="flex-1 pl-4 min-w-0">
+                <div className="flex-1 min-w-0">
                     <div className="h-full">
                         {stepComponents[currentStep]}
                     </div>
                 </div>
-
             </div>
-            <div className=" p-4 text-center text-xs">
+            <div className="text-center text-xs">
                 <div className="text-gray-600">
                     <TechInfo />
                 </div>
