@@ -1,22 +1,23 @@
-import PasteKeys from "./PasteKeys";
-import GenerateKeys from "./GenerateKeys";
-import Genesis from "./Genesis";
 import Steps from "./ui/Steps";
 import { stepList, useWizardStore } from "./store";
-import CreateL1 from "./CreateL1";
 import { TechInfo } from "./TechInfo";
+
+import Welcome from "./Welcome";
+import Genesis from "./Genesis";
+import PrepareValidators from "./PrepareValidators";
+import GenerateKeys from "./GenerateKeys";
+import CreateL1 from "./CreateL1";
 import LaunchValidators from "./LaunchValidators";
 import LaunchRpcNode from "./LaunchRpcNode";
 import OpenRPCPort from "./OpenRPCPort";
 import { AddToWallet } from "./AddToWallet";
 import DeployContracts from "./DeployContracts";
-import Welcome from "./Welcome";
 
 const stepComponents: Record<keyof typeof stepList, React.ReactNode> = {
     'welcome': <Welcome />,
     'genesis': <Genesis />,
+    "prepare-validators": <PrepareValidators />,
     'generate-keys': <GenerateKeys />,
-    'paste-keys': <PasteKeys />,
     'create-l1': <CreateL1 />,
     "launch-validators": <LaunchValidators />,
     "launch-rpc-node": <LaunchRpcNode />,
@@ -31,18 +32,17 @@ export default function L1Wizard() {
 
     return (
         <>
-            <div className="flex container mx-auto max-w-6xl py-8">
-                <div className="w-80 p-4 shrink-0">
+            <div className="container mx-auto max-w-6xl p-8 flex flex-col lg:flex-row">
+                <div className="w-full lg:w-80 mb-8">
                     <Steps />
                 </div>
-                <div className="flex-1 pl-4 min-w-0">
+                <div className="flex-1 min-w-0">
                     <div className="h-full">
                         {stepComponents[currentStep]}
                     </div>
                 </div>
-
             </div>
-            <div className=" p-4 text-center text-xs">
+            <div className="text-center text-xs">
                 <div className="text-gray-600">
                     <TechInfo />
                 </div>
