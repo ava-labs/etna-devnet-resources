@@ -1,22 +1,23 @@
-import PasteKeys from "./PasteKeys";
-import GenerateKeys from "./GenerateKeys";
-import Genesis from "./Genesis";
 import Steps from "./ui/Steps";
 import { stepList, useWizardStore } from "./store";
-import CreateL1 from "./CreateL1";
 import { TechInfo } from "./TechInfo";
+
+import Welcome from "./Welcome";
+import Genesis from "./Genesis";
+import PrepareValidators from "./PrepareValidators";
+import GenerateKeys from "./GenerateKeys";
+import CreateL1 from "./CreateL1";
 import LaunchValidators from "./LaunchValidators";
 import LaunchRpcNode from "./LaunchRpcNode";
 import OpenRPCPort from "./OpenRPCPort";
 import { AddToWallet } from "./AddToWallet";
 import DeployContracts from "./DeployContracts";
-import Welcome from "./Welcome";
 
 const stepComponents: Record<keyof typeof stepList, React.ReactNode> = {
     'welcome': <Welcome />,
     'genesis': <Genesis />,
+    "prepare-validators": <PrepareValidators />,
     'generate-keys': <GenerateKeys />,
-    'paste-keys': <PasteKeys />,
     'create-l1': <CreateL1 />,
     "launch-validators": <LaunchValidators />,
     "launch-rpc-node": <LaunchRpcNode />,
