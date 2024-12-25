@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -exu
+set -eu -o pipefail
 
 # downlaod source code if not already present
 if [ ! -d "/teleporter_src/contracts" ]; then
@@ -19,10 +19,17 @@ fi
 # Build contracts
 cd /teleporter_src/contracts && forge build
 
+cd /teleporter_src/lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/contracts/proxy/transparent && forge build
+
 # Extract and format JSON files
-for file in /teleporter_src/out/PoAValidatorManager.sol/*.json /teleporter_src/out/ValidatorMessages.sol/*.json /teleporter_src/out/NativeTokenStakingManager.sol/*.json; do
+for file in /teleporter_src/out/PoAValidatorManager.sol/PoAValidatorManager.json \
+            /teleporter_src/out/ValidatorMessages.sol/ValidatorMessages.json \
+            /teleporter_src/out/NativeTokenStakingManager.sol/NativeTokenStakingManager.json \
+            /teleporter_src/lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/out/TransparentUpgradeableProxy.sol/TransparentUpgradeableProxy.json \
+            /teleporter_src/lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/out/ProxyAdmin.sol/ProxyAdmin.json; do
     filename=$(basename "$file")
     jq '.' "$file" > "/compiled/$filename"
 done
 
-chown -R $HOST_UID:$HOST_GID /compiled
+chown -R $HOST_UID:$HOST_GID /compiled /teleporter_src
+echo "Compilation complete"

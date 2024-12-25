@@ -6,12 +6,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"math/big"
+	"os"
 	"strings"
 	"time"
-
-	_ "embed"
-
-	_ "embed"
 
 	"github.com/ava-labs/subnet-evm/commontype"
 	"github.com/ava-labs/subnet-evm/core"
@@ -21,12 +18,6 @@ import (
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/rlp"
 )
-
-//go:embed proxy_compiled/deployed_proxy_admin_bytecode.txt
-var proxyAdminBytecodeHexString string
-
-//go:embed proxy_compiled/deployed_transparent_proxy_bytecode.txt
-var transparentProxyBytecodeHexString string
 
 var (
 	OneAvax                = new(big.Int).SetUint64(1000000000000000000)
@@ -92,17 +83,14 @@ func Generate(payload GeneratePayload) (string, error) {
 		Timestamp:  uint64(now),
 	}
 
-	proxyAdminBytecodeHexString = strings.TrimSpace(strings.TrimPrefix(proxyAdminBytecodeHexString, "0x"))
-	transparentProxyBytecodeHexString = strings.TrimSpace(strings.TrimPrefix(transparentProxyBytecodeHexString, "0x"))
-
-	proxyAdminBytecode, err := hex.DecodeString(proxyAdminBytecodeHexString)
+	proxyAdminBytecode, _, err := getCompiledBytecodeFromJSON("contract_compiler/compiled/ProxyAdmin.json")
 	if err != nil {
-		return "", fmt.Errorf("failed to decode proxy admin bytecode: %s\n", err)
+		return "", fmt.Errorf("failed to get proxy admin bytecode: %w", err)
 	}
 
-	transparentProxyBytecode, err := hex.DecodeString(transparentProxyBytecodeHexString)
+	transparentProxyBytecode, _, err := getCompiledBytecodeFromJSON("contract_compiler/compiled/TransparentUpgradeableProxy.json")
 	if err != nil {
-		return "", fmt.Errorf("failed to decode transparent proxy bytecode: %s\n", err)
+		return "", fmt.Errorf("failed to get transparent proxy bytecode: %w", err)
 	}
 
 	genesis.Alloc[common.HexToAddress(ProxyAdminContractAddress)] = types.Account{
@@ -157,4 +145,40 @@ func MustDeriveContractAddress(from common.Address, nonce uint64) common.Address
 	}
 	hash := crypto.Keccak256(encoded)
 	return common.BytesToAddress(hash[12:])
+}
+
+func getCompiledBytecodeFromJSON(path string) ([]byte, []byte, error) {
+	jsonFile, err := os.Open(path)
+	if err != nil {
+		return nil, nil, err
+	}
+	defer jsonFile.Close()
+
+	var jsonData map[string]interface{}
+	decoder := json.NewDecoder(jsonFile)
+	if err := decoder.Decode(&jsonData); err != nil {
+		return nil, nil, fmt.Errorf("failed to decode JSON: %w", err)
+	}
+
+	deployedBytecodeHex, ok := jsonData["deployedBytecode"].(map[string]interface{})["object"].(string)
+	if !ok {
+		return nil, nil, fmt.Errorf("failed to get deployedBytecode.object from JSON")
+	}
+
+	deployedBytecode, err := hex.DecodeString(strings.TrimPrefix(deployedBytecodeHex, "0x"))
+	if err != nil {
+		return nil, nil, fmt.Errorf("failed to decode deployedBytecode hex: %w", err)
+	}
+
+	bytecodeHex, ok := jsonData["bytecode"].(map[string]interface{})["object"].(string)
+	if !ok {
+		return nil, nil, fmt.Errorf("failed to get bytecode.object from JSON")
+	}
+
+	bytecode, err := hex.DecodeString(strings.TrimPrefix(bytecodeHex, "0x"))
+	if err != nil {
+		return nil, nil, fmt.Errorf("failed to decode bytecode hex: %w", err)
+	}
+
+	return bytecode, deployedBytecode, nil
 }

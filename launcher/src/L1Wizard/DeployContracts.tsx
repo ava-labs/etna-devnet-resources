@@ -1,10 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useWizardStore } from './store';
-import { getWalletAddress } from './wallet';
 import PoAValidatorManager from "../../contract_compiler/compiled/PoAValidatorManager.json"
 import ValidatorMessages from "../../contract_compiler/compiled/ValidatorMessages.json"
-import { createPublicClient, createWalletClient, custom, http, Chain, defineChain, keccak256, encodeAbiParameters, parseAbiParameters, toHex } from 'viem';
-import { privateKeyToAccount } from 'viem/accounts';
+import { createPublicClient, createWalletClient, custom, http, defineChain, keccak256 } from 'viem';
 import NextPrev from './ui/NextPrev';
 
 const PROXY_ADMIN_ADDRESS = '0xC0fFEE1234567890aBCdeF1234567890abcDef34' as const;
@@ -12,7 +10,7 @@ const PROXY_ADDRESS = '0x0Feedc0de0000000000000000000000000000000' as const;
 
 // Function selectors
 const GET_IMPLEMENTATION_SELECTOR = '0x204e1c7a'; // keccak256('getProxyImplementation(address)').slice(0, 10)
-const UPGRADE_TO_SELECTOR = '0x99a88ec4'; // keccak256('upgradeTo(address)').slice(0, 10)
+// const UPGRADE_TO_SELECTOR = '0x99a88ec4'; // keccak256('upgradeTo(address)').slice(0, 10)
 
 interface DeploymentStatus {
     status: 'not_started' | 'deploying' | 'error' | 'success';
@@ -297,10 +295,10 @@ export default function DeployContracts() {
             const [address] = await walletClient.requestAddresses();
 
             // Encode upgrade function call
-            const upgradeData = encodeAbiParameters(
-                parseAbiParameters('address implementation'),
-                [deploymentState.validatorManager.address]
-            );
+            // const upgradeData = encodeAbiParameters(
+            //     parseAbiParameters('address implementation'),
+            //     [deploymentState.validatorManager.address]
+            // );
 
             // Call upgrade function
             const hash = await walletClient.sendTransaction({
