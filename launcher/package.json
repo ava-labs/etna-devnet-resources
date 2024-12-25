@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "concurrently \"npm run build -- --watch\" \"gow run ./cmd\"",
+    "dev": "concurrently --kill-others \"npm run build -- --watch\" \"gow run ./cmd\"",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
