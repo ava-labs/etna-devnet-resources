@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { getWalletAddress } from './wallet';
 import { useWizardStore } from './store';
+import NextPrev from './ui/NextPrev';
 
 function isValidL1Name(name: string): boolean {
     return name.split('').every(char => {
@@ -152,16 +153,6 @@ export default function Genesis() {
                 >
                     {isRegenerating ? 'Generating...' : 'Generate Genesis'}
                 </button>
-                <button
-                    onClick={handleContinue}
-                    disabled={!isValidEthereumAddress(ownerEthAddress) || !genesisString || !isValidL1Name(l1Name)}
-                    className={`px-4 py-2 rounded-md ${!isValidEthereumAddress(ownerEthAddress) || !genesisString || !isValidL1Name(l1Name)
-                        ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                        : 'bg-blue-500 text-white hover:bg-blue-600'
-                        }`}
-                >
-                    Next
-                </button>
             </div>
 
             {genesisString && <div className="mb-6">
@@ -174,6 +165,8 @@ export default function Genesis() {
                     </pre>
                 </div>
             </div>}
+
+             <NextPrev nextDisabled={!isValidEthereumAddress(ownerEthAddress) || !genesisString || !isValidL1Name(l1Name)} currentStepName="genesis" />
 
 
         </div>

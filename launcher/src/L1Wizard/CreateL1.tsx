@@ -133,6 +133,30 @@ export default function CreateL1() {
             )}
             <h1 className="text-2xl font-medium mb-6">Create an L1</h1>
 
+            <p className="mb-4">
+                This will create a new L1 on the Avalanche network. This will be done by issuing three transactions on the P-Chain:
+                <ol className="list-decimal list-inside pl-4 mt-4">
+                    <li>Creating a Subnet</li>
+                    <li>Creating a Blockchain</li>
+                    <li>Convert the Subnet to an L1</li>
+                </ol>
+            </p>
+
+            {!isCreationComplete && (
+                <div className="mb-8">
+                    <button
+                        onClick={handleCreate}
+                        disabled={isCreating}
+                        className={`px-6 py-2 rounded-md ${isCreating
+                            ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                            : 'bg-blue-500 text-white hover:bg-blue-600'
+                            }`}
+                    >
+                        {isCreating ? 'Creating...' : 'Create L1'}
+                    </button>
+                </div>
+            )}
+
             {error && (
                 <div className="mb-6 p-4 rounded-md bg-red-50 border border-red-200">
                     <div className="flex items-center gap-2">
@@ -181,21 +205,6 @@ export default function CreateL1() {
                     )}
                 </div>
             </div>
-
-            {!isCreationComplete && (
-                <div className="mb-8">
-                    <button
-                        onClick={handleCreate}
-                        disabled={isCreating}
-                        className={`px-6 py-2 rounded-md ${isCreating
-                            ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                            : 'bg-blue-500 text-white hover:bg-blue-600'
-                            }`}
-                    >
-                        {isCreating ? 'Creating...' : 'Create L1'}
-                    </button>
-                </div>
-            )}
 
             <NextPrev
                 nextDisabled={!isCreationComplete}

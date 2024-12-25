@@ -1,5 +1,5 @@
-import { useWizardStore, resetStore } from "./store";
-import { stepList } from "./store";
+import { useWizardStore, resetStore } from "../store";
+import { stepList } from "../store";
 
 export default function Steps() {
     const { currentStep } = useWizardStore();
