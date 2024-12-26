@@ -20,12 +20,12 @@ fi
 cd /teleporter_src/contracts && forge build
 
 cd /teleporter_src/lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/contracts/proxy/transparent && forge build
-
 # Extract and format JSON files
 for file in /teleporter_src/out/PoAValidatorManager.sol/PoAValidatorManager.json \
             /teleporter_src/out/ValidatorMessages.sol/ValidatorMessages.json \
             /teleporter_src/out/NativeTokenStakingManager.sol/NativeTokenStakingManager.json \
             /teleporter_src/lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/out/TransparentUpgradeableProxy.sol/TransparentUpgradeableProxy.json \
+            /teleporter_src/lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/out/TransparentUpgradeableProxy.sol/ITransparentUpgradeableProxy.json \
             /teleporter_src/lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/out/ProxyAdmin.sol/ProxyAdmin.json; do
     filename=$(basename "$file")
     jq '.' "$file" > "/compiled/$filename"

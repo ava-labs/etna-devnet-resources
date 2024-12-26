@@ -12,7 +12,7 @@ function isValidL1Name(name: string): boolean {
 }
 
 export default function Genesis() {
-    const { ownerEthAddress, setOwnerEthAddress, advanceFrom, evmChainId, setEvmChainId, genesisString, regenerateGenesis, l1Name, setL1Name, tokenSymbol, setTokenSymbol } = useWizardStore();
+    const { ownerEthAddress, setOwnerEthAddress, evmChainId, setEvmChainId, genesisString, regenerateGenesis, l1Name, setL1Name, tokenSymbol, setTokenSymbol } = useWizardStore();
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState('');
     const [isRegenerating, setIsRegenerating] = useState(false);
@@ -30,9 +30,9 @@ export default function Genesis() {
         }
     };
 
-    const handleContinue = () => {
-        advanceFrom('genesis')
-    }
+    // const handleContinue = () => {
+    //     advanceFrom('genesis')
+    // }
 
     const handleInputChange = (field: 'evmChainId' | 'ownerEthAddress' | 'l1Name', value: any) => {
         if (field === 'evmChainId') {
@@ -166,7 +166,7 @@ export default function Genesis() {
                 </div>
             </div>}
 
-             <NextPrev nextDisabled={!isValidEthereumAddress(ownerEthAddress) || !genesisString || !isValidL1Name(l1Name)} currentStepName="genesis" />
+            <NextPrev nextDisabled={!isValidEthereumAddress(ownerEthAddress) || !genesisString || !isValidL1Name(l1Name)} currentStepName="genesis" />
 
 
         </div>

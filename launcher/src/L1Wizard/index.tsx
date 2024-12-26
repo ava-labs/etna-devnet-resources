@@ -11,6 +11,7 @@ import OpenRPCPort from "./OpenRPCPort";
 import { AddToWallet } from "./AddToWallet";
 import DeployContracts from "./DeployContracts";
 import Welcome from "./Welcome";
+import { ProxyDebug } from "./ProxyDebug";
 
 const stepComponents: Record<keyof typeof stepList, React.ReactNode> = {
     'welcome': <Welcome />,
@@ -22,7 +23,8 @@ const stepComponents: Record<keyof typeof stepList, React.ReactNode> = {
     "launch-rpc-node": <LaunchRpcNode />,
     "open-rpc-port": <OpenRPCPort />,
     "add-to-wallet": <AddToWallet />,
-    "deploy-contracts": <DeployContracts />,
+    "deploy-contracts": <ProxyDebug />,
+    // "deploy-contracts": <DeployContracts />,
 }
 
 
