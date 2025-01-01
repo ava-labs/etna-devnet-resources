@@ -12,10 +12,12 @@ import { AddToWallet } from "./AddToWallet";
 import DeployContracts from "./DeployContracts";
 import Welcome from "./Welcome";
 import { ProxyDebug } from "./ProxyDebug";
+import CreateChain from "./CreateChain";
 
 const stepComponents: Record<keyof typeof stepList, React.ReactNode> = {
     'welcome': <Welcome />,
     'genesis': <Genesis />,
+    'create-chain': <CreateChain />,
     'generate-keys': <GenerateKeys />,
     'paste-keys': <PasteKeys />,
     'create-l1': <CreateL1 />,
