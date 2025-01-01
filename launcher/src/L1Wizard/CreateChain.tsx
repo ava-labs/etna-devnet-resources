@@ -4,6 +4,7 @@ import NextPrev from "./ui/NextPrev";
 import { createPublicClient, createWalletClient, custom, http, parseEther, formatEther } from 'viem';
 import { avalancheFuji } from 'viem/chains';
 import { newPrivateKey, getAddresses } from './wallet';
+import { transferAllCToP, getPChainBalance } from './utxo';
 
 type Status = 'not_started' | 'in_progress' | 'error' | 'success';
 
@@ -14,7 +15,7 @@ interface StepStatus {
 }
 
 export default function CreateChain() {
-    const { nodesCount, setNodesCount, tempPrivateKeyHex, setTempPrivateKeyHex } = useWizardStore();
+    const { nodesCount, setNodesCount, tempPrivateKeyHex, setTempPrivateKeyHex, pChainBalance, setPChainBalance } = useWizardStore();
     const nodeCounts = [1, 3, 5];
     const [cChainBalance, setCChainBalance] = useState<bigint>(BigInt(0));
     const [transferring, setTransferring] = useState(false);
@@ -194,9 +195,96 @@ export default function CreateChain() {
     };
 
     const handleCreate = async () => {
-        // TODO: Implement the create chain logic
-        console.log("Create chain functionality not implemented yet");
+        try {
+            // Reset any previous error states
+            setPChainStatus({ status: 'in_progress' });
+            setSubnetStatus({ status: 'not_started' });
+            setCreateChainStatus({ status: 'not_started' });
+
+            // Step 1: Transfer C to P
+            try {
+                await transferAllCToP(tempPrivateKeyHex!);
+                setPChainStatus({
+                    status: 'success',
+                    data: 'transfer-completed'
+                });
+            } catch (error: any) {
+                setPChainStatus({
+                    status: 'error',
+                    error: error.message || 'Failed to transfer funds to P-Chain'
+                });
+                return; // Stop the process if transfer fails
+            }
+
+            // Step 2: Simulate Subnet Creation
+            setSubnetStatus({ status: 'in_progress' });
+            try {
+                await new Promise(resolve => setTimeout(resolve, 500));
+                setSubnetStatus({
+                    status: 'success',
+                    data: 'subnet-' + Math.random().toString(36).substring(7)
+                });
+            } catch (error: any) {
+                setSubnetStatus({
+                    status: 'error',
+                    error: error.message || 'Failed to create subnet'
+                });
+                return;
+            }
+
+            // Step 3: Simulate Chain Creation
+            setCreateChainStatus({ status: 'in_progress' });
+            try {
+                await new Promise(resolve => setTimeout(resolve, 500));
+                setCreateChainStatus({
+                    status: 'success',
+                    data: 'chain-' + Math.random().toString(36).substring(7)
+                });
+            } catch (error: any) {
+                setCreateChainStatus({
+                    status: 'error',
+                    error: error.message || 'Failed to create chain'
+                });
+            }
+
+        } catch (error: any) {
+            console.error('Creation process failed:', error);
+            // Handle any unexpected errors
+            if (pChainStatus.status === 'in_progress') {
+                setPChainStatus({
+                    status: 'error',
+                    error: 'Unexpected error during P-Chain transfer'
+                });
+            } else if (subnetStatus.status === 'in_progress') {
+                setSubnetStatus({
+                    status: 'error',
+                    error: 'Unexpected error during subnet creation'
+                });
+            } else if (createChainStatus.status === 'in_progress') {
+                setCreateChainStatus({
+                    status: 'error',
+                    error: 'Unexpected error during chain creation'
+                });
+            }
+        }
     };
+
+    useEffect(() => {
+        if (!addresses?.P) return;
+
+        const checkPChainBalance = async () => {
+            try {
+                const balance = await getPChainBalance(addresses.P);
+                setPChainBalance(balance);
+            } catch (error) {
+                console.error('Failed to get P-Chain balance:', error);
+            }
+        };
+
+        checkPChainBalance();
+        const interval = setInterval(checkPChainBalance, 5000); // Check every 5 seconds
+        return () => clearInterval(interval);
+    }, [addresses?.P, setPChainBalance]);
 
     return (
         <div className="max-w-3xl mx-auto">
@@ -270,7 +358,7 @@ export default function CreateChain() {
                     <div className="bg-gray-50 p-4 rounded">
                         <div className="flex justify-between items-center mb-1">
                             <div className="text-sm text-gray-600">P-Chain Address:</div>
-                            <div className="text-sm text-gray-600">Balance: 0 AVAX</div>
+                            <div className="text-sm text-gray-600">Balance: {Number(pChainBalance) / 1e9} AVAX</div>
                         </div>
                         <div className="font-mono text-sm break-all">{addresses?.P}</div>
                     </div>
@@ -286,6 +374,11 @@ export default function CreateChain() {
                             {renderStepIcon(pChainStatus.status)}
                             <span className="text-gray-700">Transfer funds from C-Chain to P-Chain</span>
                         </div>
+                        {pChainStatus.error && (
+                            <p className="ml-8 mt-1 text-red-500 text-sm">
+                                Error: {pChainStatus.error}
+                            </p>
+                        )}
                         {pChainStatus.data && (
                             <p className="ml-8 mt-1 text-gray-600">
                                 <code><a href={`https://subnets-test.avax.network/c-chain/tx/${pChainStatus.data}`} target="_blank" rel="noopener noreferrer" className="text-blue-500 underline hover:text-blue-700">{pChainStatus.data}</a></code>
@@ -298,6 +391,11 @@ export default function CreateChain() {
                             {renderStepIcon(subnetStatus.status)}
                             <span className="text-gray-700">Create a Subnet</span>
                         </div>
+                        {subnetStatus.error && (
+                            <p className="ml-8 mt-1 text-red-500 text-sm">
+                                Error: {subnetStatus.error}
+                            </p>
+                        )}
                         {subnetStatus.data && (
                             <p className="ml-8 mt-1 text-gray-600">
                                 <code><a href={`https://subnets-test.avax.network/p-chain/tx/${subnetStatus.data}`} target="_blank" rel="noopener noreferrer" className="text-blue-500 underline hover:text-blue-700">{subnetStatus.data}</a></code>
@@ -310,6 +408,11 @@ export default function CreateChain() {
                             {renderStepIcon(createChainStatus.status)}
                             <span className="text-gray-700">Create a Chain</span>
                         </div>
+                        {createChainStatus.error && (
+                            <p className="ml-8 mt-1 text-red-500 text-sm">
+                                Error: {createChainStatus.error}
+                            </p>
+                        )}
                         {createChainStatus.data && (
                             <p className="ml-8 mt-1 text-gray-600">
                                 <code><a href={`https://subnets-test.avax.network/p-chain/tx/${createChainStatus.data}`} target="_blank" rel="noopener noreferrer" className="text-blue-500 underline hover:text-blue-700">{createChainStatus.data}</a></code>

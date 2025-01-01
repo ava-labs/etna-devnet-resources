@@ -133,6 +133,8 @@ interface WizardState {
     setTokenSymbol: (symbol: string) => void;
     tempPrivateKeyHex: string;
     setTempPrivateKeyHex: (key: string) => void;
+    pChainBalance: string;
+    setPChainBalance: (balance: string) => void;
 }
 
 
@@ -220,6 +222,9 @@ const wizardStoreFunc: StateCreator<WizardState> = (set, get) => ({
 
     tempPrivateKeyHex: "",
     setTempPrivateKeyHex: (key: string) => set(() => ({ tempPrivateKeyHex: key })),
+
+    pChainBalance: "0",
+    setPChainBalance: (balance: string) => set(() => ({ pChainBalance: balance })),
 })
 
 
