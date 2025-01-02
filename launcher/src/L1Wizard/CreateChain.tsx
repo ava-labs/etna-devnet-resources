@@ -100,21 +100,8 @@ export default function CreateChain() {
         <div className="max-w-3xl mx-auto">
             <h1 className="text-2xl font-medium mb-6">Create a Chain</h1>
 
-            {/* Display Selected Node Count */}
-            <div className="mb-8">
-                <h3 className="mb-4 font-medium">Selected Configuration</h3>
-                <div className="p-4 bg-gray-50 rounded-lg">
-                    <div className="flex items-center gap-2">
-                        <span className="font-medium">{nodesCount} {nodesCount === 1 ? 'Node' : 'Nodes'}</span>
-                        {nodesCount === 1 && <span className="bg-red-100 text-red-800 text-xs font-medium px-2.5 py-0.5 rounded-full">Dev</span>}
-                        {nodesCount === 3 && <span className="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full">Testnet</span>}
-                        {nodesCount === 5 && <span className="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full">Mainnet</span>}
-                    </div>
-                </div>
-            </div>
-
             {/* Creation Steps */}
-            <div className="mb-8 p-4 border rounded-lg">
+            <div className="p-4 border rounded-lg mb-4">
                 <h3 className="font-medium mb-4">Create Subnet & Chain</h3>
                 <div className="mb-4">
                     <div className="flex flex-col mb-4">
