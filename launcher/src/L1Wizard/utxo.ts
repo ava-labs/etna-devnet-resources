@@ -8,7 +8,7 @@ import { useWizardStore } from './store';
 
 const RPC_ENDPOINT = "https://api.avax-test.network"
 
-export async function transferAllCToP(privateKeyHex: string) {
+export async function transferCToP(amount: string, privateKeyHex: string) {
     const publicClient = createPublicClient({
         chain: avalancheFuji,
         transport: http(RPC_ENDPOINT + '/ext/bc/C/rpc')
@@ -17,33 +17,41 @@ export async function transferAllCToP(privateKeyHex: string) {
 
     // Get total balance
     const balance = await publicClient.getBalance({ address: address.C });
+    const amountToTransfer = parseEther(amount);
 
-    // If we have C-chain balance, export it
-    if (balance > 0n) {
-        // Estimate gas for export transaction
-        const estimatedGas = parseEther('0.1'); // Conservative gas estimate
-
-        // Calculate amount to transfer (total balance minus gas fees)
-        const amountToTransfer = balance - estimatedGas;
-        if (amountToTransfer > 0n) {
-            // Convert from wei to AVAX for the exportUTXO function
-            const avaxAmount = Number(amountToTransfer) / 1e18;
-            await exportUTXO(privateKeyHex, avaxAmount);
-        }
+    // Check if we have enough balance
+    if (balance < amountToTransfer) {
+        throw new Error('Insufficient C-chain balance');
     }
 
-    // Check for UTXOs to import, regardless of whether we just exported or not
-    const utxos = await getUTXOS(privateKeyHex);
+    // Convert from wei to AVAX for the exportUTXO function
+    const avaxAmount = Number(amountToTransfer) / 1e18;
+    await exportUTXO(privateKeyHex, avaxAmount);
 
-    if (utxos.length === 0) {
-        throw new Error('No funds to transfer - no C-chain balance and no UTXOs to import');
+    let imported = false;
+    for (let i = 0; i < 3; i++) {
+        if (i !== 0) await new Promise(resolve => setTimeout(resolve, 2000));
+
+        imported = await importExistingUTXOs(privateKeyHex);
+        if (imported) break;
     }
 
-    await importUTXOs(privateKeyHex, utxos);
+    if (!imported) {
+        throw new Error('Export transaction may still be processing - no UTXOs found to import after 3 attempts');
+    }
 
     // Update P-chain balance after transfer
     const newBalance = await getPChainBalance(address.P);
     useWizardStore.getState().setPChainBalance(newBalance);
+}
+
+export async function importExistingUTXOs(privateKeyHex: string): Promise<boolean> {
+    const utxos = await getUTXOS(privateKeyHex);
+    if (utxos.length === 0) {
+        return false;
+    }
+    await importUTXOs(privateKeyHex, utxos);
+    return true;
 }
 
 export async function exportUTXO(privateKeyHex: string, amount: number) {

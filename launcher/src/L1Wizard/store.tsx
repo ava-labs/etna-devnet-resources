@@ -15,6 +15,13 @@ export const stepList = {
         </svg>
 
     },
+    "fund-temp-wallet": {
+        title: "Fund temp wallet",
+        description: "Fund your temp wallet",
+        icon: <svg className="w-6 h-6 text-gray-800" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+            <path stroke="currentColor" strokeLinecap="round" strokeWidth="2" d="M20 6H10m0 0a2 2 0 1 0-4 0m4 0a2 2 0 1 1-4 0m0 0H4m16 6h-2m0 0a2 2 0 1 0-4 0m4 0a2 2 0 1 1-4 0m0 0H4" />
+        </svg>
+    },
     "create-chain": {
         title: "Create a chain",
         description: "Create a chain on the subnet",
@@ -243,7 +250,7 @@ export const useWizardStore = shouldPersist
     : create<WizardState>()(wizardStoreFunc);
 
 export const resetStore = () => {
-    if (confirm('Are you sure you want to start over? This will reset all progress.')) {
+    if (confirm('Are you sure you want to start over? This will reset all progress and ERASE your temporary wallet.')) {
         localStorage.removeItem('wizard-storage');
         window.location.reload();
     }
