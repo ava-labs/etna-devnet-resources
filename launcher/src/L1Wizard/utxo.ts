@@ -6,7 +6,7 @@ import { createPublicClient, http, parseEther } from 'viem'
 import { avalancheFuji } from 'viem/chains'
 import { useWizardStore } from './store';
 
-const RPC_ENDPOINT = "https://api.avax-test.network"
+export const RPC_ENDPOINT = "https://api.avax-test.network"
 
 export async function transferCToP(amount: string, privateKeyHex: string) {
     const publicClient = createPublicClient({

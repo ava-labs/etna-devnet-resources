@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useWizardStore } from './store';
 import NextPrev from "./ui/NextPrev";
+import { createSubnet, createChain } from './chain';
 
 type Status = 'not_started' | 'in_progress' | 'error' | 'success';
 
@@ -11,9 +12,25 @@ interface StepStatus {
 }
 
 export default function CreateChain() {
-    const { nodesCount } = useWizardStore();
-    const [subnetStatus, setSubnetStatus] = useState<StepStatus>({ status: 'not_started' });
-    const [createChainStatus, setCreateChainStatus] = useState<StepStatus>({ status: 'not_started' });
+    const {
+        tempPrivateKeyHex,
+        l1Name,
+        genesisString,
+        setSubnetId,
+        setChainId,
+        subnetId: existingSubnetId,
+        chainId: existingChainId
+    } = useWizardStore();
+
+    const [subnetStatus, setSubnetStatus] = useState<StepStatus>(() => ({
+        status: existingSubnetId ? 'success' : 'not_started',
+        data: existingSubnetId
+    }));
+
+    const [createChainStatus, setCreateChainStatus] = useState<StepStatus>(() => ({
+        status: existingChainId ? 'success' : 'not_started',
+        data: existingChainId
+    }));
 
     const renderStepIcon = (status: Status) => {
         switch (status) {
@@ -49,35 +66,46 @@ export default function CreateChain() {
 
     const handleCreate = async () => {
         try {
-            // Step 1: Simulate Subnet Creation
-            setSubnetStatus({ status: 'in_progress' });
-            try {
-                await new Promise(resolve => setTimeout(resolve, 500));
-                setSubnetStatus({
-                    status: 'success',
-                    data: 'subnet-' + Math.random().toString(36).substring(7)
-                });
-            } catch (error: any) {
-                setSubnetStatus({
-                    status: 'error',
-                    error: error.message || 'Failed to create subnet'
-                });
-                return;
+            if (subnetStatus.status === 'not_started') {
+                // Step 1: Create Subnet
+                setSubnetStatus({ status: 'in_progress' });
+                try {
+                    const subnetTxId = await createSubnet(tempPrivateKeyHex);
+                    setSubnetStatus({
+                        status: 'success',
+                        data: subnetTxId
+                    });
+                    setSubnetId(subnetTxId);
+                } catch (error: any) {
+                    setSubnetStatus({
+                        status: 'error',
+                        error: error.message || 'Failed to create subnet'
+                    });
+                    return;
+                }
             }
 
-            // Step 2: Simulate Chain Creation
-            setCreateChainStatus({ status: 'in_progress' });
-            try {
-                await new Promise(resolve => setTimeout(resolve, 500));
-                setCreateChainStatus({
-                    status: 'success',
-                    data: 'chain-' + Math.random().toString(36).substring(7)
-                });
-            } catch (error: any) {
-                setCreateChainStatus({
-                    status: 'error',
-                    error: error.message || 'Failed to create chain'
-                });
+            if (createChainStatus.status === 'not_started') {
+                // Step 2: Create Chain
+                setCreateChainStatus({ status: 'in_progress' });
+                try {
+                    const chainTxId = await createChain({
+                        privateKeyHex: tempPrivateKeyHex,
+                        chainName: l1Name,
+                        subnetId: subnetStatus.data,
+                        genesisData: genesisString,
+                    });
+                    setCreateChainStatus({
+                        status: 'success',
+                        data: chainTxId
+                    });
+                    setChainId(chainTxId);
+                } catch (error: any) {
+                    setCreateChainStatus({
+                        status: 'error',
+                        error: error.message || 'Failed to create chain'
+                    });
+                }
             }
 
         } catch (error: any) {
