@@ -66,11 +66,12 @@ export default function CreateChain() {
 
     const handleCreate = async () => {
         try {
+            let subnetTxId: string | undefined;
             if (subnetStatus.status === 'not_started') {
                 // Step 1: Create Subnet
                 setSubnetStatus({ status: 'in_progress' });
                 try {
-                    const subnetTxId = await createSubnet(tempPrivateKeyHex);
+                    subnetTxId = await createSubnet(tempPrivateKeyHex);
                     setSubnetStatus({
                         status: 'success',
                         data: subnetTxId
@@ -92,7 +93,7 @@ export default function CreateChain() {
                     const chainTxId = await createChain({
                         privateKeyHex: tempPrivateKeyHex,
                         chainName: l1Name,
-                        subnetId: subnetStatus.data,
+                        subnetId: subnetTxId || subnetStatus.data,//dirty hack because I don't kbnow how to properly push the update in hooks
                         genesisData: genesisString,
                     });
                     setCreateChainStatus({
@@ -130,7 +131,6 @@ export default function CreateChain() {
 
             {/* Creation Steps */}
             <div className="p-4 border rounded-lg mb-4">
-                <h3 className="font-medium mb-4">Create Subnet & Chain</h3>
                 <div className="mb-4">
                     <div className="flex flex-col mb-4">
                         <div className="flex items-center gap-3">
@@ -177,7 +177,7 @@ export default function CreateChain() {
                 >
                     {subnetStatus.status === 'in_progress' || createChainStatus.status === 'in_progress'
                         ? 'Processing...'
-                        : 'Start Process'}
+                        : 'Create Subnet + Chain'}
                 </button>
             </div>
 

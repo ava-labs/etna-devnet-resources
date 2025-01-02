@@ -11,7 +11,11 @@ import (
 	"strconv"
 	"time"
 
+	"encoding/hex"
+
 	"github.com/ava-labs/avalanchego/api/info"
+	"github.com/ava-labs/avalanchego/ids"
+	"github.com/ava-labs/avalanchego/utils/crypto/secp256k1"
 	"github.com/ava-labs/coreth/plugin/evm"
 	"github.com/ava-labs/etna-devnet-resources/launcher/pkg/balance"
 	"github.com/ava-labs/etna-devnet-resources/launcher/pkg/config"
@@ -41,6 +45,7 @@ func main() {
 
 	mux.HandleFunc("/api/genesis", logRequest(generateGenesis))
 	mux.HandleFunc("/api/create", logRequest(createL1))
+	mux.HandleFunc("/temporaryDevAPI/createChain", logRequest(createChainTempDev))
 	mux.HandleFunc("/api/compiled", logRequest(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "text/plain")
 		if compileTs == 0 {
@@ -92,6 +97,80 @@ func main() {
 		log.Fatal(err)
 		os.Exit(1)
 	}
+}
+
+type CreateChainTempDevRequest struct {
+	PrivateKeyHex string `json:"privateKeyHex"`
+	SubnetID      string `json:"subnetID"`
+	ChainName     string `json:"chainName"`
+	GenesisString string `json:"genesisString"`
+}
+
+func createChainTempDev(w http.ResponseWriter, r *http.Request) {
+	var req CreateChainTempDevRequest
+	err := json.NewDecoder(r.Body).Decode(&req)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	// Validate required fields
+	if req.PrivateKeyHex == "" {
+		http.Error(w, "Private key is required", http.StatusBadRequest)
+		return
+	}
+	if req.SubnetID == "" {
+		http.Error(w, "Subnet ID is required", http.StatusBadRequest)
+		return
+	}
+	if req.ChainName == "" {
+		http.Error(w, "Chain name is required", http.StatusBadRequest)
+		return
+	}
+	if req.GenesisString == "" {
+		http.Error(w, "Genesis string is required", http.StatusBadRequest)
+		return
+	}
+
+	// Parse private key
+	privKeyBytes, err := hex.DecodeString(req.PrivateKeyHex)
+	if err != nil {
+		http.Error(w, "Invalid private key hex", http.StatusBadRequest)
+		return
+	}
+	privateKey, err := secp256k1.ToPrivateKey(privKeyBytes)
+	if err != nil {
+		http.Error(w, "Invalid private key", http.StatusBadRequest)
+		return
+	}
+
+	// Parse subnet ID
+	subnetID, err := ids.FromString(req.SubnetID)
+	if err != nil {
+		http.Error(w, "Invalid subnet ID", http.StatusBadRequest)
+		return
+	}
+
+	// Call CreateChain
+	params := l1.CreateChainParams{
+		PrivateKey:  privateKey,
+		SubnetID:    subnetID,
+		GenesisData: req.GenesisString,
+		RpcURL:      config.GetRPCUrl(),
+		ChainName:   req.ChainName,
+	}
+
+	chainID, err := l1.CreateChain(params)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("Failed to create chain: %s", err), http.StatusInternalServerError)
+		return
+	}
+
+	// Return response
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(map[string]string{
+		"chainID": chainID.String(),
+	})
 }
 
 type CreateL1Request struct {

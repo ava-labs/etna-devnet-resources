@@ -51,5 +51,7 @@ export async function addSignature(tx: UnsignedTx, privateKeyHex: string) {
     if (tx.hasPubkey(publicKey)) {
         const signature = await secp256k1.sign(unsignedBytes, privateKey);
         tx.addSignature(signature);
+    } else {
+        throw new Error("Public key not found in transaction");
     }
 }
