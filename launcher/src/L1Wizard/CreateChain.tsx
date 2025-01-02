@@ -164,11 +164,13 @@ export default function CreateChain() {
         if (!window.ethereum || !addresses?.C) return;
 
         const requiredTotal = nodesCount + 0.5;
-        const currentBalance = Number(formatEther(cChainBalance));
-        const transferAmount = requiredTotal - currentBalance;
+        const currentCBalance = Number(formatEther(cChainBalance));
+        const currentPBalance = Number(pChainBalance) / 1e9; // Convert from nAVAX to AVAX
+        const totalCurrentBalance = currentCBalance + currentPBalance;
+        const transferAmount = requiredTotal - totalCurrentBalance;
 
         if (transferAmount <= 0) {
-            return; // Already have enough funds
+            return; // Already have enough funds across both chains
         }
 
         setTransferring(true);
@@ -342,7 +344,7 @@ export default function CreateChain() {
                             <div className="text-sm text-gray-600">Balance: {formatEther(cChainBalance)} AVAX</div>
                         </div>
                         <div className="font-mono text-sm break-all mb-3">{addresses?.C}</div>
-                        {(nodesCount + 0.5 - Number(formatEther(cChainBalance))) > 0 && (
+                        {(nodesCount + 0.5 - (Number(formatEther(cChainBalance)) + Number(pChainBalance) / 1e9)) > 0 && (
                             <button
                                 onClick={handleTransfer}
                                 disabled={transferring || chainStatus.status !== 'success'}
@@ -351,7 +353,7 @@ export default function CreateChain() {
                                     : 'bg-blue-500 hover:bg-blue-600'
                                     }`}
                             >
-                                {transferring ? 'Transferring...' : `Transfer ${(nodesCount + 0.5 - Number(formatEther(cChainBalance))).toFixed(2)} AVAX`}
+                                {transferring ? 'Transferring...' : `Transfer ${(nodesCount + 0.5 - (Number(formatEther(cChainBalance)) + Number(pChainBalance) / 1e9)).toFixed(2)} AVAX`}
                             </button>
                         )}
                     </div>
