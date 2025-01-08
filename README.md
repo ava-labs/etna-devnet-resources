@@ -1,5 +1,7 @@
 # Etna DevNet Resources
 
+> **Note**: The Etna DevNet has been torn down now that testing of the Etna upgrade has been completed and the upgrade activated on both Fuji and Mainnet. This repository is archived for reference, but commands and tutorials in it are no longer maintained and will likely not work. For up-to-date documentation and tutorials on how to launch Avalanche L1s, see https://docs.avax.network/.
+
 The Etna DevNet is a temporary Avalanche network instance that was created for the purpose of testing and integrating with the changes introduced in the Etna upgrade prior to their activation on the Fuji testnet. The network may be wiped or reset at any time as new AvalancheGo versions become ready for testing. The network will be deprecated following the activation of the Etna upgrade on the Fuji testnet.
 
 This README and repository is a collection of various resources to help in interacting and integrating with the DevNet.
